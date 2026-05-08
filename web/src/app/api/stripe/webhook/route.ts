@@ -71,12 +71,27 @@ export async function POST(req: NextRequest) {
             : subscription.customer?.id;
 
         if (customerId) {
+          // Stripe API 2025-03-31 moved current_period_end to the item level.
+          // Read item-level first, fall back to subscription-level for older
+          // API versions, and skip the field entirely if neither is present.
+          const subItems = (
+            subscription as unknown as {
+              items?: { data?: Array<{ current_period_end?: number }> };
+              current_period_end?: number;
+            }
+          );
+          const epochSeconds =
+            subItems.items?.data?.[0]?.current_period_end ??
+            subItems.current_period_end;
+
           const updates: Record<string, unknown> = {
             subscription_status: subscription.status,
-            subscription_ends_at: new Date(
-              (subscription as unknown as { current_period_end: number }).current_period_end * 1000,
-            ).toISOString(),
           };
+          if (typeof epochSeconds === 'number') {
+            updates.subscription_ends_at = new Date(
+              epochSeconds * 1000,
+            ).toISOString();
+          }
 
           // Update plan if metadata has plan_id
           if (subscription.metadata.plan_id) {

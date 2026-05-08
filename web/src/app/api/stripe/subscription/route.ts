@@ -3,14 +3,44 @@ import { createClient } from '@/lib/supabase/server';
 import { stripe, PRICE_IDS } from '@/lib/stripe';
 import { SUBSCRIBABLE_PLANS } from '@/config/plans';
 
+type SubscriptionItem = {
+  id: string;
+  current_period_end?: number;
+  price: {
+    unit_amount: number | null;
+    recurring: { interval: string } | null;
+  };
+};
+
 type SubscriptionRaw = {
   id: string;
   status: string;
-  current_period_end: number;
   cancel_at_period_end: boolean;
   metadata: Record<string, string>;
-  items: { data: Array<{ id: string; price: { unit_amount: number | null; recurring: { interval: string } | null } }> };
+  items: { data: SubscriptionItem[] };
+  // Some older API versions still return this on the subscription itself.
+  // Newer versions (2025-03-31+) moved it to subscription items.
+  current_period_end?: number;
 };
+
+/**
+ * Stripe API 2025-03-31 moved `current_period_end` from the subscription
+ * onto each subscription item. Read item-level first, fall back to the
+ * subscription-level for older API versions, and return null if neither is
+ * present (so callers can skip emitting an Invalid Date).
+ */
+function getCurrentPeriodEndIso(sub: SubscriptionRaw): string | null {
+  const itemEnd = sub.items?.data?.[0]?.current_period_end;
+  const subEnd = sub.current_period_end;
+  const epochSeconds =
+    typeof itemEnd === 'number'
+      ? itemEnd
+      : typeof subEnd === 'number'
+        ? subEnd
+        : null;
+  if (epochSeconds == null) return null;
+  return new Date(epochSeconds * 1000).toISOString();
+}
 
 async function getOrgStripeIds() {
   const supabase = await createClient();
@@ -66,7 +96,7 @@ export async function GET() {
     return NextResponse.json({
       planId: org.plan ?? 'starter',
       status: sub.status,
-      currentPeriodEnd: new Date(sub.current_period_end * 1000).toISOString(),
+      currentPeriodEnd: getCurrentPeriodEndIso(sub),
       cancelAtPeriodEnd: sub.cancel_at_period_end,
       priceAmount: price?.unit_amount ? price.unit_amount / 100 : null,
       interval: price?.recurring?.interval ?? null,
@@ -108,7 +138,7 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({
         status: updated.status,
         cancelAtPeriodEnd: false,
-        currentPeriodEnd: new Date(updated.current_period_end * 1000).toISOString(),
+        currentPeriodEnd: getCurrentPeriodEndIso(updated),
       });
     }
 
@@ -151,7 +181,7 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({
       planId: newPlanId,
       status: updated.status,
-      currentPeriodEnd: new Date(updated.current_period_end * 1000).toISOString(),
+      currentPeriodEnd: getCurrentPeriodEndIso(updated),
       cancelAtPeriodEnd: updated.cancel_at_period_end,
       priceAmount: newPrice?.unit_amount ? newPrice.unit_amount / 100 : null,
       interval: newPrice?.recurring?.interval ?? null,
@@ -184,7 +214,7 @@ export async function DELETE() {
 
     return NextResponse.json({
       cancelAtPeriodEnd: true,
-      currentPeriodEnd: new Date(updated.current_period_end * 1000).toISOString(),
+      currentPeriodEnd: getCurrentPeriodEndIso(updated),
     });
   } catch (err) {
     console.error('[stripe/subscription] DELETE error:', err);
