@@ -1,11 +1,22 @@
 import { ImageResponse } from 'next/og';
+import { readFile } from 'fs/promises';
+import path from 'path';
 
 export const runtime = 'nodejs';
 export const alt = 'Ansvisor — Open-source Answer Engine Optimization platform';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
+async function loadLogoDataUrl() {
+  // logo_dark.svg has white glyphs — visible on the dark gradient backdrop.
+  const filePath = path.join(process.cwd(), 'public', 'logo_dark.svg');
+  const buffer = await readFile(filePath);
+  return `data:image/svg+xml;base64,${buffer.toString('base64')}`;
+}
+
 export default async function OpengraphImage() {
+  const logoSrc = await loadLogoDataUrl();
+
   return new ImageResponse(
     (
       <div
@@ -40,26 +51,17 @@ export default async function OpengraphImage() {
 
         {/* Top: brand mark + wordmark */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={logoSrc}
+            alt=""
+            width={96}
+            height={96}
+            style={{ width: 96, height: 96 }}
+          />
           <div
             style={{
-              width: 88,
-              height: 88,
-              borderRadius: 22,
-              background: '#ffffff',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
               fontSize: 56,
-              fontWeight: 800,
-              color: '#1e1b4b',
-              letterSpacing: '-0.04em',
-            }}
-          >
-            A
-          </div>
-          <div
-            style={{
-              fontSize: 44,
               fontWeight: 700,
               letterSpacing: '-0.03em',
               display: 'flex',
