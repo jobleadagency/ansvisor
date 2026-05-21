@@ -1471,14 +1471,21 @@ export default function InsightsPage() {
           ),
         );
       } catch (err) {
-        // Silent refreshes fire every ~10s while a tracking job runs; a transient
-        // 5xx or network blip there shouldn't pop a red toast — the next poll
-        // will retry and the user sees nothing.
-        if (!silent) {
-          toast.error(
-            err instanceof Error ? err.message : 'Failed to load insights',
-          );
+        const message = err instanceof Error ? err.message : '';
+
+        // Next.js surfaces this when a server action's response stream is
+        // cut because the user navigated away mid-load. The destination
+        // page renders fine; the toast is pure noise. Matched
+        // case-insensitively so a wording tweak between Next versions
+        // doesn't reopen the issue.
+        if (/unexpected response/i.test(message)) {
+          console.debug('[insights] load aborted by navigation', err);
+        } else if (!silent) {
+          toast.error(message || 'Failed to load insights');
         } else {
+          // Silent refreshes fire every ~10s while a tracking job runs; a
+          // transient 5xx or network blip there shouldn't pop a red toast —
+          // the next poll will retry and the user sees nothing.
           console.warn('[insights] silent refresh failed', err);
         }
       } finally {
