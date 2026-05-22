@@ -112,10 +112,7 @@ export async function getPromptSets(brandId: string): Promise<PromptSet[]> {
   if (error) throw new Error(error.message);
 
   return (data ?? []).map((ps) =>
-    mapPromptSetRow(
-      ps as Record<string, unknown>,
-      (ps.prompts as Record<string, unknown>[]) ?? [],
-    ),
+    mapPromptSetRow(ps as Record<string, unknown>, (ps.prompts as Record<string, unknown>[]) ?? []),
   );
 }
 
@@ -183,7 +180,9 @@ export async function savePromptSet(input: SavePromptSetInput): Promise<PromptSe
   let insertedPrompts: Record<string, unknown>[] = [];
 
   if (input.prompts.length > 0) {
-    const categories = [...new Set(input.prompts.map((p) => p.category).filter(Boolean))] as string[];
+    const categories = [
+      ...new Set(input.prompts.map((p) => p.category).filter(Boolean)),
+    ] as string[];
     const topicIdMap = new Map<string, string>();
     await Promise.all(
       categories.map(async (cat) => {
@@ -198,9 +197,7 @@ export async function savePromptSet(input: SavePromptSetInput): Promise<PromptSe
         input.prompts.map((p) => {
           const filtered = filterByPlan(plan, p.platforms, p.models ?? []);
           if (filtered.platforms.length === 0 && filtered.models.length === 0) {
-            throw new Error(
-              'At least one platform or model must be selected for each prompt.',
-            );
+            throw new Error('At least one platform or model must be selected for each prompt.');
           }
           return {
             prompt_set_id: set.id,
@@ -260,22 +257,14 @@ export async function updatePrompt(
       .select('prompt_sets!inner(brands!inner(organization_id))')
       .eq('id', id)
       .single();
-    const orgId = (
-      (promptRow?.prompt_sets as { brands: { organization_id: string } })
-        ?.brands?.organization_id
-    );
+    const orgId = (promptRow?.prompt_sets as { brands: { organization_id: string } })?.brands
+      ?.organization_id;
     if (!orgId) throw new Error('Prompt not found');
 
     const plan = await getOrgPlan(orgId);
-    const filtered = filterByPlan(
-      plan,
-      updates.platforms ?? [],
-      updates.models ?? [],
-    );
+    const filtered = filterByPlan(plan, updates.platforms ?? [], updates.models ?? []);
     if (filtered.platforms.length === 0 && filtered.models.length === 0) {
-      throw new Error(
-        'At least one platform or model must be selected.',
-      );
+      throw new Error('At least one platform or model must be selected.');
     }
     if (updates.platforms !== undefined) payload.platforms = filtered.platforms;
     if (updates.models !== undefined) payload.models = filtered.models;

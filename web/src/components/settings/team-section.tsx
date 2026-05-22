@@ -1,25 +1,19 @@
-"use client";
+'use client';
 
-import { useCallback, useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
-import { toast } from "sonner";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { useCallback, useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
+import { toast } from 'sonner';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 import {
   Dialog,
   DialogClose,
@@ -29,10 +23,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+} from '@/components/ui/dialog';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   listMembers,
   listInvitations,
@@ -46,7 +40,7 @@ import {
   type TeamInvitation,
   type TeamInfo,
   type TeamRole,
-} from "@/lib/actions/team";
+} from '@/lib/actions/team';
 import {
   ArrowUpRight,
   Copy,
@@ -57,20 +51,20 @@ import {
   RefreshCw,
   Trash2,
   UserPlus,
-} from "lucide-react";
-import { useRouter } from "@/i18n/navigation";
+} from 'lucide-react';
+import { useRouter } from '@/i18n/navigation';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from '@/components/ui/dropdown-menu';
 
 const ROLE_OPTIONS: { value: TeamRole; label: string }[] = [
-  { value: "admin", label: "Admin" },
-  { value: "manager", label: "Manager" },
-  { value: "analyst", label: "Analyst" },
-  { value: "agency_partner", label: "Agency Partner" },
+  { value: 'admin', label: 'Admin' },
+  { value: 'manager', label: 'Manager' },
+  { value: 'analyst', label: 'Analyst' },
+  { value: 'agency_partner', label: 'Agency Partner' },
 ];
 
 function roleLabel(role: TeamRole): string {
@@ -81,14 +75,14 @@ function initials(name: string | null, email: string): string {
   const source = name?.trim() || email;
   return source
     .split(/\s+/)
-    .map((p) => p[0] ?? "")
+    .map((p) => p[0] ?? '')
     .slice(0, 2)
-    .join("")
+    .join('')
     .toUpperCase();
 }
 
 export function TeamSection() {
-  const t = useTranslations("settings");
+  const t = useTranslations('settings');
   const router = useRouter();
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [invitations, setInvitations] = useState<TeamInvitation[]>([]);
@@ -98,20 +92,14 @@ export function TeamSection() {
 
   const loadData = useCallback(async () => {
     try {
-      const [m, i, inf] = await Promise.all([
-        listMembers(),
-        listInvitations(),
-        getTeamInfo(),
-      ]);
+      const [m, i, inf] = await Promise.all([listMembers(), listInvitations(), getTeamInfo()]);
       setMembers(m);
       setInvitations(i);
       setInfo(inf);
       const me = m.find((mem) => mem.isCurrentUser);
       setCurrentRole(me?.role ?? null);
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to load team",
-      );
+      toast.error(error instanceof Error ? error.message : 'Failed to load team');
     } finally {
       setIsLoading(false);
     }
@@ -121,10 +109,10 @@ export function TeamSection() {
     loadData();
   }, [loadData]);
 
-  const isAdmin = currentRole === "admin";
+  const isAdmin = currentRole === 'admin';
   const seatsLabel = info
     ? info.maxTeamMembers === -1
-      ? `${info.seatsUsed} seat${info.seatsUsed === 1 ? "" : "s"} used`
+      ? `${info.seatsUsed} seat${info.seatsUsed === 1 ? '' : 's'} used`
       : `${info.seatsUsed} of ${info.maxTeamMembers} seats used`
     : null;
 
@@ -133,12 +121,10 @@ export function TeamSection() {
       <Card>
         <CardHeader className="flex flex-row items-start justify-between space-y-0">
           <div>
-            <CardTitle>{t("team")}</CardTitle>
+            <CardTitle>{t('team')}</CardTitle>
             <CardDescription>
               Manage team members and their access.
-              {seatsLabel && (
-                <span className="ml-1 text-foreground">· {seatsLabel}</span>
-              )}
+              {seatsLabel && <span className="ml-1 text-foreground">· {seatsLabel}</span>}
             </CardDescription>
           </div>
           {isAdmin && info && (
@@ -176,15 +162,14 @@ export function TeamSection() {
                       Seat limit reached
                     </p>
                     <p className="text-amber-800/80 dark:text-amber-300/80">
-                      Your {info.planName} plan includes {info.maxTeamMembers}{" "}
-                      seat{info.maxTeamMembers === 1 ? "" : "s"}. Upgrade to
-                      invite more teammates.
+                      Your {info.planName} plan includes {info.maxTeamMembers} seat
+                      {info.maxTeamMembers === 1 ? '' : 's'}. Upgrade to invite more teammates.
                     </p>
                   </div>
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => router.push("/dashboard/settings?tab=billing")}
+                    onClick={() => router.push('/dashboard/settings?tab=billing')}
                   >
                     Upgrade
                     <ArrowUpRight className="ml-1 h-3.5 w-3.5" />
@@ -200,9 +185,7 @@ export function TeamSection() {
         <Card>
           <CardHeader>
             <CardTitle>Pending invitations</CardTitle>
-            <CardDescription>
-              Invitations that haven&apos;t been accepted yet.
-            </CardDescription>
+            <CardDescription>Invitations that haven&apos;t been accepted yet.</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-1">
@@ -242,12 +225,10 @@ function MemberRow({
     setPendingRole(role);
     try {
       await updateMemberRole(member.userId, role);
-      toast.success("Role updated");
+      toast.success('Role updated');
       onChanged();
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to update role",
-      );
+      toast.error(error instanceof Error ? error.message : 'Failed to update role');
     } finally {
       setPendingRole(null);
     }
@@ -257,13 +238,11 @@ function MemberRow({
     setRemoving(true);
     try {
       await removeMember(member.userId);
-      toast.success("Member removed");
+      toast.success('Member removed');
       setRemoveDialogOpen(false);
       onChanged();
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to remove member",
-      );
+      toast.error(error instanceof Error ? error.message : 'Failed to remove member');
     } finally {
       setRemoving(false);
     }
@@ -277,9 +256,7 @@ function MemberRow({
       </Avatar>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <span className="truncate text-sm font-medium">
-            {member.fullName || member.email}
-          </span>
+          <span className="truncate text-sm font-medium">{member.fullName || member.email}</span>
           {member.isCurrentUser && (
             <Badge variant="secondary" className="text-xs">
               You
@@ -287,9 +264,7 @@ function MemberRow({
           )}
         </div>
         {member.fullName && (
-          <p className="truncate text-xs text-muted-foreground">
-            {member.email}
-          </p>
+          <p className="truncate text-xs text-muted-foreground">{member.email}</p>
         )}
       </div>
 
@@ -300,11 +275,7 @@ function MemberRow({
           disabled={pendingRole !== null}
         >
           <SelectTrigger size="sm" className="w-36">
-            {pendingRole ? (
-              <Loader2 className="h-3 w-3 animate-spin" />
-            ) : (
-              <SelectValue />
-            )}
+            {pendingRole ? <Loader2 className="h-3 w-3 animate-spin" /> : <SelectValue />}
           </SelectTrigger>
           <SelectContent>
             {ROLE_OPTIONS.map((opt) => (
@@ -331,26 +302,20 @@ function MemberRow({
             <DialogHeader>
               <DialogTitle>Remove team member?</DialogTitle>
               <DialogDescription>
-                {member.fullName || member.email} will lose access to this
-                organization. This cannot be undone.
+                {member.fullName || member.email} will lose access to this organization. This cannot
+                be undone.
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
-              <DialogClose render={<Button variant="outline" />}>
-                Cancel
-              </DialogClose>
-              <Button
-                variant="destructive"
-                onClick={handleRemove}
-                disabled={removing}
-              >
+              <DialogClose render={<Button variant="outline" />}>Cancel</DialogClose>
+              <Button variant="destructive" onClick={handleRemove} disabled={removing}>
                 {removing ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Removing...
                   </>
                 ) : (
-                  "Remove member"
+                  'Remove member'
                 )}
               </Button>
             </DialogFooter>
@@ -370,34 +335,30 @@ function InvitationRow({
   isAdmin: boolean;
   onChanged: () => void;
 }) {
-  const [busy, setBusy] = useState<"revoke" | "resend" | null>(null);
+  const [busy, setBusy] = useState<'revoke' | 'resend' | null>(null);
 
   async function handleRevoke() {
-    setBusy("revoke");
+    setBusy('revoke');
     try {
       await revokeInvitation(invitation.id);
-      toast.success("Invitation revoked");
+      toast.success('Invitation revoked');
       onChanged();
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to revoke invitation",
-      );
+      toast.error(error instanceof Error ? error.message : 'Failed to revoke invitation');
     } finally {
       setBusy(null);
     }
   }
 
   async function handleResend() {
-    setBusy("resend");
+    setBusy('resend');
     try {
       const { inviteLink } = await resendInvitation(invitation.id);
       await navigator.clipboard.writeText(inviteLink).catch(() => {});
-      toast.success("Invitation resent (link copied)");
+      toast.success('Invitation resent (link copied)');
       onChanged();
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to resend invitation",
-      );
+      toast.error(error instanceof Error ? error.message : 'Failed to resend invitation');
     } finally {
       setBusy(null);
     }
@@ -413,9 +374,7 @@ function InvitationRow({
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-medium">{invitation.email}</p>
         <p className="text-xs text-muted-foreground">
-          {expired
-            ? "Expired"
-            : `Expires ${new Date(invitation.expiresAt).toLocaleDateString()}`}
+          {expired ? 'Expired' : `Expires ${new Date(invitation.expiresAt).toLocaleDateString()}`}
         </p>
       </div>
       <Badge variant="outline">{roleLabel(invitation.role)}</Badge>
@@ -451,40 +410,32 @@ function InvitationRow({
   );
 }
 
-function InviteDialog({
-  canInvite,
-  onInvited,
-}: {
-  canInvite: boolean;
-  onInvited: () => void;
-}) {
+function InviteDialog({ canInvite, onInvited }: { canInvite: boolean; onInvited: () => void }) {
   const [open, setOpen] = useState(false);
-  const [email, setEmail] = useState("");
-  const [role, setRole] = useState<TeamRole>("analyst");
+  const [email, setEmail] = useState('');
+  const [role, setRole] = useState<TeamRole>('analyst');
   const [submitting, setSubmitting] = useState(false);
   const [inviteLink, setInviteLink] = useState<string | null>(null);
 
   function reset() {
-    setEmail("");
-    setRole("analyst");
+    setEmail('');
+    setRole('analyst');
     setInviteLink(null);
   }
 
   async function handleSubmit() {
     if (!email.trim()) {
-      toast.error("Email is required");
+      toast.error('Email is required');
       return;
     }
     setSubmitting(true);
     try {
       const { inviteLink: link } = await inviteMember(email.trim(), role);
       setInviteLink(link);
-      toast.success("Invitation sent");
+      toast.success('Invitation sent');
       onInvited();
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Failed to send invitation",
-      );
+      toast.error(error instanceof Error ? error.message : 'Failed to send invitation');
     } finally {
       setSubmitting(false);
     }
@@ -493,7 +444,7 @@ function InviteDialog({
   async function copyLink() {
     if (!inviteLink) return;
     await navigator.clipboard.writeText(inviteLink).catch(() => {});
-    toast.success("Link copied");
+    toast.success('Link copied');
   }
 
   return (
@@ -572,9 +523,7 @@ function InviteDialog({
             <DialogClose render={<Button />}>Done</DialogClose>
           ) : (
             <>
-              <DialogClose render={<Button variant="outline" />}>
-                Cancel
-              </DialogClose>
+              <DialogClose render={<Button variant="outline" />}>Cancel</DialogClose>
               <Button onClick={handleSubmit} disabled={submitting}>
                 {submitting ? (
                   <>
@@ -582,7 +531,7 @@ function InviteDialog({
                     Sending...
                   </>
                 ) : (
-                  "Send invitation"
+                  'Send invitation'
                 )}
               </Button>
             </>

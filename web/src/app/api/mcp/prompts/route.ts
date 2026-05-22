@@ -16,12 +16,7 @@ export async function GET(req: Request) {
   const isActiveRaw = url.searchParams.get('is_active');
   const limitRaw = url.searchParams.get('limit');
 
-  const isActive =
-    isActiveRaw === 'true'
-      ? true
-      : isActiveRaw === 'false'
-      ? false
-      : undefined;
+  const isActive = isActiveRaw === 'true' ? true : isActiveRaw === 'false' ? false : undefined;
   const limit = limitRaw ? Number.parseInt(limitRaw, 10) : undefined;
 
   try {

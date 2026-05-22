@@ -17,44 +17,36 @@ export default async function OpengraphImage() {
   const logoSrc = await loadLogoDataUrl();
 
   return new ImageResponse(
-    (
+    <div
+      style={{
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background:
+          'radial-gradient(ellipse at top right, #312e81 0%, #1e1b4b 35%, #0b0a2b 70%, #050516 100%)',
+        position: 'relative',
+      }}
+    >
+      {/* Soft glow accent */}
       <div
         style={{
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          position: 'absolute',
+          top: -200,
+          right: -200,
+          width: 700,
+          height: 700,
+          borderRadius: '50%',
           background:
-            'radial-gradient(ellipse at top right, #312e81 0%, #1e1b4b 35%, #0b0a2b 70%, #050516 100%)',
-          position: 'relative',
+            'radial-gradient(circle, rgba(139, 92, 246, 0.4) 0%, rgba(139, 92, 246, 0) 70%)',
+          display: 'flex',
         }}
-      >
-        {/* Soft glow accent */}
-        <div
-          style={{
-            position: 'absolute',
-            top: -200,
-            right: -200,
-            width: 700,
-            height: 700,
-            borderRadius: '50%',
-            background:
-              'radial-gradient(circle, rgba(139, 92, 246, 0.4) 0%, rgba(139, 92, 246, 0) 70%)',
-            display: 'flex',
-          }}
-        />
+      />
 
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={logoSrc}
-          alt=""
-          width={360}
-          height={360}
-          style={{ width: 360, height: 360 }}
-        />
-      </div>
-    ),
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={logoSrc} alt="" width={360} height={360} style={{ width: 360, height: 360 }} />
+    </div>,
     { ...size },
   );
 }

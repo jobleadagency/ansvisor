@@ -30,17 +30,12 @@ export interface McpAuthContext {
  * MCP endpoints are intended to be hit by long-lived external clients, so we
  * intentionally don't fall back to the dashboard's session cookie.
  */
-export async function authenticateMcpRequest(
-  req: Request,
-): Promise<McpAuthContext | NextResponse> {
+export async function authenticateMcpRequest(req: Request): Promise<McpAuthContext | NextResponse> {
   const auth = req.headers.get('authorization') ?? '';
   const token = auth.startsWith('Bearer ') ? auth.slice(7).trim() : '';
 
   if (!token || !token.startsWith(API_KEY_PREFIX)) {
-    return NextResponse.json(
-      { error: 'Missing or malformed API key' },
-      { status: 401 },
-    );
+    return NextResponse.json({ error: 'Missing or malformed API key' }, { status: 401 });
   }
 
   const hash = hashApiKey(token);

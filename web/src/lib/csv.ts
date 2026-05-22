@@ -8,9 +8,7 @@ function escape(value: unknown): string {
 
 export function toCsv(rows: Record<string, unknown>[], headers: string[]): string {
   const headerLine = headers.join(',');
-  const dataLines = rows.map((row) =>
-    headers.map((header) => escape(row[header])).join(','),
-  );
+  const dataLines = rows.map((row) => headers.map((header) => escape(row[header])).join(','));
 
   return [headerLine, ...dataLines].join('\n');
 }

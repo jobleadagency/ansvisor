@@ -28,8 +28,7 @@ export function Sidebar() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
-  const logoSrc =
-    mounted && resolvedTheme === 'dark' ? '/logo_dark.svg' : '/logo_light.svg';
+  const logoSrc = mounted && resolvedTheme === 'dark' ? '/logo_dark.svg' : '/logo_light.svg';
 
   const navKeyMap: Record<string, () => string> = {
     Overview: () => t('overview'),
@@ -53,17 +52,11 @@ export function Sidebar() {
       )}
     >
       <div
-        className={cn(
-          'flex h-16 items-center border-b px-3',
-          isCollapsed && 'justify-center px-0',
-        )}
+        className={cn('flex h-16 items-center border-b px-3', isCollapsed && 'justify-center px-0')}
       >
         <Link
           href="/dashboard"
-          className={cn(
-            'flex items-center gap-2 overflow-hidden',
-            !isCollapsed && 'w-full',
-          )}
+          className={cn('flex items-center gap-2 overflow-hidden', !isCollapsed && 'w-full')}
         >
           <Image
             src={logoSrc}
@@ -73,9 +66,7 @@ export function Sidebar() {
             className="h-6 w-6 shrink-0"
             priority
           />
-          {!isCollapsed && (
-            <span className="truncate font-semibold">{siteConfig.name}</span>
-          )}
+          {!isCollapsed && <span className="truncate font-semibold">{siteConfig.name}</span>}
         </Link>
       </div>
 
@@ -91,9 +82,7 @@ export function Sidebar() {
                 {group.title}
               </p>
             )}
-            {group.title && isCollapsed && i > 0 && (
-              <Separator className="my-2" />
-            )}
+            {group.title && isCollapsed && i > 0 && <Separator className="my-2" />}
             <nav className="space-y-0.5">
               {group.items.map((item) => {
                 const isActive =
@@ -104,9 +93,7 @@ export function Sidebar() {
                 const label = labelFn ? labelFn() : item.title;
 
                 const isLocked =
-                  isCloud &&
-                  item.requiredFeature != null &&
-                  !canUse(item.requiredFeature);
+                  isCloud && item.requiredFeature != null && !canUse(item.requiredFeature);
 
                 if (isLocked) {
                   return (
@@ -155,9 +142,7 @@ export function Sidebar() {
                       title={isCollapsed ? label : undefined}
                     >
                       <item.icon className="h-4 w-4 shrink-0" />
-                      {!isCollapsed && (
-                        <span className="truncate">{label}</span>
-                      )}
+                      {!isCollapsed && <span className="truncate">{label}</span>}
                     </span>
                   </Link>
                 );
@@ -172,12 +157,7 @@ export function Sidebar() {
       </div>
 
       <div className="border-t p-2">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="mt-1 w-full"
-          onClick={toggleCollapse}
-        >
+        <Button variant="ghost" size="icon" className="mt-1 w-full" onClick={toggleCollapse}>
           {isCollapsed ? (
             <PanelLeftOpen className="h-4 w-4" />
           ) : (

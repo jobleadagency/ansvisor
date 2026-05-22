@@ -27,14 +27,9 @@ export async function GET(req: Request) {
       : undefined;
 
   const impact =
-    impactRaw === 'high' || impactRaw === 'medium' || impactRaw === 'low'
-      ? impactRaw
-      : undefined;
+    impactRaw === 'high' || impactRaw === 'medium' || impactRaw === 'low' ? impactRaw : undefined;
 
-  const type =
-    typeRaw === 'owned' || typeRaw === 'earned'
-      ? typeRaw
-      : undefined;
+  const type = typeRaw === 'owned' || typeRaw === 'earned' ? typeRaw : undefined;
 
   const limit = limitRaw ? Number.parseInt(limitRaw, 10) : undefined;
 

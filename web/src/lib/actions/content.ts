@@ -7,14 +7,14 @@ const AEO_SERVER_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost';
 
 async function getSession() {
   const supabase = await createClient();
-  const { data: { session } } = await supabase.auth.getSession();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
   if (!session) throw new Error('Not authenticated');
   return session;
 }
 
-export async function generateOpportunities(
-  brandId: string,
-): Promise<{ jobId: string }> {
+export async function generateOpportunities(brandId: string): Promise<{ jobId: string }> {
   const session = await getSession();
 
   const res = await fetch(`${AEO_SERVER_URL}/api/content/generate`, {
@@ -61,9 +61,10 @@ export async function getGenerationJobStatus(jobId: string): Promise<GenerationJ
     const data = await res.json();
     return {
       status: data.status ?? 'not_found',
-      progress: data.progress && typeof data.progress === 'object' && data.progress.phase
-        ? data.progress
-        : null,
+      progress:
+        data.progress && typeof data.progress === 'object' && data.progress.phase
+          ? data.progress
+          : null,
       result: data.result ?? null,
       failedReason: data.failedReason ?? null,
     };
@@ -127,9 +128,7 @@ export async function getOpportunity(id: string): Promise<ContentOpportunity> {
   return res.json();
 }
 
-export async function generateBrief(
-  opportunityId: string,
-): Promise<ContentBrief> {
+export async function generateBrief(opportunityId: string): Promise<ContentBrief> {
   const session = await getSession();
 
   const res = await fetch(`${AEO_SERVER_URL}/api/content/${opportunityId}/brief`, {
@@ -240,9 +239,7 @@ export async function bulkUpdateStatus(
   return res.json();
 }
 
-export async function bulkSendToWebhook(
-  ids: string[],
-): Promise<{ sent: number; failed: number }> {
+export async function bulkSendToWebhook(ids: string[]): Promise<{ sent: number; failed: number }> {
   const session = await getSession();
 
   const res = await fetch(`${AEO_SERVER_URL}/api/content/bulk/send-webhook`, {

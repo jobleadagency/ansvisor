@@ -14,9 +14,7 @@ export interface PromptVolumeCluster {
   }[];
 }
 
-export function aggregatePromptVolumeClusters(
-  volumes: PromptVolume[],
-): PromptVolumeCluster[] {
+export function aggregatePromptVolumeClusters(volumes: PromptVolume[]): PromptVolumeCluster[] {
   const merged = new Map<string, PromptVolumeCluster>();
 
   for (const v of volumes) {

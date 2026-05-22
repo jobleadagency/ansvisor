@@ -20,10 +20,7 @@ export async function POST(req: NextRequest) {
     };
 
     if (!planId || !organizationId) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
     const priceId = PRICE_IDS[planId]?.monthly;
@@ -34,10 +31,7 @@ export async function POST(req: NextRequest) {
         'PRICE_IDS:',
         PRICE_IDS,
       );
-      return NextResponse.json(
-        { error: 'Price not configured for this plan' },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: 'Price not configured for this plan' }, { status: 400 });
     }
 
     // Fetch org to check for existing Stripe customer

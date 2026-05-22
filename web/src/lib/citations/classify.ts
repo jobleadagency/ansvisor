@@ -196,19 +196,13 @@ export function normalizeDomain(raw: string | null | undefined): string {
   return host.replace(/\/+$/, '');
 }
 
-export function classifyDomain(
-  domain: string,
-  ctx: ClassifyContext,
-): SourceCategory {
+export function classifyDomain(domain: string, ctx: ClassifyContext): SourceCategory {
   const d = domain.toLowerCase();
 
   if (ctx.brandDomains.length > 0 && matchesSuffix(d, ctx.brandDomains)) {
     return 'you';
   }
-  if (
-    ctx.competitorDomains.length > 0 &&
-    matchesSuffix(d, ctx.competitorDomains)
-  ) {
+  if (ctx.competitorDomains.length > 0 && matchesSuffix(d, ctx.competitorDomains)) {
     return 'competitor';
   }
   if (matchesSuffix(d, FORUM_DOMAINS)) return 'forum';

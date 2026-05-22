@@ -44,12 +44,7 @@ interface Props {
   };
 }
 
-export function MetricBreakdownSheet({
-  brandId,
-  metric,
-  onOpenChange,
-  filters,
-}: Props) {
+export function MetricBreakdownSheet({ brandId, metric, onOpenChange, filters }: Props) {
   const open = Boolean(brandId && metric);
   const [data, setData] = useState<InsightsBreakdown | null>(null);
   const [loading, setLoading] = useState(false);
@@ -57,10 +52,7 @@ export function MetricBreakdownSheet({
 
   // Filters is passed as a fresh object each render from the parent — derive a
   // stable cache key so the fetch effect doesn't re-run needlessly.
-  const filtersKey = useMemo(
-    () => JSON.stringify(filters ?? {}),
-    [filters],
-  );
+  const filtersKey = useMemo(() => JSON.stringify(filters ?? {}), [filters]);
 
   useEffect(() => {
     if (!open || !brandId || !metric) {
@@ -99,9 +91,7 @@ export function MetricBreakdownSheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full flex flex-col gap-0 p-0 sm:max-w-xl">
         <SheetHeader className="border-b px-5 py-4">
-          <SheetTitle className="text-base">
-            {title} Breakdown
-          </SheetTitle>
+          <SheetTitle className="text-base">{title} Breakdown</SheetTitle>
           <SheetDescription className="text-xs">
             {data
               ? `Last ${data.windowDays} days vs previous ${data.windowDays} days`
@@ -119,9 +109,7 @@ export function MetricBreakdownSheet({
             </div>
           )}
 
-          {!loading && !error && data && metric && (
-            <BreakdownBody data={data} metric={metric} />
-          )}
+          {!loading && !error && data && metric && <BreakdownBody data={data} metric={metric} />}
         </div>
       </SheetContent>
     </Sheet>
@@ -141,19 +129,11 @@ function BreakdownSkeleton() {
   );
 }
 
-function BreakdownBody({
-  data,
-  metric,
-}: {
-  data: InsightsBreakdown;
-  metric: BreakdownMetric;
-}) {
+function BreakdownBody({ data, metric }: { data: InsightsBreakdown; metric: BreakdownMetric }) {
   const [tab, setTab] = useState<'prompts' | 'platforms' | 'topics'>('prompts');
 
   const pickRows = () =>
-    tab === 'prompts' ? data.byPrompt
-    : tab === 'platforms' ? data.byPlatform
-    : data.byTopic;
+    tab === 'prompts' ? data.byPrompt : tab === 'platforms' ? data.byPlatform : data.byTopic;
 
   return (
     <div className="space-y-4">
@@ -178,12 +158,7 @@ function BreakdownBody({
               </span>
             </div>
           </div>
-          <DeltaPill
-            delta={data.delta}
-            deltaPct={data.deltaPct}
-            metric={metric}
-            big
-          />
+          <DeltaPill delta={data.delta} deltaPct={data.deltaPct} metric={metric} big />
         </div>
         <RootCauseSummary data={data} metric={metric} />
       </div>
@@ -219,31 +194,18 @@ function BreakdownBody({
   );
 }
 
-function RootCauseSummary({
-  data,
-  metric,
-}: {
-  data: InsightsBreakdown;
-  metric: BreakdownMetric;
-}) {
+function RootCauseSummary({ data, metric }: { data: InsightsBreakdown; metric: BreakdownMetric }) {
   const isDrop = data.delta < 0;
   const isFlat = data.delta === 0;
-  const topPrompt = isDrop
-    ? data.byPrompt[0]
-    : data.byPrompt[data.byPrompt.length - 1];
-  const topPlatform = isDrop
-    ? data.byPlatform[0]
-    : data.byPlatform[data.byPlatform.length - 1];
-  const promptContributes =
-    !!topPrompt && (isDrop ? topPrompt.delta < 0 : topPrompt.delta > 0);
+  const topPrompt = isDrop ? data.byPrompt[0] : data.byPrompt[data.byPrompt.length - 1];
+  const topPlatform = isDrop ? data.byPlatform[0] : data.byPlatform[data.byPlatform.length - 1];
+  const promptContributes = !!topPrompt && (isDrop ? topPrompt.delta < 0 : topPrompt.delta > 0);
   const platformContributes =
     !!topPlatform && (isDrop ? topPlatform.delta < 0 : topPlatform.delta > 0);
 
   if (isFlat || !promptContributes || !topPrompt) {
     return (
-      <div className="mt-2 text-xs text-muted-foreground leading-relaxed">
-        {data.rootCause}
-      </div>
+      <div className="mt-2 text-xs text-muted-foreground leading-relaxed">{data.rootCause}</div>
     );
   }
 
@@ -259,7 +221,8 @@ function RootCauseSummary({
       {formatContribution(topPrompt, metric)}.
       {platformContributes && topPlatform && (
         <>
-          {' '}Top platform {isDrop ? 'drop' : 'gain'}: {topPlatform.label}{' '}
+          {' '}
+          Top platform {isDrop ? 'drop' : 'gain'}: {topPlatform.label}{' '}
           {formatContribution(topPlatform, metric)}.
         </>
       )}
@@ -310,23 +273,15 @@ function BreakdownTable({
                   <div className="line-clamp-2 text-sm">{r.label}</div>
                 )}
                 {r.sublabel && (
-                  <div className="mt-0.5 text-[11px] text-muted-foreground">
-                    {r.sublabel}
-                  </div>
+                  <div className="mt-0.5 text-[11px] text-muted-foreground">{r.sublabel}</div>
                 )}
               </td>
               <td className="px-2 py-2 text-right tabular-nums text-muted-foreground">
                 {formatValue(r.prev, metric)}
               </td>
-              <td className="px-2 py-2 text-right tabular-nums">
-                {formatValue(r.cur, metric)}
-              </td>
+              <td className="px-2 py-2 text-right tabular-nums">{formatValue(r.cur, metric)}</td>
               <td className="px-2 py-2 text-right">
-                <DeltaPill
-                  delta={r.delta}
-                  deltaPct={r.deltaPct}
-                  metric={metric}
-                />
+                <DeltaPill delta={r.delta} deltaPct={r.deltaPct} metric={metric} />
               </td>
             </tr>
           ))}
@@ -362,9 +317,7 @@ function DeltaPill({
 
   const positive = delta > 0;
   const Icon = positive ? TrendingUp : TrendingDown;
-  const color = positive
-    ? 'text-green-600 dark:text-green-400'
-    : 'text-red-500';
+  const color = positive ? 'text-green-600 dark:text-green-400' : 'text-red-500';
 
   // Prefer percentage display for count metrics when available; fall back to
   // absolute delta for visibility (pts) or when previous was zero.
@@ -388,12 +341,7 @@ function DeltaPill({
       <Icon className={big ? 'h-3.5 w-3.5' : 'h-3 w-3'} />
       <span>{primary}</span>
       {secondary && (
-        <span
-          className={cn(
-            'font-normal text-muted-foreground',
-            big ? 'text-xs' : 'text-[10px]',
-          )}
-        >
+        <span className={cn('font-normal text-muted-foreground', big ? 'text-xs' : 'text-[10px]')}>
           ({secondary})
         </span>
       )}

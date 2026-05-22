@@ -1,27 +1,21 @@
-"use client";
+'use client';
 
-import { use, useCallback, useEffect, useState } from "react";
+import { use, useCallback, useEffect, useState } from 'react';
 import {
   createTopic,
   deleteTopic,
   getPromptCountByTopic,
   getTopics,
   updateTopic,
-} from "@/lib/actions/topic";
-import type { Topic } from "@/types";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { toast } from "sonner";
-import { Check, Loader2, Pencil, Plus, Tag, Trash2, X } from "lucide-react";
+} from '@/lib/actions/topic';
+import type { Topic } from '@/types';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { toast } from 'sonner';
+import { Check, Loader2, Pencil, Plus, Tag, Trash2, X } from 'lucide-react';
 import {
   Dialog,
   DialogClose,
@@ -31,7 +25,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -44,9 +38,9 @@ export default function BrandTopicsPage({ params }: PageProps) {
   const [promptCounts, setPromptCounts] = useState<Record<string, number>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
-  const [newName, setNewName] = useState("");
+  const [newName, setNewName] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editName, setEditName] = useState("");
+  const [editName, setEditName] = useState('');
 
   const load = useCallback(async () => {
     setIsLoading(true);
@@ -61,7 +55,7 @@ export default function BrandTopicsPage({ params }: PageProps) {
       );
       setPromptCounts(counts);
     } catch {
-      toast.error("Failed to load topics");
+      toast.error('Failed to load topics');
     } finally {
       setIsLoading(false);
     }
@@ -75,17 +69,17 @@ export default function BrandTopicsPage({ params }: PageProps) {
     const name = newName.trim();
     if (!name) return;
     if (topics.some((t) => t.name.toLowerCase() === name.toLowerCase())) {
-      toast.error("This topic already exists");
+      toast.error('This topic already exists');
       return;
     }
     setIsAdding(true);
     try {
       const added = await createTopic(brandId, name);
       setTopics((prev) => [...prev, added]);
-      setNewName("");
+      setNewName('');
       toast.success(`"${added.name}" topic added`);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to add topic");
+      toast.error(err instanceof Error ? err.message : 'Failed to add topic');
     } finally {
       setIsAdding(false);
     }
@@ -95,16 +89,16 @@ export default function BrandTopicsPage({ params }: PageProps) {
     const name = editName.trim();
     if (!name) return;
     if (topics.some((t) => t.id !== id && t.name.toLowerCase() === name.toLowerCase())) {
-      toast.error("This topic already exists");
+      toast.error('This topic already exists');
       return;
     }
     try {
       const updated = await updateTopic(id, name);
       setTopics((prev) => prev.map((t) => (t.id === id ? updated : t)));
       setEditingId(null);
-      toast.success("Topic updated");
+      toast.success('Topic updated');
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to update topic");
+      toast.error(err instanceof Error ? err.message : 'Failed to update topic');
     }
   };
 
@@ -112,9 +106,9 @@ export default function BrandTopicsPage({ params }: PageProps) {
     try {
       await deleteTopic(id);
       setTopics((prev) => prev.filter((t) => t.id !== id));
-      toast.success("Topic removed");
+      toast.success('Topic removed');
     } catch {
-      toast.error("Failed to remove topic");
+      toast.error('Failed to remove topic');
     }
   };
 
@@ -126,7 +120,8 @@ export default function BrandTopicsPage({ params }: PageProps) {
           Topics
         </CardTitle>
         <CardDescription>
-          Manage the topics used to categorize your prompts. Topics are assigned to prompts during creation.
+          Manage the topics used to categorize your prompts. Topics are assigned to prompts during
+          creation.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -151,8 +146,8 @@ export default function BrandTopicsPage({ params }: PageProps) {
                           value={editName}
                           onChange={(e) => setEditName(e.target.value)}
                           onKeyDown={(e) => {
-                            if (e.key === "Enter") handleEdit(topic.id);
-                            if (e.key === "Escape") setEditingId(null);
+                            if (e.key === 'Enter') handleEdit(topic.id);
+                            if (e.key === 'Escape') setEditingId(null);
                           }}
                           className="h-8 text-sm"
                           autoFocus
@@ -176,9 +171,7 @@ export default function BrandTopicsPage({ params }: PageProps) {
                       </div>
                     ) : (
                       <>
-                        <p className="flex-1 truncate text-sm font-medium">
-                          {topic.name}
-                        </p>
+                        <p className="flex-1 truncate text-sm font-medium">{topic.name}</p>
                         <Button
                           variant="ghost"
                           size="icon"
@@ -208,8 +201,8 @@ export default function BrandTopicsPage({ params }: PageProps) {
                               <DialogDescription>
                                 Are you sure you want to delete &quot;{topic.name}&quot;?
                                 {(promptCounts[topic.id] ?? 0) > 0
-                                  ? ` ${promptCounts[topic.id]} prompt${promptCounts[topic.id] === 1 ? "" : "s"} using this topic will become uncategorized.`
-                                  : " No prompts are using this topic."}
+                                  ? ` ${promptCounts[topic.id]} prompt${promptCounts[topic.id] === 1 ? '' : 's'} using this topic will become uncategorized.`
+                                  : ' No prompts are using this topic.'}
                               </DialogDescription>
                             </DialogHeader>
                             <DialogFooter>
@@ -253,7 +246,7 @@ export default function BrandTopicsPage({ params }: PageProps) {
                   placeholder="e.g. Industry, Comparison, How-to..."
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && newName.trim() && handleAdd()}
+                  onKeyDown={(e) => e.key === 'Enter' && newName.trim() && handleAdd()}
                   className="flex-1"
                 />
                 <Button

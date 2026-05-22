@@ -21,9 +21,7 @@ export async function GET(req: NextRequest) {
 
     if (session.payment_status === 'paid' || session.status === 'complete') {
       const customerId =
-        typeof session.customer === 'string'
-          ? session.customer
-          : session.customer?.id;
+        typeof session.customer === 'string' ? session.customer : session.customer?.id;
 
       const subscription =
         typeof session.subscription === 'string'
@@ -31,10 +29,9 @@ export async function GET(req: NextRequest) {
           : session.subscription;
 
       const subscriptionId = subscription?.id;
-      const orgId =
-        (subscription as { metadata?: { organization_id?: string } })?.metadata?.organization_id;
-      const planId =
-        (subscription as { metadata?: { plan_id?: string } })?.metadata?.plan_id;
+      const orgId = (subscription as { metadata?: { organization_id?: string } })?.metadata
+        ?.organization_id;
+      const planId = (subscription as { metadata?: { plan_id?: string } })?.metadata?.plan_id;
 
       if (orgId && customerId && subscriptionId) {
         // Update org subscription (resolves webhook race condition)
@@ -80,7 +77,12 @@ export async function GET(req: NextRequest) {
                 if (trackingRes.ok) {
                   const result = await trackingRes.json();
                   trackingJobId = result.jobId;
-                  console.log('[stripe/success] Tracking triggered for brand:', brand.id, 'jobId:', trackingJobId);
+                  console.log(
+                    '[stripe/success] Tracking triggered for brand:',
+                    brand.id,
+                    'jobId:',
+                    trackingJobId,
+                  );
                 } else {
                   console.error('[stripe/success] Tracking trigger failed:', trackingRes.status);
                 }

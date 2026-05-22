@@ -13,13 +13,7 @@ import { classifyArticleType } from '@/lib/citations/article-type';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-export type CitationsDatePreset =
-  | '24h'
-  | '7d'
-  | '30d'
-  | '90d'
-  | 'all'
-  | 'custom';
+export type CitationsDatePreset = '24h' | '7d' | '30d' | '90d' | 'all' | 'custom';
 
 export interface CitationsFilters {
   datePreset: CitationsDatePreset;
@@ -82,9 +76,7 @@ export interface CitationsOverview {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function resolveDateRange(
-  filters: CitationsFilters,
-): { from?: string; to?: string } {
+function resolveDateRange(filters: CitationsFilters): { from?: string; to?: string } {
   if (filters.datePreset === 'custom') {
     return { from: filters.dateFrom, to: filters.dateTo };
   }
@@ -170,9 +162,7 @@ export async function getCitationsOverview(
   // 3. Build filtered prompt_results query.
   let query = supabase
     .from('prompt_results')
-    .select(
-      'id, prompt_id, platform, model_used, region, created_at, citations, citation_count',
-    )
+    .select('id, prompt_id, platform, model_used, region, created_at, citations, citation_count')
     .eq('brand_id', brandId);
 
   const { from, to } = resolveDateRange(filters);
@@ -193,14 +183,10 @@ export async function getCitationsOverview(
       .from('prompts')
       .select('id')
       .in('topic_id', filters.topicIds);
-    const topicPromptIds = ((topicPrompts ?? []) as { id: string }[]).map(
-      (p) => p.id,
-    );
+    const topicPromptIds = ((topicPrompts ?? []) as { id: string }[]).map((p) => p.id);
     query = query.in(
       'prompt_id',
-      topicPromptIds.length > 0
-        ? topicPromptIds
-        : ['00000000-0000-0000-0000-000000000000'],
+      topicPromptIds.length > 0 ? topicPromptIds : ['00000000-0000-0000-0000-000000000000'],
     );
   }
 
@@ -320,14 +306,9 @@ export async function getCitationsOverview(
         models: Array.from(agg.models).sort(),
         totalCitations: agg.totalCitations,
         avgCitationsPerResult:
-          resultsCiting > 0
-            ? Math.round((agg.totalCitations / resultsCiting) * 10) / 10
-            : 0,
+          resultsCiting > 0 ? Math.round((agg.totalCitations / resultsCiting) * 10) / 10 : 0,
         resultsCiting,
-        usagePct:
-          totalResults > 0
-            ? Math.round((resultsCiting / totalResults) * 1000) / 10
-            : 0,
+        usagePct: totalResults > 0 ? Math.round((resultsCiting / totalResults) * 1000) / 10 : 0,
         articleTypes,
       };
     })
@@ -344,10 +325,7 @@ export async function getCitationsOverview(
         models: Array.from(agg.models).sort(),
         totalCitations: agg.totalCitations,
         resultsCiting,
-        usagePct:
-          totalResults > 0
-            ? Math.round((resultsCiting / totalResults) * 1000) / 10
-            : 0,
+        usagePct: totalResults > 0 ? Math.round((resultsCiting / totalResults) * 1000) / 10 : 0,
         articleType: agg.articleType,
       };
     })
@@ -356,25 +334,17 @@ export async function getCitationsOverview(
   // 6. Source type breakdown (all categories, even with zero).
   const categoryCounts = new Map<SourceCategory, number>();
   for (const row of rowsOut) {
-    categoryCounts.set(
-      row.category,
-      (categoryCounts.get(row.category) ?? 0) + 1,
-    );
+    categoryCounts.set(row.category, (categoryCounts.get(row.category) ?? 0) + 1);
   }
   const totalDomains = rowsOut.length;
-  const sourceTypeBreakdown: CitationsSourceBreakdown[] = SOURCE_CATEGORIES.map(
-    (category) => {
-      const count = categoryCounts.get(category) ?? 0;
-      return {
-        category,
-        count,
-        pct:
-          totalDomains > 0
-            ? Math.round((count / totalDomains) * 1000) / 10
-            : 0,
-      };
-    },
-  ).filter((b) => b.count > 0);
+  const sourceTypeBreakdown: CitationsSourceBreakdown[] = SOURCE_CATEGORIES.map((category) => {
+    const count = categoryCounts.get(category) ?? 0;
+    return {
+      category,
+      count,
+      pct: totalDomains > 0 ? Math.round((count / totalDomains) * 1000) / 10 : 0,
+    };
+  }).filter((b) => b.count > 0);
 
   return {
     rows: rowsOut,
@@ -385,9 +355,7 @@ export async function getCitationsOverview(
       citations: totalCitations,
       results: totalResults,
       avgCitationsPerResult:
-        totalResults > 0
-          ? Math.round((totalCitations / totalResults) * 10) / 10
-          : 0,
+        totalResults > 0 ? Math.round((totalCitations / totalResults) * 10) / 10 : 0,
     },
     sourceTypeBreakdown,
   };

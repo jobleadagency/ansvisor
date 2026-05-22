@@ -47,9 +47,7 @@ export function UserProfileNavItem({
           {initials}
         </AvatarFallback>
       </Avatar>
-      {!collapsed && (
-        <span className="truncate text-sm font-medium capitalize">{label}</span>
-      )}
+      {!collapsed && <span className="truncate text-sm font-medium capitalize">{label}</span>}
     </Link>
   );
 }

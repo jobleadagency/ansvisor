@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect } from 'react';
 import {
   AreaChart,
   Area,
@@ -12,8 +12,8 @@ import {
   PieChart,
   Pie,
   Cell,
-} from "recharts";
-import type { TrafficTrendPoint } from "@/lib/actions/traffic";
+} from 'recharts';
+import type { TrafficTrendPoint } from '@/lib/actions/traffic';
 
 // ─── Auto-sizing wrapper ─────────────────────────────────────────────────────
 
@@ -40,7 +40,7 @@ function ChartContainer({
   }, []);
 
   return (
-    <div ref={ref} style={{ width: "100%", height }}>
+    <div ref={ref} style={{ width: '100%', height }}>
       {width > 0 && children(width)}
     </div>
   );
@@ -49,37 +49,37 @@ function ChartContainer({
 // ─── Platform colors ─────────────────────────────────────────────────────────
 
 const PLATFORM_COLORS: Record<string, string> = {
-  "chatgpt.com": "#6366f1",
-  "chat.openai.com": "#6366f1",
-  "search.chatgpt.com": "#6366f1",
-  "perplexity.ai": "#8b5cf6",
-  "claude.ai": "#c4b5fd",
-  "gemini.google.com": "#a78bfa",
-  "copilot.microsoft.com": "#ddd6fe",
-  "you.com": "#818cf8",
-  "phind.com": "#a5b4fc",
-  "meta.ai": "#7c3aed",
-  "poe.com": "#e9d5ff",
-  unknown: "#94a3b8",
+  'chatgpt.com': '#6366f1',
+  'chat.openai.com': '#6366f1',
+  'search.chatgpt.com': '#6366f1',
+  'perplexity.ai': '#8b5cf6',
+  'claude.ai': '#c4b5fd',
+  'gemini.google.com': '#a78bfa',
+  'copilot.microsoft.com': '#ddd6fe',
+  'you.com': '#818cf8',
+  'phind.com': '#a5b4fc',
+  'meta.ai': '#7c3aed',
+  'poe.com': '#e9d5ff',
+  unknown: '#94a3b8',
 };
 
 const PLATFORM_NAMES: Record<string, string> = {
-  "chatgpt.com": "ChatGPT",
-  "chat.openai.com": "ChatGPT",
-  "search.chatgpt.com": "ChatGPT",
-  "perplexity.ai": "Perplexity",
-  "claude.ai": "Claude",
-  "gemini.google.com": "Gemini",
-  "copilot.microsoft.com": "Copilot",
-  "you.com": "You.com",
-  "phind.com": "Phind",
-  "meta.ai": "Meta AI",
-  "poe.com": "Poe",
-  unknown: "Unknown",
+  'chatgpt.com': 'ChatGPT',
+  'chat.openai.com': 'ChatGPT',
+  'search.chatgpt.com': 'ChatGPT',
+  'perplexity.ai': 'Perplexity',
+  'claude.ai': 'Claude',
+  'gemini.google.com': 'Gemini',
+  'copilot.microsoft.com': 'Copilot',
+  'you.com': 'You.com',
+  'phind.com': 'Phind',
+  'meta.ai': 'Meta AI',
+  'poe.com': 'Poe',
+  unknown: 'Unknown',
 };
 
 function getColor(platform: string): string {
-  return PLATFORM_COLORS[platform] ?? "#94a3b8";
+  return PLATFORM_COLORS[platform] ?? '#94a3b8';
 }
 
 export function getPlatformName(platform: string): string {
@@ -171,7 +171,7 @@ export function ReferralTrendChart({ data }: { data: TrafficTrendPoint[] }) {
   if (!data.length) return null;
 
   // Extract platform keys (everything except 'date')
-  const platformKeys = Object.keys(data[0]).filter((k) => k !== "date");
+  const platformKeys = Object.keys(data[0]).filter((k) => k !== 'date');
 
   return (
     <ChartContainer height={220}>
@@ -199,7 +199,7 @@ export function ReferralTrendChart({ data }: { data: TrafficTrendPoint[] }) {
             className="fill-muted-foreground"
             tickFormatter={(v: string) => {
               const d = new Date(v);
-              return d.toLocaleDateString("en", { month: "short", day: "numeric" });
+              return d.toLocaleDateString('en', { month: 'short', day: 'numeric' });
             }}
           />
           <YAxis
@@ -235,11 +235,7 @@ export function ReferralTrendChart({ data }: { data: TrafficTrendPoint[] }) {
   );
 }
 
-export function PlatformBreakdownChart({
-  data,
-}: {
-  data: { platform: string; visits: number }[];
-}) {
+export function PlatformBreakdownChart({ data }: { data: { platform: string; visits: number }[] }) {
   const [hovered, setHovered] = useState<string | null>(null);
 
   const total = data.reduce((s, d) => s + d.visits, 0) || 1;

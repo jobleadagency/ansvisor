@@ -1,19 +1,19 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useCallback, useRef } from "react";
-import { useTranslations } from "next-intl";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useTranslations } from 'next-intl';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 import {
   Table,
   TableBody,
@@ -21,7 +21,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
 import {
   Lightbulb,
   Zap,
@@ -33,10 +33,10 @@ import {
   ExternalLink,
   X,
   Settings2,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useBrandStore } from "@/stores/use-brand-store";
-import { usePlanContext } from "@/components/providers/plan-provider";
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useBrandStore } from '@/stores/use-brand-store';
+import { usePlanContext } from '@/components/providers/plan-provider';
 import {
   generateOpportunities,
   getGenerationJobStatus,
@@ -45,16 +45,13 @@ import {
   sendToWebhook,
   bulkSendToWebhook,
   bulkUpdateStatus,
-} from "@/lib/actions/content";
-import type {
-  ContentOpportunity,
-  ContentOpportunityStatus,
-} from "@/types";
-import { toast } from "sonner";
-import { Link } from "@/i18n/navigation";
-import { WebhookSettingsDialog } from "./_webhook-settings";
+} from '@/lib/actions/content';
+import type { ContentOpportunity, ContentOpportunityStatus } from '@/types';
+import { toast } from 'sonner';
+import { Link } from '@/i18n/navigation';
+import { WebhookSettingsDialog } from './_webhook-settings';
 
-const GENERATION_STORAGE_KEY = "aeo:content-generation";
+const GENERATION_STORAGE_KEY = 'aeo:content-generation';
 const GENERATION_TIMEOUT_MS = 3 * 60 * 1000;
 
 interface GenerationJob {
@@ -64,7 +61,9 @@ interface GenerationJob {
 }
 
 function saveGenerationJob(job: GenerationJob) {
-  try { localStorage.setItem(GENERATION_STORAGE_KEY, JSON.stringify(job)); } catch {}
+  try {
+    localStorage.setItem(GENERATION_STORAGE_KEY, JSON.stringify(job));
+  } catch {}
 }
 
 function loadGenerationJob(): GenerationJob | null {
@@ -77,25 +76,29 @@ function loadGenerationJob(): GenerationJob | null {
       return null;
     }
     return job;
-  } catch { return null; }
+  } catch {
+    return null;
+  }
 }
 
 function clearGenerationJob() {
-  try { localStorage.removeItem(GENERATION_STORAGE_KEY); } catch {}
+  try {
+    localStorage.removeItem(GENERATION_STORAGE_KEY);
+  } catch {}
 }
 
 const IMPACT_COLORS: Record<string, string> = {
-  high: "border-red-500/30 bg-red-500/10 text-red-600 dark:text-red-400",
-  medium: "border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400",
-  low: "border-slate-500/30 bg-slate-500/10 text-slate-600 dark:text-slate-400",
+  high: 'border-red-500/30 bg-red-500/10 text-red-600 dark:text-red-400',
+  medium: 'border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400',
+  low: 'border-slate-500/30 bg-slate-500/10 text-slate-600 dark:text-slate-400',
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  new: "border-blue-500/30 bg-blue-500/10 text-blue-600 dark:text-blue-400",
-  sent: "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
-  in_progress: "border-violet-500/30 bg-violet-500/10 text-violet-600 dark:text-violet-400",
-  done: "border-green-500/30 bg-green-500/10 text-green-600 dark:text-green-400",
-  dismissed: "border-zinc-500/30 bg-zinc-500/10 text-zinc-500 dark:text-zinc-400",
+  new: 'border-blue-500/30 bg-blue-500/10 text-blue-600 dark:text-blue-400',
+  sent: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+  in_progress: 'border-violet-500/30 bg-violet-500/10 text-violet-600 dark:text-violet-400',
+  done: 'border-green-500/30 bg-green-500/10 text-green-600 dark:text-green-400',
+  dismissed: 'border-zinc-500/30 bg-zinc-500/10 text-zinc-500 dark:text-zinc-400',
 };
 
 function KpiCard({
@@ -126,7 +129,7 @@ function KpiCard({
 }
 
 export default function ContentPage() {
-  const t = useTranslations("content");
+  const t = useTranslations('content');
   const activeBrandId = useBrandStore((s) => s.activeBrandId);
   const { isCloud } = usePlanContext();
 
@@ -136,10 +139,10 @@ export default function ContentPage() {
   const [generating, setGenerating] = useState(false);
   const [sendingId, setSendingId] = useState<string | null>(null);
 
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [impactFilter, setImpactFilter] = useState<string>("all");
-  const [typeFilter, setTypeFilter] = useState<string>("all");
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [impactFilter, setImpactFilter] = useState<string>('all');
+  const [typeFilter, setTypeFilter] = useState<string>('all');
 
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkSending, setBulkSending] = useState(false);
@@ -159,21 +162,21 @@ export default function ContentPage() {
     setSelectedIds(new Set());
     try {
       const filters: Record<string, string> = {};
-      if (statusFilter !== "all") filters.status = statusFilter;
-      if (impactFilter !== "all") filters.impact = impactFilter;
-      if (typeFilter !== "all") filters.type = typeFilter;
+      if (statusFilter !== 'all') filters.status = statusFilter;
+      if (impactFilter !== 'all') filters.impact = impactFilter;
+      if (typeFilter !== 'all') filters.type = typeFilter;
 
       const data = await getOpportunities(activeBrandId, {
         ...filters,
         limit: 100,
-        sort: "score",
+        sort: 'score',
       });
       setOpportunities(data.opportunities);
       setTotal(data.total);
       return data.total;
     } catch (err) {
-      console.error("Failed to load opportunities:", err);
-      toast.error("Failed to load content opportunities");
+      console.error('Failed to load opportunities:', err);
+      toast.error('Failed to load content opportunities');
       return 0;
     } finally {
       setLoading(false);
@@ -184,49 +187,52 @@ export default function ContentPage() {
     loadData();
   }, [loadData]);
 
-  const pollJob = useCallback((jobId: string, startedAt: number) => {
-    pollRef.current = true;
-    setGenerating(true);
+  const pollJob = useCallback(
+    (jobId: string, startedAt: number) => {
+      pollRef.current = true;
+      setGenerating(true);
 
-    const poll = async () => {
-      while (pollRef.current) {
-        await new Promise((r) => setTimeout(r, 3000));
-        if (!pollRef.current) break;
-        try {
-          const status = await getGenerationJobStatus(jobId);
+      const poll = async () => {
+        while (pollRef.current) {
+          await new Promise((r) => setTimeout(r, 3000));
+          if (!pollRef.current) break;
+          try {
+            const status = await getGenerationJobStatus(jobId);
 
-          if (status.status === "completed") {
-            pollRef.current = false;
-            clearGenerationJob();
-            setGenerating(false);
-            toast.success(`Generated ${status.result?.generated ?? 0} opportunities`);
-            loadData();
-            break;
+            if (status.status === 'completed') {
+              pollRef.current = false;
+              clearGenerationJob();
+              setGenerating(false);
+              toast.success(`Generated ${status.result?.generated ?? 0} opportunities`);
+              loadData();
+              break;
+            }
+
+            if (status.status === 'failed') {
+              pollRef.current = false;
+              clearGenerationJob();
+              setGenerating(false);
+              toast.error(status.failedReason || 'Generation failed — please try again');
+              break;
+            }
+
+            if (Date.now() - startedAt > GENERATION_TIMEOUT_MS) {
+              pollRef.current = false;
+              clearGenerationJob();
+              setGenerating(false);
+              toast.error('Generation timed out — please try again');
+              break;
+            }
+          } catch {
+            // keep polling
           }
-
-          if (status.status === "failed") {
-            pollRef.current = false;
-            clearGenerationJob();
-            setGenerating(false);
-            toast.error(status.failedReason || "Generation failed — please try again");
-            break;
-          }
-
-          if (Date.now() - startedAt > GENERATION_TIMEOUT_MS) {
-            pollRef.current = false;
-            clearGenerationJob();
-            setGenerating(false);
-            toast.error("Generation timed out — please try again");
-            break;
-          }
-        } catch {
-          // keep polling
         }
-      }
-    };
+      };
 
-    poll();
-  }, [loadData]);
+      poll();
+    },
+    [loadData],
+  );
 
   // Restore generation state from localStorage on mount
   useEffect(() => {
@@ -235,7 +241,9 @@ export default function ContentPage() {
     if (!saved || saved.brandId !== activeBrandId) return;
 
     pollJob(saved.jobId, saved.startedAt);
-    return () => { pollRef.current = false; };
+    return () => {
+      pollRef.current = false;
+    };
   }, [activeBrandId, pollJob]);
 
   const handleGenerate = async () => {
@@ -246,8 +254,8 @@ export default function ContentPage() {
       saveGenerationJob({ brandId: activeBrandId, jobId, startedAt });
       pollJob(jobId, startedAt);
     } catch (err) {
-      console.error("Generate failed:", err);
-      toast.error(err instanceof Error ? err.message : "Failed to generate opportunities");
+      console.error('Generate failed:', err);
+      toast.error(err instanceof Error ? err.message : 'Failed to generate opportunities');
       setGenerating(false);
     }
   };
@@ -256,11 +264,11 @@ export default function ContentPage() {
     setSendingId(id);
     try {
       await sendToWebhook(id);
-      toast.success("Sent to workflow!");
+      toast.success('Sent to workflow!');
       await loadData();
     } catch (err) {
-      console.error("Webhook send failed:", err);
-      toast.error(err instanceof Error ? err.message : "Failed to send");
+      console.error('Webhook send failed:', err);
+      toast.error(err instanceof Error ? err.message : 'Failed to send');
     } finally {
       setSendingId(null);
     }
@@ -268,12 +276,12 @@ export default function ContentPage() {
 
   const handleDismiss = async (id: string) => {
     try {
-      await updateOpportunityStatus(id, "dismissed");
-      toast.success("Opportunity dismissed");
+      await updateOpportunityStatus(id, 'dismissed');
+      toast.success('Opportunity dismissed');
       await loadData();
     } catch (err) {
-      console.error("Dismiss failed:", err);
-      toast.error("Failed to dismiss");
+      console.error('Dismiss failed:', err);
+      toast.error('Failed to dismiss');
     }
   };
 
@@ -286,7 +294,7 @@ export default function ContentPage() {
       setSelectedIds(new Set());
       await loadData();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Bulk send failed");
+      toast.error(err instanceof Error ? err.message : 'Bulk send failed');
     } finally {
       setBulkSending(false);
     }
@@ -296,29 +304,30 @@ export default function ContentPage() {
     setBulkSending(true);
     try {
       const ids = Array.from(selectedIds);
-      const result = await bulkUpdateStatus(ids, "dismissed");
+      const result = await bulkUpdateStatus(ids, 'dismissed');
       toast.success(`Dismissed ${result.updated} opportunities`);
       setSelectedIds(new Set());
       await loadData();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Bulk dismiss failed");
+      toast.error(err instanceof Error ? err.message : 'Bulk dismiss failed');
     } finally {
       setBulkSending(false);
     }
   };
 
-  const filtered = opportunities.filter((o) =>
-    o.title.toLowerCase().includes(search.toLowerCase()) ||
-    (o.description || "").toLowerCase().includes(search.toLowerCase()),
+  const filtered = opportunities.filter(
+    (o) =>
+      o.title.toLowerCase().includes(search.toLowerCase()) ||
+      (o.description || '').toLowerCase().includes(search.toLowerCase()),
   );
 
-  const highImpact = opportunities.filter((o) => o.impact === "high").length;
-  const sentCount = opportunities.filter((o) => o.status === "sent" || o.status === "in_progress" || o.status === "done").length;
+  const highImpact = opportunities.filter((o) => o.impact === 'high').length;
+  const sentCount = opportunities.filter(
+    (o) => o.status === 'sent' || o.status === 'in_progress' || o.status === 'done',
+  ).length;
   const avgScore =
     opportunities.length > 0
-      ? Math.round(
-          opportunities.reduce((s, o) => s + o.opportunityScore, 0) / opportunities.length,
-        )
+      ? Math.round(opportunities.reduce((s, o) => s + o.opportunityScore, 0) / opportunities.length)
       : 0;
 
   if (!activeBrandId) {
@@ -333,8 +342,8 @@ export default function ContentPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
-          <p className="text-muted-foreground text-sm">{t("description")}</p>
+          <h1 className="text-2xl font-bold tracking-tight">{t('title')}</h1>
+          <p className="text-muted-foreground text-sm">{t('description')}</p>
         </div>
         <div className="flex items-center gap-2">
           <Button
@@ -344,7 +353,7 @@ export default function ContentPage() {
             className="gap-2"
           >
             <Settings2 className="h-4 w-4" />
-            {t("webhook.title")}
+            {t('webhook.title')}
           </Button>
           {!isCloud && (
             <Button
@@ -361,10 +370,10 @@ export default function ContentPage() {
                 <Lightbulb className="h-4 w-4" />
               )}
               {generating
-                ? t("generating")
+                ? t('generating')
                 : opportunities.length > 0
-                  ? t("regenerate")
-                  : t("generate")}
+                  ? t('regenerate')
+                  : t('generate')}
             </Button>
           )}
         </div>
@@ -379,10 +388,8 @@ export default function ContentPage() {
           <CardContent className="flex flex-col items-center justify-center py-16 gap-4">
             <Lightbulb className="h-12 w-12 text-muted-foreground/40" />
             <div className="text-center space-y-1">
-              <p className="text-sm font-medium">{t("noOpportunities")}</p>
-              <p className="text-xs text-muted-foreground">
-                {t("noOpportunitiesHint")}
-              </p>
+              <p className="text-sm font-medium">{t('noOpportunities')}</p>
+              <p className="text-xs text-muted-foreground">{t('noOpportunitiesHint')}</p>
             </div>
             <Button onClick={handleGenerate} disabled={generating} size="sm" className="gap-2">
               {generating ? (
@@ -390,7 +397,7 @@ export default function ContentPage() {
               ) : (
                 <Lightbulb className="h-4 w-4" />
               )}
-              {generating ? t("generating") : t("generate")}
+              {generating ? t('generating') : t('generate')}
             </Button>
           </CardContent>
         </Card>
@@ -398,39 +405,35 @@ export default function ContentPage() {
         <>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
             <KpiCard
-              title={t("kpi.total")}
+              title={t('kpi.total')}
               icon={Lightbulb}
               value={total}
               sub={`${filtered.length} shown`}
             />
             <KpiCard
-              title={t("kpi.highImpact")}
+              title={t('kpi.highImpact')}
               icon={Zap}
               value={highImpact}
               sub="opportunities"
             />
             <KpiCard
-              title={t("kpi.sentToWorkflow")}
+              title={t('kpi.sentToWorkflow')}
               icon={Send}
               value={sentCount}
               sub="sent or in progress"
             />
-            <KpiCard
-              title={t("kpi.avgScore")}
-              icon={BarChart3}
-              value={avgScore}
-              sub="out of 100"
-            />
+            <KpiCard title={t('kpi.avgScore')} icon={BarChart3} value={avgScore} sub="out of 100" />
           </div>
 
           <Card>
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between gap-4 flex-wrap">
                 <div className="flex items-center gap-2">
-                  <CardTitle className="text-sm font-medium">
-                    {t("opportunities")}
-                  </CardTitle>
-                  <Badge variant="outline" className="text-xs border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                  <CardTitle className="text-sm font-medium">{t('opportunities')}</CardTitle>
+                  <Badge
+                    variant="outline"
+                    className="text-xs border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                  >
                     {total} Available
                   </Badge>
                 </div>
@@ -449,12 +452,12 @@ export default function ContentPage() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">{t("filters.allStatuses")}</SelectItem>
-                      <SelectItem value="new">{t("status.new")}</SelectItem>
-                      <SelectItem value="sent">{t("status.sent")}</SelectItem>
-                      <SelectItem value="in_progress">{t("status.in_progress")}</SelectItem>
-                      <SelectItem value="done">{t("status.done")}</SelectItem>
-                      <SelectItem value="dismissed">{t("status.dismissed")}</SelectItem>
+                      <SelectItem value="all">{t('filters.allStatuses')}</SelectItem>
+                      <SelectItem value="new">{t('status.new')}</SelectItem>
+                      <SelectItem value="sent">{t('status.sent')}</SelectItem>
+                      <SelectItem value="in_progress">{t('status.in_progress')}</SelectItem>
+                      <SelectItem value="done">{t('status.done')}</SelectItem>
+                      <SelectItem value="dismissed">{t('status.dismissed')}</SelectItem>
                     </SelectContent>
                   </Select>
                   <Select value={impactFilter} onValueChange={(v) => v && setImpactFilter(v)}>
@@ -462,10 +465,10 @@ export default function ContentPage() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">{t("filters.allImpacts")}</SelectItem>
-                      <SelectItem value="high">{t("impact.high")}</SelectItem>
-                      <SelectItem value="medium">{t("impact.medium")}</SelectItem>
-                      <SelectItem value="low">{t("impact.low")}</SelectItem>
+                      <SelectItem value="all">{t('filters.allImpacts')}</SelectItem>
+                      <SelectItem value="high">{t('impact.high')}</SelectItem>
+                      <SelectItem value="medium">{t('impact.medium')}</SelectItem>
+                      <SelectItem value="low">{t('impact.low')}</SelectItem>
                     </SelectContent>
                   </Select>
                   <Select value={typeFilter} onValueChange={(v) => v && setTypeFilter(v)}>
@@ -473,9 +476,9 @@ export default function ContentPage() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">{t("filters.allTypes")}</SelectItem>
-                      <SelectItem value="owned">{t("type.owned")}</SelectItem>
-                      <SelectItem value="earned">{t("type.earned")}</SelectItem>
+                      <SelectItem value="all">{t('filters.allTypes')}</SelectItem>
+                      <SelectItem value="owned">{t('type.owned')}</SelectItem>
+                      <SelectItem value="earned">{t('type.earned')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -484,7 +487,7 @@ export default function ContentPage() {
             {selectedIds.size > 0 && (
               <div className="flex items-center gap-2 border-b bg-muted/50 px-4 py-2">
                 <span className="text-xs text-muted-foreground">
-                  {t("bulk.selected", { count: selectedIds.size })}
+                  {t('bulk.selected', { count: selectedIds.size })}
                 </span>
                 <div className="flex items-center gap-1 ml-auto">
                   <Button
@@ -499,7 +502,7 @@ export default function ContentPage() {
                     ) : (
                       <Send className="h-3 w-3" />
                     )}
-                    {t("bulk.sendAll")}
+                    {t('bulk.sendAll')}
                   </Button>
                   <Button
                     variant="outline"
@@ -509,7 +512,7 @@ export default function ContentPage() {
                     disabled={bulkSending}
                   >
                     <X className="h-3 w-3" />
-                    {t("bulk.dismissAll")}
+                    {t('bulk.dismissAll')}
                   </Button>
                 </div>
               </div>
@@ -520,27 +523,22 @@ export default function ContentPage() {
                   <TableRow>
                     <TableHead className="w-10 pl-4">
                       <Checkbox
-                        checked={
-                          filtered.length > 0 &&
-                          selectedIds.size === filtered.length
-                        }
+                        checked={filtered.length > 0 && selectedIds.size === filtered.length}
                         onCheckedChange={(checked) => {
                           if (checked) {
-                            setSelectedIds(
-                              new Set(filtered.map((o) => o.id))
-                            );
+                            setSelectedIds(new Set(filtered.map((o) => o.id)));
                           } else {
                             setSelectedIds(new Set());
                           }
                         }}
                       />
                     </TableHead>
-                    <TableHead className="pl-6 w-[40%]">{t("table.action")}</TableHead>
-                    <TableHead className="text-center">{t("table.type")}</TableHead>
-                    <TableHead className="text-center">{t("table.impact")}</TableHead>
-                    <TableHead className="text-center">{t("table.score")}</TableHead>
-                    <TableHead className="text-center">{t("table.status")}</TableHead>
-                    <TableHead className="text-right pr-6">{t("table.actions")}</TableHead>
+                    <TableHead className="pl-6 w-[40%]">{t('table.action')}</TableHead>
+                    <TableHead className="text-center">{t('table.type')}</TableHead>
+                    <TableHead className="text-center">{t('table.impact')}</TableHead>
+                    <TableHead className="text-center">{t('table.score')}</TableHead>
+                    <TableHead className="text-center">{t('table.status')}</TableHead>
+                    <TableHead className="text-right pr-6">{t('table.actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -562,9 +560,7 @@ export default function ContentPage() {
                           href={`/dashboard/content/${opp.id}`}
                           className="block hover:underline"
                         >
-                          <p className="text-sm font-medium line-clamp-1">
-                            {opp.title}
-                          </p>
+                          <p className="text-sm font-medium line-clamp-1">{opp.title}</p>
                           {opp.description && (
                             <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">
                               {opp.description}
@@ -574,15 +570,20 @@ export default function ContentPage() {
                       </TableCell>
                       <TableCell className="text-center">
                         <Badge variant="outline" className="text-xs">
-                          {t(`type.${opp.type}` as "type.owned" | "type.earned")}
+                          {t(`type.${opp.type}` as 'type.owned' | 'type.earned')}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-center">
                         <Badge
                           variant="outline"
-                          className={cn("text-xs", IMPACT_COLORS[opp.impact])}
+                          className={cn('text-xs', IMPACT_COLORS[opp.impact])}
                         >
-                          {t(`impact.${opp.impact}` as "impact.high" | "impact.medium" | "impact.low")}
+                          {t(
+                            `impact.${opp.impact}` as
+                              | 'impact.high'
+                              | 'impact.medium'
+                              | 'impact.low',
+                          )}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-center">
@@ -593,14 +594,14 @@ export default function ContentPage() {
                       <TableCell className="text-center">
                         <Badge
                           variant="outline"
-                          className={cn("text-xs whitespace-nowrap", STATUS_COLORS[opp.status])}
+                          className={cn('text-xs whitespace-nowrap', STATUS_COLORS[opp.status])}
                         >
                           {t(`status.${opp.status}` as `status.${ContentOpportunityStatus}`)}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right pr-6">
                         <div className="flex items-center justify-end gap-1">
-                          {opp.status === "new" && (
+                          {opp.status === 'new' && (
                             <>
                               <Button
                                 variant="ghost"

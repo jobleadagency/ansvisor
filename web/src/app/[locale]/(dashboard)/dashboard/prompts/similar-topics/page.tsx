@@ -65,9 +65,7 @@ export default function SimilarTopicsPage() {
 
     return all.filter((cluster) => {
       if (cluster.keyword.toLowerCase().includes(normalizedSearch)) return true;
-      return cluster.prompts.some((prompt) =>
-        prompt.text.toLowerCase().includes(normalizedSearch),
-      );
+      return cluster.prompts.some((prompt) => prompt.text.toLowerCase().includes(normalizedSearch));
     });
   }, [search, volumes]);
 
@@ -95,9 +93,7 @@ export default function SimilarTopicsPage() {
           Back to Prompt Insights
         </Link>
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            Similar Topics
-          </h1>
+          <h1 className="text-2xl font-semibold tracking-tight">Similar Topics</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Keyword clusters aggregated across analyzed prompts.
           </p>
@@ -144,9 +140,7 @@ export default function SimilarTopicsPage() {
         <CardHeader className="pb-3">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-              <CardTitle className="text-sm font-medium">
-                All Similar Topics
-              </CardTitle>
+              <CardTitle className="text-sm font-medium">All Similar Topics</CardTitle>
               <Badge variant="secondary">{clusters.length}</Badge>
             </div>
             <div className="relative w-full sm:w-60">
@@ -181,9 +175,7 @@ export default function SimilarTopicsPage() {
               )}
               {!loading &&
                 clusters.map((cluster) => {
-                  const topPrompt = [...cluster.prompts].sort(
-                    (a, b) => b.volume - a.volume,
-                  )[0];
+                  const topPrompt = [...cluster.prompts].sort((a, b) => b.volume - a.volume)[0];
 
                   return (
                     <TableRow key={cluster.keyword.toLowerCase()}>
@@ -200,9 +192,7 @@ export default function SimilarTopicsPage() {
                         {formatVolume(cluster.estimatedAiVolume)}
                       </TableCell>
                       <TableCell className="text-center">
-                        <Badge variant="outline">
-                          {cluster.occurrences}
-                        </Badge>
+                        <Badge variant="outline">{cluster.occurrences}</Badge>
                       </TableCell>
                       <TableCell className="max-w-[360px]">
                         {topPrompt ? (

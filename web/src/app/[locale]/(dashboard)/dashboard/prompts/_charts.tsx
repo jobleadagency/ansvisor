@@ -1,15 +1,7 @@
 'use client';
 
 import { useRef, useState, useEffect } from 'react';
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Cell,
-} from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell } from 'recharts';
 
 // ─── Auto-sizing wrapper ─────────────────────────────────────────────────────
 
@@ -108,20 +100,14 @@ export function PlatformVolumeChart({ totalVolume }: { totalVolume: number }) {
           layout="vertical"
           margin={{ top: 0, right: 12, left: 4, bottom: 0 }}
         >
-          <CartesianGrid
-            strokeDasharray="3 3"
-            className="stroke-border"
-            horizontal={false}
-          />
+          <CartesianGrid strokeDasharray="3 3" className="stroke-border" horizontal={false} />
           <XAxis
             type="number"
             tick={{ fontSize: 10 }}
             tickLine={false}
             axisLine={false}
             className="fill-muted-foreground"
-            tickFormatter={(v) =>
-              v >= 1000 ? `${(v / 1000).toFixed(0)}k` : `${v}`
-            }
+            tickFormatter={(v) => (v >= 1000 ? `${(v / 1000).toFixed(0)}k` : `${v}`)}
           />
           <YAxis
             type="category"
@@ -139,9 +125,7 @@ export function PlatformVolumeChart({ totalVolume }: { totalVolume: number }) {
               const row = payload[0].payload as PlatformVolumeItem;
               return (
                 <div className="rounded-lg border bg-background px-3 py-2 shadow-md text-xs">
-                  <p className="font-medium text-foreground mb-0.5">
-                    {row.name}
-                  </p>
+                  <p className="font-medium text-foreground mb-0.5">{row.name}</p>
                   <p className="text-muted-foreground">
                     Est. queries:{' '}
                     <span className="font-medium text-foreground">

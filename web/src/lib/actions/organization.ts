@@ -40,8 +40,7 @@ export async function createOrganization(name: string) {
     .select()
     .single();
 
-  if (error || !org)
-    throw new Error(error?.message ?? 'Failed to create organization');
+  if (error || !org) throw new Error(error?.message ?? 'Failed to create organization');
 
   const { error: profileError } = await supabase
     .from('profiles')

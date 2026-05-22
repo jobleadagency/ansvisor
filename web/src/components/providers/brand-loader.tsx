@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
-import { useBrandStore } from "@/stores/use-brand-store";
-import type { Brand } from "@/types";
+import { useEffect } from 'react';
+import { useBrandStore } from '@/stores/use-brand-store';
+import type { Brand } from '@/types';
 
 interface BrandLoaderProps {
   brands: Brand[];

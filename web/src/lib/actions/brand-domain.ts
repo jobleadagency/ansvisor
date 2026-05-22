@@ -31,8 +31,7 @@ export async function addDomain(
     .select()
     .single();
 
-  if (error || !domain)
-    throw new Error(error?.message ?? 'Failed to add domain');
+  if (error || !domain) throw new Error(error?.message ?? 'Failed to add domain');
 
   revalidatePath('/dashboard/brands');
   return mapDomainRow(domain as Record<string, unknown>);
@@ -56,8 +55,7 @@ export async function updateDomain(
     .select()
     .single();
 
-  if (error || !domain)
-    throw new Error(error?.message ?? 'Failed to update domain');
+  if (error || !domain) throw new Error(error?.message ?? 'Failed to update domain');
 
   revalidatePath('/dashboard/brands');
   return mapDomainRow(domain as Record<string, unknown>);

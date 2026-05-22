@@ -27,8 +27,7 @@ export function MobileNav() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
-  const logoSrc =
-    mounted && resolvedTheme === 'dark' ? '/logo_dark.svg' : '/logo_light.svg';
+  const logoSrc = mounted && resolvedTheme === 'dark' ? '/logo_dark.svg' : '/logo_light.svg';
 
   const getLabel = (title: string): string => {
     const map: Record<string, string> = {
@@ -48,9 +47,7 @@ export function MobileNav() {
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger
-        render={<Button variant="ghost" size="icon" className="md:hidden" />}
-      >
+      <SheetTrigger render={<Button variant="ghost" size="icon" className="md:hidden" />}>
         <Menu className="h-5 w-5" />
         <span className="sr-only">Toggle menu</span>
       </SheetTrigger>
@@ -95,9 +92,7 @@ export function MobileNav() {
                 const label = getLabel(item.title);
 
                 const isLocked =
-                  isCloud &&
-                  item.requiredFeature != null &&
-                  !canUse(item.requiredFeature);
+                  isCloud && item.requiredFeature != null && !canUse(item.requiredFeature);
 
                 if (isLocked) {
                   return (
@@ -119,11 +114,7 @@ export function MobileNav() {
                 }
 
                 return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setOpen(false)}
-                  >
+                  <Link key={item.href} href={item.href} onClick={() => setOpen(false)}>
                     <span
                       className={cn(
                         'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',

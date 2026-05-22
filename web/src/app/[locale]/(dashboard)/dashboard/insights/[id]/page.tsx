@@ -3,23 +3,13 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useRouter } from '@/i18n/navigation';
-import {
-  getPromptResultById,
-  type PromptResultWithText,
-} from '@/lib/actions/tracking';
+import { getPromptResultById, type PromptResultWithText } from '@/lib/actions/tracking';
 import { Markdown } from '@/components/ui/markdown';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import {
-  ArrowLeft,
-  ExternalLink,
-  MessageSquareText,
-  Quote,
-  Eye,
-  Clock,
-} from 'lucide-react';
+import { ArrowLeft, ExternalLink, MessageSquareText, Quote, Eye, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const PLATFORM_LABELS: Record<string, string> = {
@@ -41,11 +31,7 @@ const PLATFORM_LABELS: Record<string, string> = {
   'gemini-web': 'Gemini',
 };
 
-function SentimentBadge({
-  sentiment,
-}: {
-  sentiment: 'positive' | 'neutral' | 'negative';
-}) {
+function SentimentBadge({ sentiment }: { sentiment: 'positive' | 'neutral' | 'negative' }) {
   return (
     <Badge
       variant="outline"
@@ -110,11 +96,7 @@ export default function ResultDetailPage() {
         <p className="text-muted-foreground text-sm mt-1">
           This result may have been deleted or does not exist.
         </p>
-        <Button
-          variant="outline"
-          className="mt-6 gap-2"
-          onClick={() => router.back()}
-        >
+        <Button variant="outline" className="mt-6 gap-2" onClick={() => router.back()}>
           <ArrowLeft className="h-4 w-4" />
           Go back
         </Button>
@@ -137,9 +119,7 @@ export default function ResultDetailPage() {
 
       {/* Header */}
       <div className="space-y-3">
-        <h1 className="text-xl font-semibold leading-snug">
-          {result.promptText}
-        </h1>
+        <h1 className="text-xl font-semibold leading-snug">{result.promptText}</h1>
 
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant="secondary" className="text-xs">
@@ -164,9 +144,7 @@ export default function ResultDetailPage() {
           <CardContent className="flex items-center gap-3 p-4">
             <MessageSquareText className="h-5 w-5 text-muted-foreground" />
             <div>
-              <p className="text-2xl font-bold tabular-nums">
-                {result.mentionCount}
-              </p>
+              <p className="text-2xl font-bold tabular-nums">{result.mentionCount}</p>
               <p className="text-xs text-muted-foreground">Mentions</p>
             </div>
           </CardContent>
@@ -175,9 +153,7 @@ export default function ResultDetailPage() {
           <CardContent className="flex items-center gap-3 p-4">
             <Quote className="h-5 w-5 text-muted-foreground" />
             <div>
-              <p className="text-2xl font-bold tabular-nums">
-                {result.citationCount}
-              </p>
+              <p className="text-2xl font-bold tabular-nums">{result.citationCount}</p>
               <p className="text-xs text-muted-foreground">Brand Citations</p>
             </div>
           </CardContent>
@@ -186,9 +162,7 @@ export default function ResultDetailPage() {
           <CardContent className="flex items-center gap-3 p-4">
             <ExternalLink className="h-5 w-5 text-muted-foreground" />
             <div>
-              <p className="text-2xl font-bold tabular-nums">
-                {result.citations.length}
-              </p>
+              <p className="text-2xl font-bold tabular-nums">{result.citations.length}</p>
               <p className="text-xs text-muted-foreground">Total Citations</p>
             </div>
           </CardContent>
@@ -209,9 +183,7 @@ export default function ResultDetailPage() {
       {result.citations.length > 0 && (
         <Card>
           <CardContent className="p-6">
-            <h2 className="text-sm font-medium mb-4">
-              Citations ({result.citations.length})
-            </h2>
+            <h2 className="text-sm font-medium mb-4">Citations ({result.citations.length})</h2>
             <div className="space-y-2">
               {result.citations.map((cite, i) => (
                 <a
@@ -223,12 +195,8 @@ export default function ResultDetailPage() {
                 >
                   <ExternalLink className="h-4 w-4 mt-0.5 shrink-0 text-muted-foreground" />
                   <div className="min-w-0">
-                    <p className="font-medium truncate">
-                      {cite.title || cite.url}
-                    </p>
-                    <p className="text-muted-foreground text-xs truncate">
-                      {cite.url}
-                    </p>
+                    <p className="font-medium truncate">{cite.title || cite.url}</p>
+                    <p className="text-muted-foreground text-xs truncate">{cite.url}</p>
                   </div>
                 </a>
               ))}

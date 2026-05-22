@@ -71,19 +71,18 @@ async function requireAdmin() {
 export async function getTeamInfo(): Promise<TeamInfo> {
   const { profile } = await getCurrentUserAndOrg();
 
-  const [{ count: memberCount }, { count: pendingCount }, plan] =
-    await Promise.all([
-      supabaseAdmin
-        .from('profiles')
-        .select('*', { count: 'exact', head: true })
-        .eq('organization_id', profile.organization_id),
-      supabaseAdmin
-        .from('invitations')
-        .select('*', { count: 'exact', head: true })
-        .eq('organization_id', profile.organization_id)
-        .eq('status', 'pending'),
-      getOrgPlan(profile.organization_id),
-    ]);
+  const [{ count: memberCount }, { count: pendingCount }, plan] = await Promise.all([
+    supabaseAdmin
+      .from('profiles')
+      .select('*', { count: 'exact', head: true })
+      .eq('organization_id', profile.organization_id),
+    supabaseAdmin
+      .from('invitations')
+      .select('*', { count: 'exact', head: true })
+      .eq('organization_id', profile.organization_id)
+      .eq('status', 'pending'),
+    getOrgPlan(profile.organization_id),
+  ]);
 
   const mc = memberCount ?? 0;
   const pc = pendingCount ?? 0;
@@ -187,11 +186,8 @@ export async function inviteMember(email: string, role: TeamRole) {
     .limit(1);
 
   if (existingMember && existingMember.length > 0) {
-    const { data: authUsers } =
-      await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 200 });
-    const matched = authUsers?.users?.find(
-      (u) => u.email?.toLowerCase() === normalizedEmail,
-    );
+    const { data: authUsers } = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 200 });
+    const matched = authUsers?.users?.find((u) => u.email?.toLowerCase() === normalizedEmail);
     if (matched) {
       const { data: matchedProfile } = await supabaseAdmin
         .from('profiles')
@@ -273,9 +269,7 @@ export async function resendInvitation(invitationId: string) {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
   const inviteLink = `${appUrl}/invite/${invitation.token}`;
 
-  const newExpiresAt = new Date(
-    Date.now() + 7 * 24 * 60 * 60 * 1000,
-  ).toISOString();
+  const newExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
   await supabaseAdmin
     .from('invitations')
     .update({ expires_at: newExpiresAt })
@@ -333,9 +327,7 @@ export interface AcceptInvitationResult {
   role: TeamRole;
 }
 
-export async function acceptInvitation(
-  token: string,
-): Promise<AcceptInvitationResult> {
+export async function acceptInvitation(token: string): Promise<AcceptInvitationResult> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -357,19 +349,14 @@ export async function acceptInvitation(
 
   const expiresAt = new Date(invitation.expires_at as string);
   if (expiresAt.getTime() < Date.now()) {
-    await supabaseAdmin
-      .from('invitations')
-      .update({ status: 'expired' })
-      .eq('id', invitation.id);
+    await supabaseAdmin.from('invitations').update({ status: 'expired' }).eq('id', invitation.id);
     throw new Error('This invitation has expired');
   }
 
   const inviteEmail = (invitation.email as string).toLowerCase();
   const userEmail = user.email?.toLowerCase() ?? '';
   if (inviteEmail !== userEmail) {
-    throw new Error(
-      `This invitation was sent to ${inviteEmail}. Please sign in with that email.`,
-    );
+    throw new Error(`This invitation was sent to ${inviteEmail}. Please sign in with that email.`);
   }
 
   const { error: profileErr } = await supabaseAdmin
@@ -402,9 +389,7 @@ export async function acceptInvitation(
 export async function getInvitationByToken(token: string) {
   const { data, error } = await supabaseAdmin
     .from('invitations')
-    .select(
-      'id, email, role, status, expires_at, organization_id, organizations(name)',
-    )
+    .select('id, email, role, status, expires_at, organization_id, organizations(name)')
     .eq('token', token)
     .maybeSingle();
 
@@ -417,7 +402,6 @@ export async function getInvitationByToken(token: string) {
     status: data.status as TeamInvitation['status'],
     expiresAt: data.expires_at as string,
     organizationId: data.organization_id as string,
-    organizationName:
-      (data.organizations as unknown as { name: string } | null)?.name ?? null,
+    organizationName: (data.organizations as unknown as { name: string } | null)?.name ?? null,
   };
 }

@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from '@/lib/supabase/server';
 import {
   type Feature,
   type Plan,
@@ -7,26 +7,26 @@ import {
   hasFeature,
   isCloud,
   isWithinLimit,
-} from "@/config/plans";
+} from '@/config/plans';
 
 export async function getOrgPlan(organizationId: string): Promise<Plan> {
-  if (!isCloud()) return getPlan("self_hosted");
+  if (!isCloud()) return getPlan('self_hosted');
 
   const supabase = await createClient();
   const { data } = await supabase
-    .from("organizations")
-    .select("plan, subscription_status, plan_overrides")
-    .eq("id", organizationId)
+    .from('organizations')
+    .select('plan, subscription_status, plan_overrides')
+    .eq('id', organizationId)
     .single();
 
-  if (data?.subscription_status !== "active") {
-    return getPlan("starter");
+  if (data?.subscription_status !== 'active') {
+    return getPlan('starter');
   }
 
   const plan = getPlan(data?.plan);
 
   // Enterprise orgs can have custom limit overrides
-  if (data?.plan === "enterprise" && data.plan_overrides) {
+  if (data?.plan === 'enterprise' && data.plan_overrides) {
     const overrides = data.plan_overrides as Record<string, unknown>;
     return {
       ...plan,
@@ -42,27 +42,21 @@ export class PlanLimitError extends Error {
 
   constructor(message: string, requiredPlan: string) {
     super(message);
-    this.name = "PlanLimitError";
+    this.name = 'PlanLimitError';
     this.requiredPlan = requiredPlan;
   }
 }
 
-export async function enforceFeature(
-  organizationId: string,
-  feature: Feature,
-): Promise<void> {
+export async function enforceFeature(organizationId: string, feature: Feature): Promise<void> {
   const plan = await getOrgPlan(organizationId);
   if (!hasFeature(plan, feature)) {
-    throw new PlanLimitError(
-      `This feature requires a higher plan.`,
-      plan.name,
-    );
+    throw new PlanLimitError(`This feature requires a higher plan.`, plan.name);
   }
 }
 
 export async function enforceLimit(
   organizationId: string,
-  key: keyof Omit<PlanLimits, "features" | "allowedScrapers" | "allowedModels">,
+  key: keyof Omit<PlanLimits, 'features' | 'allowedScrapers' | 'allowedModels'>,
   currentCount: number,
 ): Promise<void> {
   const plan = await getOrgPlan(organizationId);

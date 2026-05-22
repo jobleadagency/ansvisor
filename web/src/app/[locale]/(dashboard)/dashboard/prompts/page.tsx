@@ -42,10 +42,7 @@ import {
   type VolumeQuota,
 } from '@/lib/actions/volumes';
 import { getPromptSets } from '@/lib/actions/prompt';
-import {
-  getPromptVisibilitySummaries,
-  type PromptVisibilitySummary,
-} from '@/lib/actions/tracking';
+import { getPromptVisibilitySummaries, type PromptVisibilitySummary } from '@/lib/actions/tracking';
 import { aggregatePromptVolumeClusters } from '@/lib/prompt-volume-clusters';
 import type { PromptVolume, Prompt } from '@/types';
 import { toast } from 'sonner';
@@ -118,20 +115,13 @@ const INTENT_LABELS: Record<string, string> = {
 };
 
 const INTENT_COLORS: Record<string, string> = {
-  comparison:
-    'border-indigo-500/30 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400',
-  'how-to':
-    'border-violet-500/30 bg-violet-500/10 text-violet-600 dark:text-violet-400',
-  'what-is':
-    'border-purple-400/30 bg-purple-400/10 text-purple-600 dark:text-purple-400',
-  'best-top':
-    'border-blue-400/30 bg-blue-400/10 text-blue-600 dark:text-blue-400',
-  'vs-review':
-    'border-cyan-500/30 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400',
-  recommendation:
-    'border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
-  'problem-solving':
-    'border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400',
+  comparison: 'border-indigo-500/30 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400',
+  'how-to': 'border-violet-500/30 bg-violet-500/10 text-violet-600 dark:text-violet-400',
+  'what-is': 'border-purple-400/30 bg-purple-400/10 text-purple-600 dark:text-purple-400',
+  'best-top': 'border-blue-400/30 bg-blue-400/10 text-blue-600 dark:text-blue-400',
+  'vs-review': 'border-cyan-500/30 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400',
+  recommendation: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+  'problem-solving': 'border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400',
 };
 
 const PROMPT_EXPORT_HEADERS = [
@@ -212,9 +202,7 @@ function KpiCard({
         <p
           className={cn(
             'text-xs mt-1 flex items-center gap-0.5',
-            subPositive
-              ? 'text-green-600 dark:text-green-400'
-              : 'text-muted-foreground',
+            subPositive ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground',
           )}
         >
           {sub}
@@ -235,9 +223,7 @@ export default function PromptsPage() {
   const [search, setSearch] = useState('');
   const [volumes, setVolumes] = useState<PromptVolume[]>([]);
   const [allPrompts, setAllPrompts] = useState<Prompt[]>([]);
-  const [visibility, setVisibility] = useState<
-    Record<string, PromptVisibilitySummary>
-  >({});
+  const [visibility, setVisibility] = useState<Record<string, PromptVisibilitySummary>>({});
   const [loading, setLoading] = useState(true);
   const [analyzing, setAnalyzing] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -252,9 +238,7 @@ export default function PromptsPage() {
 
   const initialTab: TabId = (() => {
     const raw = searchParams.get('tab');
-    return (VALID_TABS as readonly string[]).includes(raw ?? '')
-      ? (raw as TabId)
-      : 'all';
+    return (VALID_TABS as readonly string[]).includes(raw ?? '') ? (raw as TabId) : 'all';
   })();
   const [tab, setTab] = useState<TabId>(initialTab);
 
@@ -311,14 +295,10 @@ export default function PromptsPage() {
     );
 
     const promptsToAnalyze =
-      promptsWithoutVolume.length > 0
-        ? promptsWithoutVolume
-        : allPrompts.filter((p) => p.isActive);
+      promptsWithoutVolume.length > 0 ? promptsWithoutVolume : allPrompts.filter((p) => p.isActive);
 
     if (promptsToAnalyze.length === 0) {
-      toast.error(
-        'No active prompts to analyze. Add prompts to a brand first.',
-      );
+      toast.error('No active prompts to analyze. Add prompts to a brand first.');
       return;
     }
 
@@ -337,12 +317,9 @@ export default function PromptsPage() {
       toast.success(`Analyzed ${promptsToAnalyze.length} prompts`);
       await loadData();
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : 'Volume analysis failed';
+      const message = err instanceof Error ? err.message : 'Volume analysis failed';
       if (message.includes('limit reached')) {
-        toast.error(
-          'Monthly volume analysis limit reached. Upgrade your plan for more.',
-        );
+        toast.error('Monthly volume analysis limit reached. Upgrade your plan for more.');
       } else {
         console.error('Volume analysis failed:', err);
         toast.error('Volume analysis failed');
@@ -368,12 +345,9 @@ export default function PromptsPage() {
       toast.success(`Refreshed volumes for ${result.refreshed} prompts`);
       await loadData();
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : 'Volume refresh failed';
+      const message = err instanceof Error ? err.message : 'Volume refresh failed';
       if (message.includes('limit reached')) {
-        toast.error(
-          'Monthly volume analysis limit reached. Upgrade your plan for more.',
-        );
+        toast.error('Monthly volume analysis limit reached. Upgrade your plan for more.');
       } else {
         console.error('Volume refresh failed:', err);
         toast.error('Volume refresh failed');
@@ -407,16 +381,12 @@ export default function PromptsPage() {
           used: quota.limit === -1 ? 0 : quota.limit - result.remaining,
         });
       }
-      toast.success(
-        `Re-analyzed ${activePrompts.length} prompts with new keywords`,
-      );
+      toast.success(`Re-analyzed ${activePrompts.length} prompts with new keywords`);
       await loadData();
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Re-analysis failed';
       if (message.includes('limit reached')) {
-        toast.error(
-          'Monthly volume analysis limit reached. Upgrade your plan for more.',
-        );
+        toast.error('Monthly volume analysis limit reached. Upgrade your plan for more.');
       } else {
         console.error('Re-analysis failed:', err);
         toast.error('Re-analysis failed');
@@ -436,8 +406,7 @@ export default function PromptsPage() {
       v.intent.toLowerCase().includes(search.toLowerCase()),
   );
 
-  const quotaExhausted =
-    quota !== null && quota.limit !== -1 && quota.remaining <= 0;
+  const quotaExhausted = quota !== null && quota.limit !== -1 && quota.remaining <= 0;
 
   // Join prompts with their volume + visibility summaries once, reused by the
   // All Prompts table.
@@ -570,9 +539,7 @@ export default function PromptsPage() {
               <>
                 <Button
                   onClick={handleRefreshVolumes}
-                  disabled={
-                    refreshing || analyzing || loading || quotaExhausted
-                  }
+                  disabled={refreshing || analyzing || loading || quotaExhausted}
                   size="sm"
                   variant="outline"
                   className="gap-2"
@@ -586,9 +553,7 @@ export default function PromptsPage() {
                 </Button>
                 <Button
                   onClick={handleReanalyzeAll}
-                  disabled={
-                    analyzing || refreshing || loading || quotaExhausted
-                  }
+                  disabled={analyzing || refreshing || loading || quotaExhausted}
                   size="sm"
                   variant="outline"
                   className="gap-2"
@@ -603,14 +568,11 @@ export default function PromptsPage() {
               </>
             )}
             {volumes.length > 0 &&
-              allPrompts.filter(
-                (p) => p.isActive && !volumes.find((v) => v.promptId === p.id),
-              ).length > 0 && (
+              allPrompts.filter((p) => p.isActive && !volumes.find((v) => v.promptId === p.id))
+                .length > 0 && (
                 <Button
                   onClick={handleAnalyzeNew}
-                  disabled={
-                    analyzing || refreshing || loading || quotaExhausted
-                  }
+                  disabled={analyzing || refreshing || loading || quotaExhausted}
                   size="sm"
                   className="gap-2"
                 >
@@ -662,8 +624,7 @@ export default function PromptsPage() {
                     )}
                     {quota && quota.limit !== -1 && !quotaExhausted && (
                       <p className="text-xs text-muted-foreground">
-                        {quota.remaining}/{quota.limit} analyses remaining this
-                        month
+                        {quota.remaining}/{quota.limit} analyses remaining this month
                       </p>
                     )}
                   </>
@@ -704,14 +665,11 @@ export default function PromptsPage() {
               <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
                 <Card className="lg:col-span-2">
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium">
-                      Prompt Volumes
-                    </CardTitle>
+                    <CardTitle className="text-sm font-medium">Prompt Volumes</CardTitle>
                     <p className="text-xs text-muted-foreground">
-                      Total estimated AI-answered queries across all topic
-                      clusters, split by answer-engine share. Weights include
-                      Google AI Overview (~35% of Google searches), Google AI
-                      Mode, and standalone chatbots.
+                      Total estimated AI-answered queries across all topic clusters, split by
+                      answer-engine share. Weights include Google AI Overview (~35% of Google
+                      searches), Google AI Mode, and standalone chatbots.
                     </p>
                   </CardHeader>
                   <CardContent>
@@ -723,9 +681,7 @@ export default function PromptsPage() {
                   <CardHeader className="pb-2">
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <CardTitle className="text-sm font-medium">
-                          Similar Topics
-                        </CardTitle>
+                        <CardTitle className="text-sm font-medium">Similar Topics</CardTitle>
                         <p className="text-xs text-muted-foreground">
                           Most-searched keyword clusters across all prompts
                         </p>
@@ -751,9 +707,7 @@ export default function PromptsPage() {
               <Card>
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between gap-4 flex-wrap">
-                    <CardTitle className="text-sm font-medium">
-                      Prompt Volumes
-                    </CardTitle>
+                    <CardTitle className="text-sm font-medium">Prompt Volumes</CardTitle>
                     <div className="relative w-60">
                       <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
                       <Input
@@ -806,9 +760,7 @@ export default function PromptsPage() {
                       {filtered.map((row) => (
                         <TableRow key={row.id} className="hover:bg-muted/50">
                           <TableCell className="pl-6 font-medium text-sm max-w-[280px]">
-                            <span className="line-clamp-1">
-                              {row.promptText}
-                            </span>
+                            <span className="line-clamp-1">{row.promptText}</span>
                           </TableCell>
                           <TableCell className="text-center text-xs text-muted-foreground tabular-nums">
                             {row.keywords.length}
@@ -844,9 +796,8 @@ export default function PromptsPage() {
                   )}
                   <div className="px-6 py-2 border-t">
                     <p className="text-xs text-muted-foreground">
-                      * Est. AI Volume = Total Google search volume of extracted
-                      keywords × AI adoption rate. Figures are approximations
-                      for planning purposes.
+                      * Est. AI Volume = Total Google search volume of extracted keywords × AI
+                      adoption rate. Figures are approximations for planning purposes.
                     </p>
                   </div>
                 </CardContent>
@@ -877,10 +828,7 @@ export default function PromptsPage() {
                           >
                             Est. AI Volume
                           </ColHead>
-                          <ColHead
-                            className="text-center"
-                            tooltip="The detected search intent."
-                          >
+                          <ColHead className="text-center" tooltip="The detected search intent.">
                             Intent
                           </ColHead>
                           <ColHead
@@ -896,10 +844,7 @@ export default function PromptsPage() {
                           .filter((v) => v.estAiVolume >= 5000)
                           .sort((a, b) => b.estAiVolume - a.estAiVolume)
                           .map((row) => (
-                            <TableRow
-                              key={row.id}
-                              className="hover:bg-muted/50"
-                            >
+                            <TableRow key={row.id} className="hover:bg-muted/50">
                               <TableCell className="pl-6 font-medium text-sm">
                                 {row.promptText}
                               </TableCell>
@@ -909,10 +854,7 @@ export default function PromptsPage() {
                               <TableCell className="text-center">
                                 <Badge
                                   variant="outline"
-                                  className={cn(
-                                    'text-xs',
-                                    INTENT_COLORS[row.intent] || '',
-                                  )}
+                                  className={cn('text-xs', INTENT_COLORS[row.intent] || '')}
                                 >
                                   {INTENT_LABELS[row.intent] || row.intent}
                                 </Badge>
@@ -965,14 +907,11 @@ function AllPromptsTab({
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     const sorted = [...prompts].sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     );
     if (!q) return sorted;
     return sorted.filter(
-      (p) =>
-        p.text.toLowerCase().includes(q) ||
-        (p.category ?? '').toLowerCase().includes(q),
+      (p) => p.text.toLowerCase().includes(q) || (p.category ?? '').toLowerCase().includes(q),
     );
   }, [prompts, search]);
 
@@ -1011,9 +950,7 @@ function AllPromptsTab({
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div>
-            <CardTitle className="text-sm font-medium">
-              All Prompts ({prompts.length})
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">All Prompts ({prompts.length})</CardTitle>
             <p className="text-xs text-muted-foreground mt-0.5">
               Read-only overview · edit prompts from each brand&apos;s page
             </p>
@@ -1054,10 +991,7 @@ function AllPromptsTab({
               >
                 Volume
               </ColHead>
-              <ColHead
-                className="text-right"
-                tooltip="Most recent tracking run for this prompt."
-              >
+              <ColHead className="text-right" tooltip="Most recent tracking run for this prompt.">
                 Last run
               </ColHead>
               <TableHead className="text-right pr-6 w-[60px]">Edit</TableHead>
@@ -1198,17 +1132,13 @@ function SimilarTopicsList({ volumes }: { volumes: PromptVolume[] }) {
               />
             </div>
             <span className="w-12 text-right font-medium tabular-nums text-foreground">
-              {item.volume >= 1000
-                ? `${(item.volume / 1000).toFixed(1)}k`
-                : item.volume}
+              {item.volume >= 1000 ? `${(item.volume / 1000).toFixed(1)}k` : item.volume}
             </span>
           </div>
         );
       })}
       {sorted.length === 0 && (
-        <p className="text-xs text-muted-foreground text-center py-4">
-          No keyword data yet
-        </p>
+        <p className="text-xs text-muted-foreground text-center py-4">No keyword data yet</p>
       )}
     </div>
   );

@@ -37,7 +37,10 @@ export async function addCompetitor(
     .insert({
       brand_id: brandId,
       name: input.name.trim(),
-      domain: input.domain.trim().replace(/^https?:\/\//, '').replace(/\/+$/, ''),
+      domain: input.domain
+        .trim()
+        .replace(/^https?:\/\//, '')
+        .replace(/\/+$/, ''),
     })
     .select()
     .single();

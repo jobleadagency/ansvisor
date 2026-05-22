@@ -1,20 +1,20 @@
 export const FEATURES = [
-  "basic_insights",
-  "advanced_analytics",
-  "prompt_suggestions",
-  "prompt_volumes",
-  "daily_monitoring",
-  "competitor_tracking",
-  "content_optimization",
-  "custom_reports",
-  "api_access",
-  "white_label",
-  "sso_saml",
+  'basic_insights',
+  'advanced_analytics',
+  'prompt_suggestions',
+  'prompt_volumes',
+  'daily_monitoring',
+  'competitor_tracking',
+  'content_optimization',
+  'custom_reports',
+  'api_access',
+  'white_label',
+  'sso_saml',
 ] as const;
 
 export type Feature = (typeof FEATURES)[number];
 
-export type PlanId = "self_hosted" | "starter" | "growth" | "enterprise";
+export type PlanId = 'self_hosted' | 'starter' | 'growth' | 'enterprise';
 
 export interface PlanLimits {
   maxBrands: number;
@@ -47,9 +47,9 @@ export interface Plan {
 
 export const PLANS: Record<PlanId, Plan> = {
   self_hosted: {
-    id: "self_hosted",
-    name: "Self-Hosted",
-    tagline: "Full control on your own infrastructure",
+    id: 'self_hosted',
+    name: 'Self-Hosted',
+    tagline: 'Full control on your own infrastructure',
     pricing: null,
     limits: {
       maxBrands: -1,
@@ -61,22 +61,22 @@ export const PLANS: Record<PlanId, Plan> = {
       maxDailyOnDemand: -1,
       onDemandCooldownMinutes: 0,
       features: [
-        "basic_insights",
-        "prompt_suggestions",
-        "prompt_volumes",
-        "advanced_analytics",
-        "daily_monitoring",
-        "competitor_tracking",
-        "content_optimization",
-        "custom_reports",
-        "api_access",
+        'basic_insights',
+        'prompt_suggestions',
+        'prompt_volumes',
+        'advanced_analytics',
+        'daily_monitoring',
+        'competitor_tracking',
+        'content_optimization',
+        'custom_reports',
+        'api_access',
       ],
     },
   },
   starter: {
-    id: "starter",
-    name: "Starter",
-    tagline: "Track your brand across AI platforms",
+    id: 'starter',
+    name: 'Starter',
+    tagline: 'Track your brand across AI platforms',
     pricing: { monthly: 49 },
     limits: {
       maxBrands: 1,
@@ -87,25 +87,25 @@ export const PLANS: Record<PlanId, Plan> = {
       maxVolumeAnalyses: 4,
       maxDailyOnDemand: 3,
       onDemandCooldownMinutes: 15,
-      allowedScrapers: ["chatgpt-web", "perplexity-web"],
+      allowedScrapers: ['chatgpt-web', 'perplexity-web'],
       allowedModels: [],
       features: [
-        "basic_insights",
-        "advanced_analytics",
-        "prompt_suggestions",
-        "prompt_volumes",
-        "daily_monitoring",
-        "competitor_tracking",
-        "content_optimization",
-        "custom_reports",
-        "api_access",
+        'basic_insights',
+        'advanced_analytics',
+        'prompt_suggestions',
+        'prompt_volumes',
+        'daily_monitoring',
+        'competitor_tracking',
+        'content_optimization',
+        'custom_reports',
+        'api_access',
       ],
     },
   },
   growth: {
-    id: "growth",
-    name: "Growth",
-    tagline: "For brands that need deep insights",
+    id: 'growth',
+    name: 'Growth',
+    tagline: 'For brands that need deep insights',
     pricing: { monthly: 249 },
     highlighted: true,
     limits: {
@@ -118,22 +118,22 @@ export const PLANS: Record<PlanId, Plan> = {
       maxDailyOnDemand: 10,
       onDemandCooldownMinutes: 5,
       features: [
-        "basic_insights",
-        "prompt_suggestions",
-        "prompt_volumes",
-        "advanced_analytics",
-        "daily_monitoring",
-        "competitor_tracking",
-        "content_optimization",
-        "custom_reports",
-        "api_access",
+        'basic_insights',
+        'prompt_suggestions',
+        'prompt_volumes',
+        'advanced_analytics',
+        'daily_monitoring',
+        'competitor_tracking',
+        'content_optimization',
+        'custom_reports',
+        'api_access',
       ],
     },
   },
   enterprise: {
-    id: "enterprise",
-    name: "Enterprise",
-    tagline: "For agencies and large teams at scale",
+    id: 'enterprise',
+    name: 'Enterprise',
+    tagline: 'For agencies and large teams at scale',
     pricing: null,
     limits: {
       maxBrands: -1,
@@ -145,37 +145,37 @@ export const PLANS: Record<PlanId, Plan> = {
       maxDailyOnDemand: -1,
       onDemandCooldownMinutes: 0,
       features: [
-        "basic_insights",
-        "prompt_suggestions",
-        "prompt_volumes",
-        "advanced_analytics",
-        "daily_monitoring",
-        "competitor_tracking",
-        "content_optimization",
-        "custom_reports",
-        "api_access",
-        "white_label",
-        "sso_saml",
+        'basic_insights',
+        'prompt_suggestions',
+        'prompt_volumes',
+        'advanced_analytics',
+        'daily_monitoring',
+        'competitor_tracking',
+        'content_optimization',
+        'custom_reports',
+        'api_access',
+        'white_label',
+        'sso_saml',
       ],
     },
   },
 } as const;
 
-export const PLAN_ORDER: PlanId[] = ["starter", "growth", "enterprise"];
+export const PLAN_ORDER: PlanId[] = ['starter', 'growth', 'enterprise'];
 
-export const SUBSCRIBABLE_PLANS: PlanId[] = ["starter", "growth"];
+export const SUBSCRIBABLE_PLANS: PlanId[] = ['starter', 'growth'];
 
 /**
  * Self-hosted instances bypass all limits.
  * Cloud is determined by NEXT_PUBLIC_IS_CLOUD env var.
  */
 export function isCloud(): boolean {
-  return process.env.NEXT_PUBLIC_IS_CLOUD === "true";
+  return process.env.NEXT_PUBLIC_IS_CLOUD === 'true';
 }
 
 export function getPlan(planId: string | null | undefined): Plan {
   if (!isCloud()) return PLANS.self_hosted;
-  return PLANS[(planId as PlanId) ?? "starter"] ?? PLANS.starter;
+  return PLANS[(planId as PlanId) ?? 'starter'] ?? PLANS.starter;
 }
 
 export function hasFeature(plan: Plan, feature: Feature): boolean {
@@ -184,7 +184,7 @@ export function hasFeature(plan: Plan, feature: Feature): boolean {
 
 export function isWithinLimit(
   plan: Plan,
-  key: keyof Omit<PlanLimits, "features" | "allowedScrapers" | "allowedModels">,
+  key: keyof Omit<PlanLimits, 'features' | 'allowedScrapers' | 'allowedModels'>,
   currentCount: number,
 ): boolean {
   const limit = plan.limits[key];
@@ -196,5 +196,5 @@ export function getMinimumPlanForFeature(feature: Feature): PlanId {
   for (const id of PLAN_ORDER) {
     if (PLANS[id].limits.features.includes(feature)) return id;
   }
-  return "enterprise";
+  return 'enterprise';
 }

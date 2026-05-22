@@ -13,11 +13,7 @@ export async function POST(req: NextRequest) {
 
   let event: Stripe.Event;
   try {
-    event = stripe.webhooks.constructEvent(
-      body,
-      signature,
-      process.env.STRIPE_WEBHOOK_SECRET!,
-    );
+    event = stripe.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET!);
   } catch (err) {
     console.error('[stripe/webhook] Signature verification failed:', err);
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
@@ -28,9 +24,7 @@ export async function POST(req: NextRequest) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session;
         const customerId =
-          typeof session.customer === 'string'
-            ? session.customer
-            : session.customer?.id;
+          typeof session.customer === 'string' ? session.customer : session.customer?.id;
         const subscriptionId =
           typeof session.subscription === 'string'
             ? session.subscription
@@ -38,11 +32,19 @@ export async function POST(req: NextRequest) {
 
         if (customerId && subscriptionId) {
           // Fetch the subscription to get metadata
-          const subscription =
-            await stripe.subscriptions.retrieve(subscriptionId);
+          const subscription = await stripe.subscriptions.retrieve(subscriptionId);
           const orgId = subscription.metadata.organization_id;
           const planId = subscription.metadata.plan_id;
-          console.log('[webhook] checkout.session.completed — orgId:', orgId, 'planId:', planId, 'customerId:', customerId, 'subscriptionId:', subscriptionId);
+          console.log(
+            '[webhook] checkout.session.completed — orgId:',
+            orgId,
+            'planId:',
+            planId,
+            'customerId:',
+            customerId,
+            'subscriptionId:',
+            subscriptionId,
+          );
 
           if (orgId) {
             const { error } = await supabaseAdmin
@@ -58,7 +60,10 @@ export async function POST(req: NextRequest) {
             else console.log('[webhook] DB updated successfully for org:', orgId);
           }
         } else {
-          console.log('[webhook] checkout.session.completed — missing customerId or subscriptionId:', { customerId, subscriptionId });
+          console.log(
+            '[webhook] checkout.session.completed — missing customerId or subscriptionId:',
+            { customerId, subscriptionId },
+          );
         }
         break;
       }
@@ -74,23 +79,18 @@ export async function POST(req: NextRequest) {
           // Stripe API 2025-03-31 moved current_period_end to the item level.
           // Read item-level first, fall back to subscription-level for older
           // API versions, and skip the field entirely if neither is present.
-          const subItems = (
-            subscription as unknown as {
-              items?: { data?: Array<{ current_period_end?: number }> };
-              current_period_end?: number;
-            }
-          );
+          const subItems = subscription as unknown as {
+            items?: { data?: Array<{ current_period_end?: number }> };
+            current_period_end?: number;
+          };
           const epochSeconds =
-            subItems.items?.data?.[0]?.current_period_end ??
-            subItems.current_period_end;
+            subItems.items?.data?.[0]?.current_period_end ?? subItems.current_period_end;
 
           const updates: Record<string, unknown> = {
             subscription_status: subscription.status,
           };
           if (typeof epochSeconds === 'number') {
-            updates.subscription_ends_at = new Date(
-              epochSeconds * 1000,
-            ).toISOString();
+            updates.subscription_ends_at = new Date(epochSeconds * 1000).toISOString();
           }
 
           // Update plan if metadata has plan_id
@@ -128,9 +128,7 @@ export async function POST(req: NextRequest) {
       case 'invoice.payment_succeeded': {
         const invoice = event.data.object as Stripe.Invoice;
         const customerId =
-          typeof invoice.customer === 'string'
-            ? invoice.customer
-            : invoice.customer?.id;
+          typeof invoice.customer === 'string' ? invoice.customer : invoice.customer?.id;
 
         if (customerId) {
           await supabaseAdmin
@@ -144,9 +142,7 @@ export async function POST(req: NextRequest) {
       case 'invoice.payment_failed': {
         const invoice = event.data.object as Stripe.Invoice;
         const customerId =
-          typeof invoice.customer === 'string'
-            ? invoice.customer
-            : invoice.customer?.id;
+          typeof invoice.customer === 'string' ? invoice.customer : invoice.customer?.id;
 
         if (customerId) {
           await supabaseAdmin

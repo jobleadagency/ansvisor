@@ -1,13 +1,7 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
-import type {
-  PromptResult,
-  AIPlatform,
-  Sentiment,
-  Citation,
-  CompetitorMention,
-} from '@/types';
+import type { PromptResult, AIPlatform, Sentiment, Citation, CompetitorMention } from '@/types';
 
 /**
  * Apply the `model` filter to a Supabase query against `prompt_results.model_used`.
@@ -18,10 +12,7 @@ import type {
  * filter dropdown.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function applyModelFilter<T extends { eq: any; in: any }>(
-  query: T,
-  model: string | undefined,
-): T {
+function applyModelFilter<T extends { eq: any; in: any }>(query: T, model: string | undefined): T {
   if (!model) return query;
   const list = model
     .split(',')
@@ -45,8 +36,7 @@ function mapResultRow(row: Record<string, unknown>): PromptResult {
     visibilityScore: row.visibility_score as number,
     modelUsed: (row.model_used as string | null) ?? undefined,
     region: (row.region as string | null) ?? undefined,
-    competitorMentions:
-      (row.competitor_mentions as CompetitorMention[] | null) ?? undefined,
+    competitorMentions: (row.competitor_mentions as CompetitorMention[] | null) ?? undefined,
     createdAt: row.created_at as string,
   };
 }
@@ -113,10 +103,7 @@ async function buildResultsQuery(
   },
 ) {
   const supabase = await createClient();
-  let query = supabase
-    .from('prompt_results')
-    .select('*')
-    .eq('brand_id', brandId);
+  let query = supabase.from('prompt_results').select('*').eq('brand_id', brandId);
 
   if (opts?.platform) query = query.eq('platform', opts.platform);
   query = applyModelFilter(query, opts?.model);
@@ -130,15 +117,11 @@ async function buildResultsQuery(
       .from('prompts')
       .select('id')
       .eq('topic_id', opts.topicId);
-    const topicPromptIds = ((topicPrompts ?? []) as { id: string }[]).map(
-      (p) => p.id,
-    );
+    const topicPromptIds = ((topicPrompts ?? []) as { id: string }[]).map((p) => p.id);
     // Use a sentinel that matches nothing when the topic has no prompts so results are empty.
     query = query.in(
       'prompt_id',
-      topicPromptIds.length > 0
-        ? topicPromptIds
-        : ['00000000-0000-0000-0000-000000000000'],
+      topicPromptIds.length > 0 ? topicPromptIds : ['00000000-0000-0000-0000-000000000000'],
     );
   }
 
@@ -174,33 +157,20 @@ export async function getPromptResults(
   const promptIds = [...new Set(rows.map((r) => r.prompt_id as string))];
   const { data: promptRows } =
     promptIds.length > 0
-      ? await supabase
-          .from('prompts')
-          .select('id, text, category, topic_id')
-          .in('id', promptIds)
+      ? await supabase.from('prompts').select('id, text, category, topic_id').in('id', promptIds)
       : { data: [] };
 
-  const promptRowsRaw = (promptRows ?? []) as unknown as Record<
-    string,
-    unknown
-  >[];
+  const promptRowsRaw = (promptRows ?? []) as unknown as Record<string, unknown>[];
 
   const topicIds = [
-    ...new Set(
-      promptRowsRaw
-        .map((p) => p.topic_id as string | null)
-        .filter(Boolean) as string[],
-    ),
+    ...new Set(promptRowsRaw.map((p) => p.topic_id as string | null).filter(Boolean) as string[]),
   ];
   const { data: topicRows } =
     topicIds.length > 0
       ? await supabase.from('topics').select('id, name').in('id', topicIds)
       : { data: [] };
   const topicMap = new Map(
-    ((topicRows ?? []) as Record<string, unknown>[]).map((t) => [
-      t.id as string,
-      t.name as string,
-    ]),
+    ((topicRows ?? []) as Record<string, unknown>[]).map((t) => [t.id as string, t.name as string]),
   );
 
   const promptMap = new Map(
@@ -226,9 +196,7 @@ export async function getPromptResults(
       promptCategory: (pm?.category as string | null) ?? undefined,
       topicId: (pm?.topicId as string | null) ?? undefined,
       topicName: pm?.topicId
-        ? (topicMap.get(pm.topicId) ??
-          (pm?.category as string | null) ??
-          undefined)
+        ? (topicMap.get(pm.topicId) ?? (pm?.category as string | null) ?? undefined)
         : ((pm?.category as string | null) ?? undefined),
     };
   });
@@ -239,9 +207,7 @@ export async function getPromptResults(
 /**
  * Fetch a single prompt result by its ID, joining prompt text.
  */
-export async function getPromptResultById(
-  resultId: string,
-): Promise<PromptResultWithText | null> {
+export async function getPromptResultById(resultId: string): Promise<PromptResultWithText | null> {
   const supabase = await createClient();
 
   const { data, error } = await supabase
@@ -294,9 +260,7 @@ export async function getPromptDetail(
 
   const { data: promptData, error: promptError } = await supabase
     .from('prompts')
-    .select(
-      'id, prompt_set_id, text, category, topic_id, is_active, created_at',
-    )
+    .select('id, prompt_set_id, text, category, topic_id, is_active, created_at')
     .eq('id', promptId)
     .single();
 
@@ -347,10 +311,7 @@ export async function getPromptDetail(
   const totalResults = results.length;
   const avgVisibilityScore =
     totalResults > 0
-      ? Math.round(
-          results.reduce((sum, row) => sum + row.visibilityScore, 0) /
-            totalResults,
-        )
+      ? Math.round(results.reduce((sum, row) => sum + row.visibilityScore, 0) / totalResults)
       : 0;
 
   return {
@@ -415,14 +376,8 @@ export async function getInsightsSummary(
   const avgVisibilityScore = Math.round(
     rows.reduce((s, r) => s + (r.visibility_score as number), 0) / totalResults,
   );
-  const totalMentions = rows.reduce(
-    (s, r) => s + (r.mention_count as number),
-    0,
-  );
-  const totalCitations = rows.reduce(
-    (s, r) => s + (r.citation_count as number),
-    0,
-  );
+  const totalMentions = rows.reduce((s, r) => s + (r.mention_count as number), 0);
+  const totalCitations = rows.reduce((s, r) => s + (r.citation_count as number), 0);
   const positiveCount = rows.filter((r) => r.sentiment === 'positive').length;
   const positiveSentimentPct = Math.round((positiveCount / totalResults) * 100);
 
@@ -441,13 +396,11 @@ export async function getInsightsSummary(
     modelMap.set(m, existing);
   }
 
-  const platformBreakdown = Array.from(modelMap.entries()).map(
-    ([model, data]) => ({
-      platform: model,
-      avgScore: Math.round(data.totalScore / data.count),
-      resultCount: data.count,
-    }),
-  );
+  const platformBreakdown = Array.from(modelMap.entries()).map(([model, data]) => ({
+    platform: model,
+    avgScore: Math.round(data.totalScore / data.count),
+    resultCount: data.count,
+  }));
 
   // --- Previous period comparison ---
   let visibilityChange: number | null = null;
@@ -475,10 +428,7 @@ export async function getInsightsSummary(
       ? opts
       : { ...opts, dateFrom: currentFrom.toISOString() };
 
-    const { query: curQuery } = await buildResultsQuery(
-      brandId,
-      currentFilterOpts,
-    );
+    const { query: curQuery } = await buildResultsQuery(brandId, currentFilterOpts);
     const { data: curResults } = await curQuery;
     const curRows = (curResults ?? []) as Record<string, unknown>[];
 
@@ -494,38 +444,20 @@ export async function getInsightsSummary(
     if (curRows.length > 0 && prevRows.length > 0) {
       const curTotal = curRows.length;
       const curAvgVis = Math.round(
-        curRows.reduce((s, r) => s + (r.visibility_score as number), 0) /
-          curTotal,
+        curRows.reduce((s, r) => s + (r.visibility_score as number), 0) / curTotal,
       );
-      const curMentions = curRows.reduce(
-        (s, r) => s + (r.mention_count as number),
-        0,
-      );
-      const curCitations = curRows.reduce(
-        (s, r) => s + (r.citation_count as number),
-        0,
-      );
-      const curPositive = curRows.filter(
-        (r) => r.sentiment === 'positive',
-      ).length;
+      const curMentions = curRows.reduce((s, r) => s + (r.mention_count as number), 0);
+      const curCitations = curRows.reduce((s, r) => s + (r.citation_count as number), 0);
+      const curPositive = curRows.filter((r) => r.sentiment === 'positive').length;
       const curSentimentPct = Math.round((curPositive / curTotal) * 100);
 
       const prevTotal = prevRows.length;
       const prevAvgVis = Math.round(
-        prevRows.reduce((s, r) => s + (r.visibility_score as number), 0) /
-          prevTotal,
+        prevRows.reduce((s, r) => s + (r.visibility_score as number), 0) / prevTotal,
       );
-      const prevMentions = prevRows.reduce(
-        (s, r) => s + (r.mention_count as number),
-        0,
-      );
-      const prevCitations = prevRows.reduce(
-        (s, r) => s + (r.citation_count as number),
-        0,
-      );
-      const prevPositive = prevRows.filter(
-        (r) => r.sentiment === 'positive',
-      ).length;
+      const prevMentions = prevRows.reduce((s, r) => s + (r.mention_count as number), 0);
+      const prevCitations = prevRows.reduce((s, r) => s + (r.citation_count as number), 0);
+      const prevPositive = prevRows.filter((r) => r.sentiment === 'positive').length;
       const prevSentimentPct = Math.round((prevPositive / prevTotal) * 100);
 
       visibilityChange = curAvgVis - prevAvgVis;
@@ -595,13 +527,7 @@ export async function triggerTrackingCheck(
 }
 
 export interface TrackingJobStatus {
-  status:
-    | 'waiting'
-    | 'active'
-    | 'completed'
-    | 'failed'
-    | 'delayed'
-    | 'not_found';
+  status: 'waiting' | 'active' | 'completed' | 'failed' | 'delayed' | 'not_found';
   progress: {
     current: number;
     total: number;
@@ -648,9 +574,7 @@ export async function getJobStatus(jobId: string): Promise<TrackingJobStatus> {
     return {
       status: data.status ?? 'not_found',
       progress:
-        data.progress &&
-        typeof data.progress === 'object' &&
-        data.progress.total
+        data.progress && typeof data.progress === 'object' && data.progress.total
           ? data.progress
           : null,
       result: data.result ?? null,
@@ -761,9 +685,7 @@ export async function getPromptVisibilitySummaries(
  */
 export async function getBrandPrompts(
   brandId: string,
-): Promise<
-  { id: string; text: string; category?: string; platforms: string[] }[]
-> {
+): Promise<{ id: string; text: string; category?: string; platforms: string[] }[]> {
   const supabase = await createClient();
 
   const { data: promptSets } = await supabase
@@ -838,10 +760,7 @@ const SCRAPER_PROVIDER: Record<string, string> = {
   'gemini-web': 'Gemini',
 };
 
-function resolveProvider(
-  modelUsed: string | null | undefined,
-  platform?: string | null,
-): string {
+function resolveProvider(modelUsed: string | null | undefined, platform?: string | null): string {
   if (platform && SCRAPER_PROVIDER[platform]) return SCRAPER_PROVIDER[platform];
   if (!modelUsed) return 'Unknown';
   const mapped = MODEL_TO_PROVIDER[modelUsed];
@@ -870,11 +789,7 @@ export async function getCompetitorComparison(
 ): Promise<CompetitorComparisonData> {
   const supabase = await createClient();
 
-  const { data: brand } = await supabase
-    .from('brands')
-    .select('name')
-    .eq('id', brandId)
-    .single();
+  const { data: brand } = await supabase.from('brands').select('name').eq('id', brandId).single();
 
   const { query } = await buildResultsQuery(brandId, opts);
   const { data: results, error } = await query;
@@ -915,10 +830,7 @@ export async function getCompetitorComparison(
 
     const [curRes, prevRes] = await Promise.all([
       (async () => {
-        const { query: curQuery } = await buildResultsQuery(
-          brandId,
-          currentFilterOpts,
-        );
+        const { query: curQuery } = await buildResultsQuery(brandId, currentFilterOpts);
         return curQuery;
       })(),
       (async () => {
@@ -935,19 +847,12 @@ export async function getCompetitorComparison(
     const prevRows = (prevRes.data ?? []) as Record<string, unknown>[];
 
     if (curRows.length > 0) {
-      const curTotal = curRows.reduce(
-        (s, r) => s + (r.visibility_score as number),
-        0,
-      );
+      const curTotal = curRows.reduce((s, r) => s + (r.visibility_score as number), 0);
       curBrandAvg = curTotal / curRows.length;
 
-      const curCompMap = new Map<
-        string,
-        { totalScore: number; count: number }
-      >();
+      const curCompMap = new Map<string, { totalScore: number; count: number }>();
       for (const row of curRows) {
-        const mentions =
-          (row.competitor_mentions as CompetitorMention[] | null) ?? [];
+        const mentions = (row.competitor_mentions as CompetitorMention[] | null) ?? [];
         for (const cm of mentions) {
           const ex = curCompMap.get(cm.competitor_id) ?? {
             totalScore: 0,
@@ -964,19 +869,12 @@ export async function getCompetitorComparison(
     }
 
     if (prevRows.length > 0) {
-      const prevTotal = prevRows.reduce(
-        (s, r) => s + (r.visibility_score as number),
-        0,
-      );
+      const prevTotal = prevRows.reduce((s, r) => s + (r.visibility_score as number), 0);
       prevBrandAvg = prevTotal / prevRows.length;
 
-      const prevCompMap = new Map<
-        string,
-        { totalScore: number; count: number }
-      >();
+      const prevCompMap = new Map<string, { totalScore: number; count: number }>();
       for (const row of prevRows) {
-        const mentions =
-          (row.competitor_mentions as CompetitorMention[] | null) ?? [];
+        const mentions = (row.competitor_mentions as CompetitorMention[] | null) ?? [];
         for (const cm of mentions) {
           const ex = prevCompMap.get(cm.competitor_id) ?? {
             totalScore: 0,
@@ -996,26 +894,14 @@ export async function getCompetitorComparison(
   const brandName = (brand?.name as string) ?? 'Your Brand';
 
   // --- Flat brand-level aggregates ---
-  const brandTotalScore = rows.reduce(
-    (s, r) => s + (r.visibility_score as number),
-    0,
-  );
-  const brandTotalMentions = rows.reduce(
-    (s, r) => s + (r.mention_count as number),
-    0,
-  );
-  const brandTotalCitations = rows.reduce(
-    (s, r) => s + (r.citation_count as number),
-    0,
-  );
+  const brandTotalScore = rows.reduce((s, r) => s + (r.visibility_score as number), 0);
+  const brandTotalMentions = rows.reduce((s, r) => s + (r.mention_count as number), 0);
+  const brandTotalCitations = rows.reduce((s, r) => s + (r.citation_count as number), 0);
   const brandAvg = Math.round(brandTotalScore / rows.length);
 
   // Percentage change relative to the previous-period value.
   // Null when no comparable previous value exists (or growth from 0 → x is undefined).
-  const pctChange = (
-    cur: number | null,
-    prev: number | null,
-  ): number | null => {
+  const pctChange = (cur: number | null, prev: number | null): number | null => {
     if (cur === null || prev === null) return null;
     if (prev === 0) return cur === 0 ? 0 : null;
     return Math.round(((cur - prev) / prev) * 1000) / 10;
@@ -1046,8 +932,7 @@ export async function getCompetitorComparison(
   >();
 
   for (const row of rows) {
-    const mentions =
-      (row.competitor_mentions as CompetitorMention[] | null) ?? [];
+    const mentions = (row.competitor_mentions as CompetitorMention[] | null) ?? [];
     for (const cm of mentions) {
       const existing = compMap.get(cm.competitor_id) ?? {
         id: cm.competitor_id,
@@ -1100,8 +985,7 @@ export async function getCompetitorComparison(
     bp.count += 1;
     brandByProvider.set(provider, bp);
 
-    const mentions =
-      (row.competitor_mentions as CompetitorMention[] | null) ?? [];
+    const mentions = (row.competitor_mentions as CompetitorMention[] | null) ?? [];
     for (const cm of mentions) {
       if (!compByProvider.has(cm.name)) compByProvider.set(cm.name, new Map());
       const pm = compByProvider.get(cm.name)!;
@@ -1118,21 +1002,19 @@ export async function getCompetitorComparison(
     for (const p of pm.keys()) allProviders.add(p);
   }
 
-  const providerRows: ProviderComparisonRow[] = [...allProviders]
-    .sort()
-    .map((provider) => {
-      const row: ProviderComparisonRow = { provider };
+  const providerRows: ProviderComparisonRow[] = [...allProviders].sort().map((provider) => {
+    const row: ProviderComparisonRow = { provider };
 
-      const bp = brandByProvider.get(provider);
-      row[brandName] = bp ? Math.round(bp.totalScore / bp.count) : 0;
+    const bp = brandByProvider.get(provider);
+    row[brandName] = bp ? Math.round(bp.totalScore / bp.count) : 0;
 
-      for (const [compName, pm] of compByProvider) {
-        const cp = pm.get(provider);
-        row[compName] = cp ? Math.round(cp.totalScore / cp.count) : 0;
-      }
+    for (const [compName, pm] of compByProvider) {
+      const cp = pm.get(provider);
+      row[compName] = cp ? Math.round(cp.totalScore / cp.count) : 0;
+    }
 
-      return row;
-    });
+    return row;
+  });
 
   return { brands: entries, providerRows };
 }
@@ -1203,8 +1085,7 @@ export async function getShareOfVoiceData(
     };
     pa.brandMentions += brandM;
 
-    const mentions =
-      (row.competitor_mentions as CompetitorMention[] | null) ?? [];
+    const mentions = (row.competitor_mentions as CompetitorMention[] | null) ?? [];
     let rowCompMentions = 0;
     for (const cm of mentions) {
       rowCompMentions += cm.mention_count;
@@ -1222,8 +1103,7 @@ export async function getShareOfVoiceData(
   }
 
   const totalAll = totalBrandMentions + totalCompMentions;
-  const overallSov =
-    totalAll > 0 ? Math.round((totalBrandMentions / totalAll) * 1000) / 10 : 0;
+  const overallSov = totalAll > 0 ? Math.round((totalBrandMentions / totalAll) * 1000) / 10 : 0;
 
   // --- By platform ---
   const byPlatform: SoVByPlatform[] = [...providerMap.entries()]
@@ -1233,8 +1113,7 @@ export async function getShareOfVoiceData(
         provider,
         brandMentions: agg.brandMentions,
         competitorMentions: agg.competitorMentions,
-        sov:
-          total > 0 ? Math.round((agg.brandMentions / total) * 1000) / 10 : 0,
+        sov: total > 0 ? Math.round((agg.brandMentions / total) * 1000) / 10 : 0,
       };
     })
     .sort((a, b) => b.sov - a.sov);
@@ -1244,10 +1123,8 @@ export async function getShareOfVoiceData(
   const trend: SoVTrendPoint[] = sortedDays.map((day) => {
     const d = dayMap.get(day)!;
     const total = d.brandMentions + d.competitorMentions;
-    const brandSov =
-      total > 0 ? Math.round((d.brandMentions / total) * 1000) / 10 : 0;
-    const competitorSov =
-      total > 0 ? Math.round((d.competitorMentions / total) * 1000) / 10 : 0;
+    const brandSov = total > 0 ? Math.round((d.brandMentions / total) * 1000) / 10 : 0;
+    const competitorSov = total > 0 ? Math.round((d.competitorMentions / total) * 1000) / 10 : 0;
     const dateObj = new Date(day + 'T00:00:00');
     const label = dateObj.toLocaleDateString('en-US', {
       month: 'short',
@@ -1289,13 +1166,11 @@ export async function getShareOfVoiceData(
       let prevCompM = 0;
       for (const row of prevRows) {
         prevBrandM += row.mention_count as number;
-        const cms =
-          (row.competitor_mentions as CompetitorMention[] | null) ?? [];
+        const cms = (row.competitor_mentions as CompetitorMention[] | null) ?? [];
         for (const cm of cms) prevCompM += cm.mention_count;
       }
       const prevTotal = prevBrandM + prevCompM;
-      const prevSov =
-        prevTotal > 0 ? Math.round((prevBrandM / prevTotal) * 1000) / 10 : 0;
+      const prevSov = prevTotal > 0 ? Math.round((prevBrandM / prevTotal) * 1000) / 10 : 0;
       overallSovChange = Math.round((overallSov - prevSov) * 10) / 10;
     }
   }
@@ -1342,10 +1217,7 @@ export async function getVisibilityTrend(
       .select('id')
       .eq('topic_id', opts.topicId);
     const ids = ((topicPrompts ?? []) as { id: string }[]).map((p) => p.id);
-    query = query.in(
-      'prompt_id',
-      ids.length > 0 ? ids : ['00000000-0000-0000-0000-000000000000'],
-    );
+    query = query.in('prompt_id', ids.length > 0 ? ids : ['00000000-0000-0000-0000-000000000000']);
   }
 
   const { data, error } = await query;
@@ -1376,8 +1248,7 @@ export async function getVisibilityTrend(
     entry.totalScore += row.visibility_score as number;
     entry.count += 1;
 
-    const mentions =
-      (row.competitor_mentions as CompetitorMention[] | null) ?? [];
+    const mentions = (row.competitor_mentions as CompetitorMention[] | null) ?? [];
     for (const cm of mentions) {
       entry.compTotalScore += cm.visibility_score;
       entry.compCount += 1;
@@ -1400,8 +1271,7 @@ export async function getVisibilityTrend(
     points.push({
       date: label,
       score: Math.round(d.totalScore / d.count),
-      competitors:
-        d.compCount > 0 ? Math.round(d.compTotalScore / d.compCount) : null,
+      competitors: d.compCount > 0 ? Math.round(d.compTotalScore / d.compCount) : null,
     });
   }
 
@@ -1479,10 +1349,7 @@ export async function getHeadToHeadComparison(
   const promptIds = [...new Set(rows.map((r) => r.prompt_id as string))];
   const { data: promptData } =
     promptIds.length > 0
-      ? await supabase
-          .from('prompts')
-          .select('id, text, category')
-          .in('id', promptIds)
+      ? await supabase.from('prompts').select('id, text, category').in('id', promptIds)
       : { data: [] };
   const promptMap = new Map(
     (promptData ?? []).map((p) => [
@@ -1515,8 +1382,7 @@ export async function getHeadToHeadComparison(
       row.model_used as string | null,
       row.platform as string | null,
     );
-    const mentions =
-      (row.competitor_mentions as CompetitorMention[] | null) ?? [];
+    const mentions = (row.competitor_mentions as CompetitorMention[] | null) ?? [];
     const comp = mentions.find((cm) => cm.competitor_id === competitorId);
     const compScore = comp?.visibility_score ?? 0;
 
@@ -1575,10 +1441,8 @@ export async function getHeadToHeadComparison(
     })
     .sort((a, b) => a.platform.localeCompare(b.platform));
 
-  const brandAvg =
-    brandCount > 0 ? Math.round(brandTotalScore / brandCount) : 0;
-  const competitorAvg =
-    compCount > 0 ? Math.round(compTotalScore / compCount) : 0;
+  const brandAvg = brandCount > 0 ? Math.round(brandTotalScore / brandCount) : 0;
+  const competitorAvg = compCount > 0 ? Math.round(compTotalScore / compCount) : 0;
 
   const sorted = [...promptRows].sort((a, b) => a.diff - b.diff);
   const gaps = sorted.filter((r) => r.diff < 0).slice(0, 10);
@@ -1771,10 +1635,7 @@ export async function getInsightsBreakdown(
           .in('id', [...allPromptIds])
       : { data: [] as unknown[] };
 
-  const promptInfo = new Map<
-    string,
-    { text: string; topicId: string | null }
-  >();
+  const promptInfo = new Map<string, { text: string; topicId: string | null }>();
   const topicIds = new Set<string>();
   for (const p of (promptRowsRaw ?? []) as Array<{
     id: string;
@@ -1826,11 +1687,7 @@ export async function getInsightsBreakdown(
     const rows: BreakdownRow[] = keys.map((key) => {
       const curAgg = aggregateMetric(curMap.get(key) ?? [], metric);
       const prevAgg = aggregateMetric(prevMap.get(key) ?? [], metric);
-      const { delta, deltaPct } = computeDelta(
-        curAgg.value,
-        prevAgg.value,
-        metric,
-      );
+      const { delta, deltaPct } = computeDelta(curAgg.value, prevAgg.value, metric);
       const { id, label, sublabel } = resolver(key);
       return {
         id,
@@ -1853,9 +1710,7 @@ export async function getInsightsBreakdown(
   const prevByPrompt = groupBy(prevRows, (r) => r.prompt_id);
   const byPrompt = buildRows(curByPrompt, prevByPrompt, (pid) => {
     const info = promptInfo.get(pid);
-    const topicName = info?.topicId
-      ? topicNameById.get(info.topicId)
-      : undefined;
+    const topicName = info?.topicId ? topicNameById.get(info.topicId) : undefined;
     return {
       id: pid,
       label: info?.text ?? 'Unknown prompt',
@@ -1881,9 +1736,7 @@ export async function getInsightsBreakdown(
   const byTopic = buildRows(curByTopic, prevByTopic, (tid) => ({
     id: tid,
     label:
-      tid === '__uncategorized__'
-        ? 'Uncategorized'
-        : (topicNameById.get(tid) ?? 'Unknown topic'),
+      tid === '__uncategorized__' ? 'Uncategorized' : (topicNameById.get(tid) ?? 'Unknown topic'),
   }));
 
   // ─── Totals + root-cause summary ────────────────────────────────────────────
@@ -1896,11 +1749,7 @@ export async function getInsightsBreakdown(
   );
 
   const metricLabel =
-    metric === 'visibility'
-      ? 'Visibility'
-      : metric === 'mentions'
-        ? 'Mentions'
-        : 'Citations';
+    metric === 'visibility' ? 'Visibility' : metric === 'mentions' ? 'Mentions' : 'Citations';
 
   const isDrop = totalDelta < 0;
   const isFlat = totalDelta === 0;
@@ -1909,12 +1758,9 @@ export async function getInsightsBreakdown(
   // `buildRows` sorts ascending by delta so byPrompt[0] is the largest drop and
   // byPrompt[last] is the largest gain.
   const topPrompt = isDrop ? byPrompt[0] : byPrompt[byPrompt.length - 1];
-  const topPlatform = isDrop
-    ? byPlatform[0]
-    : byPlatform[byPlatform.length - 1];
+  const topPlatform = isDrop ? byPlatform[0] : byPlatform[byPlatform.length - 1];
 
-  const promptContributes =
-    !!topPrompt && (isDrop ? topPrompt.delta < 0 : topPrompt.delta > 0);
+  const promptContributes = !!topPrompt && (isDrop ? topPrompt.delta < 0 : topPrompt.delta > 0);
   const platformContributes =
     !!topPlatform && (isDrop ? topPlatform.delta < 0 : topPlatform.delta > 0);
 
@@ -1958,10 +1804,7 @@ function truncate(s: string, max: number): string {
  *   - citations: "lost 7 citations (−15%)"
  *   - visibility: "dropped 2.1 pts"           or  "rose 2.1 pts"
  */
-function formatContribution(
-  row: BreakdownRow,
-  metric: BreakdownMetric,
-): string {
+function formatContribution(row: BreakdownRow, metric: BreakdownMetric): string {
   const isLoss = row.delta < 0;
   const abs = Math.abs(row.delta);
 

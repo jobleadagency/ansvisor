@@ -40,7 +40,12 @@ function mapLogRow(row: Record<string, unknown>): TrafficLog {
   };
 }
 
-function getDateRange(days: number): { from: string; to: string; prevFrom: string; prevTo: string } {
+function getDateRange(days: number): {
+  from: string;
+  to: string;
+  prevFrom: string;
+  prevTo: string;
+} {
   const now = new Date();
   const to = now.toISOString();
   const from = new Date(now.getTime() - days * 86400000).toISOString();
@@ -49,10 +54,7 @@ function getDateRange(days: number): { from: string; to: string; prevFrom: strin
   return { from, to, prevFrom, prevTo };
 }
 
-export async function getTrafficSummary(
-  brandId: string,
-  days = 7,
-): Promise<TrafficSummary> {
+export async function getTrafficSummary(brandId: string, days = 7): Promise<TrafficSummary> {
   const supabase = await createClient();
   const { from, prevFrom, prevTo } = getDateRange(days);
 
@@ -136,10 +138,7 @@ export async function getTrafficSummary(
   };
 }
 
-export async function getTrafficTrend(
-  brandId: string,
-  days = 7,
-): Promise<TrafficTrendPoint[]> {
+export async function getTrafficTrend(brandId: string, days = 7): Promise<TrafficTrendPoint[]> {
   const supabase = await createClient();
   const from = new Date(Date.now() - days * 86400000).toISOString();
 

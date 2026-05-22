@@ -1,9 +1,9 @@
-import { NextIntlClientProvider, hasLocale } from "next-intl";
-import { getMessages } from "next-intl/server";
-import { notFound } from "next/navigation";
-import { ThemeProvider } from "next-themes";
-import { routing } from "@/i18n/routing";
-import { Toaster } from "@/components/ui/sonner";
+import { NextIntlClientProvider, hasLocale } from 'next-intl';
+import { getMessages } from 'next-intl/server';
+import { notFound } from 'next/navigation';
+import { ThemeProvider } from 'next-themes';
+import { routing } from '@/i18n/routing';
+import { Toaster } from '@/components/ui/sonner';
 
 export default async function LocaleLayout({
   children,
@@ -21,12 +21,7 @@ export default async function LocaleLayout({
   const messages = await getMessages();
 
   return (
-    <ThemeProvider
-      attribute="class"
-      defaultTheme="dark"
-      enableSystem
-      disableTransitionOnChange
-    >
+    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
       <NextIntlClientProvider messages={messages} locale={locale}>
         {children}
         <Toaster richColors position="top-right" />

@@ -12,19 +12,9 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import {
-  ArrowLeft,
-  ChevronDown,
-  Clock,
-  Eye,
-  MessageSquareText,
-  Quote,
-} from 'lucide-react';
+import { ArrowLeft, ChevronDown, Clock, Eye, MessageSquareText, Quote } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import {
-  AIProviderAvatar,
-  resolveAIProvider,
-} from '@/components/ai-provider-avatar';
+import { AIProviderAvatar, resolveAIProvider } from '@/components/ai-provider-avatar';
 
 const PLATFORM_LABELS: Record<string, string> = {
   chatgpt: 'ChatGPT',
@@ -85,11 +75,7 @@ function formatTimestamp(iso: string): string {
   });
 }
 
-function SentimentBadge({
-  sentiment,
-}: {
-  sentiment: 'positive' | 'neutral' | 'negative';
-}) {
+function SentimentBadge({ sentiment }: { sentiment: 'positive' | 'neutral' | 'negative' }) {
   return (
     <Badge
       variant="outline"
@@ -108,13 +94,7 @@ function SentimentBadge({
   );
 }
 
-function ModelBadge({
-  model,
-  platform,
-}: {
-  model?: string;
-  platform?: string;
-}) {
+function ModelBadge({ model, platform }: { model?: string; platform?: string }) {
   const provider = resolveAIProvider(model ?? platform ?? '', platform);
   return (
     <span className="inline-flex items-center gap-1.5 rounded-full border bg-background px-2 py-1">
@@ -132,18 +112,12 @@ function VisibilityBar({ score }: { score: number }) {
         <div
           className={cn(
             'h-full rounded-full',
-            rounded >= 70
-              ? 'bg-emerald-500'
-              : rounded >= 40
-                ? 'bg-amber-500'
-                : 'bg-red-500',
+            rounded >= 70 ? 'bg-emerald-500' : rounded >= 40 ? 'bg-amber-500' : 'bg-red-500',
           )}
           style={{ width: `${Math.min(100, Math.max(0, rounded))}%` }}
         />
       </div>
-      <span className="w-8 text-right text-xs font-semibold tabular-nums">
-        {rounded}
-      </span>
+      <span className="w-8 text-right text-xs font-semibold tabular-nums">{rounded}</span>
     </div>
   );
 }
@@ -379,10 +353,7 @@ export default function PromptDetailPage() {
     };
   }, [promptId]);
 
-  const platformGroups = useMemo(
-    () => groupByPlatform(data?.results ?? []),
-    [data?.results],
-  );
+  const platformGroups = useMemo(() => groupByPlatform(data?.results ?? []), [data?.results]);
 
   const togglePlatform = (key: string) =>
     setExpanded((prev) => {
@@ -415,11 +386,7 @@ export default function PromptDetailPage() {
         <p className="mt-1 text-sm text-muted-foreground">
           This prompt may have been deleted or does not exist.
         </p>
-        <Button
-          variant="outline"
-          className="mt-6 gap-2"
-          onClick={() => router.back()}
-        >
+        <Button variant="outline" className="mt-6 gap-2" onClick={() => router.back()}>
           <ArrowLeft className="h-4 w-4" />
           Go back
         </Button>
@@ -440,9 +407,7 @@ export default function PromptDetailPage() {
       </Button>
 
       <div className="space-y-3">
-        <h1 className="text-xl font-semibold leading-snug">
-          {data.prompt.text}
-        </h1>
+        <h1 className="text-xl font-semibold leading-snug">{data.prompt.text}</h1>
         <div className="flex flex-wrap items-center gap-2">
           {data.prompt.topicName && (
             <Badge variant="secondary" className="text-xs">
@@ -491,7 +456,8 @@ export default function PromptDetailPage() {
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-medium">Platform Results</CardTitle>
           <p className="text-xs text-muted-foreground">
-            {data.summary.totalResults} result{data.summary.totalResults !== 1 ? 's' : ''} grouped by platform and model.
+            {data.summary.totalResults} result{data.summary.totalResults !== 1 ? 's' : ''} grouped
+            by platform and model.
           </p>
         </CardHeader>
         <CardContent className="space-y-3">

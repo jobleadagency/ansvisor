@@ -8,8 +8,8 @@ import {
   Settings,
   Tag,
   Users,
-} from "lucide-react";
-import type { Feature } from "@/config/plans";
+} from 'lucide-react';
+import type { Feature } from '@/config/plans';
 
 export interface NavItem {
   title: string;
@@ -29,67 +29,67 @@ export const dashboardNav: NavGroup[] = [
   {
     items: [
       {
-        title: "Brands",
-        href: "/dashboard/brands",
+        title: 'Brands',
+        href: '/dashboard/brands',
         icon: Building2,
       },
     ],
   },
   {
-    title: "Analytics",
+    title: 'Analytics',
     items: [
       {
-        title: "Answer Engine Insights",
-        href: "/dashboard/insights",
+        title: 'Answer Engine Insights',
+        href: '/dashboard/insights',
         icon: BarChart3,
-        requiredFeature: "basic_insights",
+        requiredFeature: 'basic_insights',
       },
       {
-        title: "Topics",
-        href: "/dashboard/topics",
+        title: 'Topics',
+        href: '/dashboard/topics',
         icon: Tag,
       },
       {
-        title: "Prompts",
-        href: "/dashboard/prompts",
+        title: 'Prompts',
+        href: '/dashboard/prompts',
         icon: Globe,
       },
       {
-        title: "Citations",
-        href: "/dashboard/citations",
+        title: 'Citations',
+        href: '/dashboard/citations',
         icon: Quote,
       },
       {
-        title: "AI Traffic Analytics",
-        href: "/dashboard/traffic",
+        title: 'AI Traffic Analytics',
+        href: '/dashboard/traffic',
         icon: LineChart,
-        requiredFeature: "advanced_analytics",
+        requiredFeature: 'advanced_analytics',
       },
       {
-        title: "Competitors",
-        href: "/dashboard/competitors",
+        title: 'Competitors',
+        href: '/dashboard/competitors',
         icon: Users,
-        requiredFeature: "competitor_tracking",
+        requiredFeature: 'competitor_tracking',
       },
     ],
   },
   {
-    title: "Optimization",
+    title: 'Optimization',
     items: [
       {
-        title: "Content Optimization",
-        href: "/dashboard/content",
+        title: 'Content Optimization',
+        href: '/dashboard/content',
         icon: FileText,
-        requiredFeature: "content_optimization",
+        requiredFeature: 'content_optimization',
       },
     ],
   },
   {
-    title: "System",
+    title: 'System',
     items: [
       {
-        title: "Settings",
-        href: "/dashboard/settings",
+        title: 'Settings',
+        href: '/dashboard/settings',
         icon: Settings,
       },
     ],

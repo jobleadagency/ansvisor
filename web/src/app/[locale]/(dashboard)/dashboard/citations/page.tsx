@@ -1,27 +1,10 @@
 'use client';
 
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
-import {
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-} from 'recharts';
-import {
-  Quote,
-  Globe,
-  ExternalLink,
-  Filter as FilterIcon,
-  Layers,
-} from 'lucide-react';
+import { PieChart, Pie, Cell, Tooltip } from 'recharts';
+import { Quote, Globe, ExternalLink, Filter as FilterIcon, Layers } from 'lucide-react';
 import { useBrandStore } from '@/stores/use-brand-store';
 import {
   getCitationsOverview,
@@ -45,17 +28,9 @@ import {
   ComboboxValue,
 } from '@/components/ui/combobox';
 import type { Topic } from '@/types';
-import {
-  SOURCE_CATEGORY_LABELS,
-  type SourceCategory,
-} from '@/lib/citations/classify';
+import { SOURCE_CATEGORY_LABELS, type SourceCategory } from '@/lib/citations/classify';
 import { getFaviconUrl } from '@/lib/favicon';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -66,12 +41,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Table,
   TableBody,
@@ -91,14 +61,7 @@ import {
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
-const DATE_PRESETS: CitationsDatePreset[] = [
-  '24h',
-  '7d',
-  '30d',
-  '90d',
-  'all',
-  'custom',
-];
+const DATE_PRESETS: CitationsDatePreset[] = ['24h', '7d', '30d', '90d', 'all', 'custom'];
 
 const CATEGORY_COLORS: Record<SourceCategory, string> = {
   you: '#6366f1',
@@ -113,20 +76,13 @@ const CATEGORY_COLORS: Record<SourceCategory, string> = {
 
 const CATEGORY_BADGE_CLASSES: Record<SourceCategory, string> = {
   you: 'border-indigo-500/30 bg-indigo-500/10 text-indigo-700 dark:text-indigo-300',
-  competitor:
-    'border-orange-500/30 bg-orange-500/10 text-orange-700 dark:text-orange-300',
-  editorial:
-    'border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-300',
-  forum:
-    'border-green-500/30 bg-green-500/10 text-green-700 dark:text-green-300',
-  social:
-    'border-purple-500/30 bg-purple-500/10 text-purple-700 dark:text-purple-300',
-  review:
-    'border-yellow-500/30 bg-yellow-500/10 text-yellow-700 dark:text-yellow-300',
-  institutional:
-    'border-teal-500/30 bg-teal-500/10 text-teal-700 dark:text-teal-300',
-  other:
-    'border-slate-400/30 bg-slate-400/10 text-slate-700 dark:text-slate-300',
+  competitor: 'border-orange-500/30 bg-orange-500/10 text-orange-700 dark:text-orange-300',
+  editorial: 'border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-300',
+  forum: 'border-green-500/30 bg-green-500/10 text-green-700 dark:text-green-300',
+  social: 'border-purple-500/30 bg-purple-500/10 text-purple-700 dark:text-purple-300',
+  review: 'border-yellow-500/30 bg-yellow-500/10 text-yellow-700 dark:text-yellow-300',
+  institutional: 'border-teal-500/30 bg-teal-500/10 text-teal-700 dark:text-teal-300',
+  other: 'border-slate-400/30 bg-slate-400/10 text-slate-700 dark:text-slate-300',
 };
 
 // AI platform / model friendly names — kept in sync with the insights page.
@@ -231,9 +187,7 @@ const DEFAULT_FILTERS: UIFilters = {
   competitorOnly: false,
 };
 
-function buildPlatformOptions(
-  rows: CitationsOverview['rows'],
-): PlatformOption[] {
+function buildPlatformOptions(rows: CitationsOverview['rows']): PlatformOption[] {
   const slugToLabel = new Map<string, string>();
   for (const row of rows) {
     for (const slug of row.models) {
@@ -254,10 +208,7 @@ function buildPlatformOptions(
       label,
       value: slugs.sort().join(','),
     }))
-    .sort(
-      (a, b) =>
-        a.label.localeCompare(b.label) || a.value.localeCompare(b.value),
-    );
+    .sort((a, b) => a.label.localeCompare(b.label) || a.value.localeCompare(b.value));
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -305,14 +256,9 @@ function UsageBar({ pct }: { pct: number }) {
   return (
     <div className="flex items-center gap-2">
       <div className="h-1.5 w-20 rounded-full bg-muted overflow-hidden">
-        <div
-          className="h-full rounded-full bg-primary"
-          style={{ width: `${clamped}%` }}
-        />
+        <div className="h-full rounded-full bg-primary" style={{ width: `${clamped}%` }} />
       </div>
-      <span className="text-xs tabular-nums text-foreground">
-        {pct.toFixed(1)}%
-      </span>
+      <span className="text-xs tabular-nums text-foreground">{pct.toFixed(1)}%</span>
     </div>
   );
 }
@@ -443,9 +389,7 @@ function SourceTypeDonut({
               aria-hidden
             />
             <span className="truncate text-foreground">{d.label}</span>
-            <span className="ml-auto tabular-nums text-muted-foreground">
-              {d.pct.toFixed(1)}%
-            </span>
+            <span className="ml-auto tabular-nums text-muted-foreground">{d.pct.toFixed(1)}%</span>
           </li>
         ))}
       </ul>
@@ -485,9 +429,7 @@ function FilterBar({
   return (
     <div className="flex flex-wrap items-end gap-3">
       <div>
-        <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
-          Date Range
-        </label>
+        <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Date Range</label>
         <div className="flex rounded-md border overflow-hidden">
           {DATE_PRESETS.map((p) => (
             <button
@@ -510,9 +452,7 @@ function FilterBar({
       {filters.datePreset === 'custom' && (
         <>
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
-              From
-            </label>
+            <label className="mb-1.5 block text-xs font-medium text-muted-foreground">From</label>
             <Input
               type="date"
               value={filters.dateFrom}
@@ -521,9 +461,7 @@ function FilterBar({
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
-              To
-            </label>
+            <label className="mb-1.5 block text-xs font-medium text-muted-foreground">To</label>
             <Input
               type="date"
               value={filters.dateTo}
@@ -536,14 +474,10 @@ function FilterBar({
 
       {topics.length > 0 && (
         <div>
-          <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
-            Topic
-          </label>
+          <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Topic</label>
           <Select
             value={filters.topic || null}
-            onValueChange={(v) =>
-              onChange({ topic: !v || v === '__all__' ? '' : v })
-            }
+            onValueChange={(v) => onChange({ topic: !v || v === '__all__' ? '' : v })}
           >
             <SelectTrigger className="h-8 w-40 text-xs">
               <SelectValue placeholder="All Topics">
@@ -568,16 +502,12 @@ function FilterBar({
 
       {prompts.length > 0 && (
         <div>
-          <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
-            Prompt
-          </label>
+          <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Prompt</label>
           <Combobox
             items={promptComboboxItems}
             value={
               filters.prompt
-                ? (promptComboboxItems.find(
-                    (item) => item.value === filters.prompt,
-                  ) ?? null)
+                ? (promptComboboxItems.find((item) => item.value === filters.prompt) ?? null)
                 : null
             }
             onValueChange={(item: PromptComboboxItem | null) =>
@@ -607,21 +537,17 @@ function FilterBar({
       )}
 
       <div>
-        <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
-          Platform
-        </label>
+        <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Platform</label>
         <Select
           value={filters.platform || null}
-          onValueChange={(v) =>
-            onChange({ platform: !v || v === '__all__' ? '' : v })
-          }
+          onValueChange={(v) => onChange({ platform: !v || v === '__all__' ? '' : v })}
         >
           <SelectTrigger className="h-8 w-40 text-xs">
             <SelectValue placeholder="All Platforms">
               {(value) =>
                 value && value !== '__all__'
-                  ? platforms.find((platform) => platform.value === value)
-                      ?.label ?? getGroupedPlatformLabel(value)
+                  ? (platforms.find((platform) => platform.value === value)?.label ??
+                    getGroupedPlatformLabel(value))
                   : 'All Platforms'
               }
             </SelectValue>
@@ -638,14 +564,10 @@ function FilterBar({
       </div>
 
       <div>
-        <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
-          Region
-        </label>
+        <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Region</label>
         <Select
           value={filters.region || null}
-          onValueChange={(v) =>
-            onChange({ region: !v || v === '__all__' ? '' : v })
-          }
+          onValueChange={(v) => onChange({ region: !v || v === '__all__' ? '' : v })}
         >
           <SelectTrigger className="h-8 w-32 text-xs">
             <SelectValue placeholder="All Regions" />
@@ -667,9 +589,7 @@ function FilterBar({
           variant={filters.excludeOwnDomain ? 'default' : 'outline'}
           size="sm"
           className="h-8 text-xs"
-          onClick={() =>
-            onChange({ excludeOwnDomain: !filters.excludeOwnDomain })
-          }
+          onClick={() => onChange({ excludeOwnDomain: !filters.excludeOwnDomain })}
         >
           Exclude own domain
         </Button>
@@ -681,9 +601,7 @@ function FilterBar({
           onClick={() =>
             onChange({
               competitorOnly: !filters.competitorOnly,
-              excludeOwnDomain: !filters.competitorOnly
-                ? true
-                : filters.excludeOwnDomain,
+              excludeOwnDomain: !filters.competitorOnly ? true : filters.excludeOwnDomain,
             })
           }
         >
@@ -742,16 +660,12 @@ function DomainsTable({ rows }: { rows: CitationDomainRow[] }) {
       <TableBody>
         {rows.map((row, i) => (
           <TableRow key={row.domain}>
-            <TableCell className="text-xs text-muted-foreground tabular-nums">
-              {i + 1}
-            </TableCell>
+            <TableCell className="text-xs text-muted-foreground tabular-nums">{i + 1}</TableCell>
             <TableCell>
               <div className="flex items-center gap-2 min-w-0">
                 <DomainFavicon domain={row.domain} />
                 <div className="flex min-w-0 flex-col">
-                  <span className="truncate text-sm font-medium">
-                    {row.domain}
-                  </span>
+                  <span className="truncate text-sm font-medium">{row.domain}</span>
                   <div className="flex items-center gap-1.5 pt-0.5">
                     <CategoryBadge category={row.category} />
                     <a
@@ -800,9 +714,7 @@ function UrlsTable({ rows }: { rows: CitationUrlRow[] }) {
       <TableBody>
         {rows.map((row, i) => (
           <TableRow key={row.url}>
-            <TableCell className="text-xs text-muted-foreground tabular-nums">
-              {i + 1}
-            </TableCell>
+            <TableCell className="text-xs text-muted-foreground tabular-nums">{i + 1}</TableCell>
             <TableCell>
               <div className="flex items-start gap-2 min-w-0">
                 <DomainFavicon domain={row.domain} />
@@ -817,9 +729,7 @@ function UrlsTable({ rows }: { rows: CitationUrlRow[] }) {
                     {row.title || row.url}
                   </a>
                   <div className="flex items-center gap-1.5 pt-0.5">
-                    <span className="truncate text-[11px] text-muted-foreground">
-                      {row.domain}
-                    </span>
+                    <span className="truncate text-[11px] text-muted-foreground">{row.domain}</span>
                     <CategoryBadge category={row.category} />
                   </div>
                 </div>
@@ -831,9 +741,7 @@ function UrlsTable({ rows }: { rows: CitationUrlRow[] }) {
             <TableCell>
               <UsageBar pct={row.usagePct} />
             </TableCell>
-            <TableCell className="text-right text-xs tabular-nums">
-              {row.totalCitations}
-            </TableCell>
+            <TableCell className="text-right text-xs tabular-nums">{row.totalCitations}</TableCell>
           </TableRow>
         ))}
       </TableBody>
@@ -887,16 +795,16 @@ export default function CitationsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [topics, setTopics] = useState<Topic[]>([]);
   const [prompts, setPrompts] = useState<PromptOption[]>([]);
-  const [availablePlatforms, setAvailablePlatforms] = useState<PlatformOption[]>(
-    [],
-  );
+  const [availablePlatforms, setAvailablePlatforms] = useState<PlatformOption[]>([]);
   const [availableRegions, setAvailableRegions] = useState<string[]>([]);
 
   const activeBrandId = brand?.id ?? null;
 
   useEffect(() => {
     if (!activeBrandId) return;
-    getTopics(activeBrandId).then(setTopics).catch(() => {});
+    getTopics(activeBrandId)
+      .then(setTopics)
+      .catch(() => {});
     getBrandPrompts(activeBrandId)
       .then((rows) => setPrompts(rows.map((r) => ({ id: r.id, text: r.text }))))
       .catch(() => {});
@@ -933,21 +841,13 @@ export default function CitationsPage() {
       setAvailablePlatforms((prev) =>
         Array.from(
           new Map(
-            [...prev, ...platformOptions].map((platform) => [
-              platform.value,
-              platform,
-            ]),
+            [...prev, ...platformOptions].map((platform) => [platform.value, platform]),
           ).values(),
-        ).sort(
-          (a, b) =>
-            a.label.localeCompare(b.label) || a.value.localeCompare(b.value),
-        ),
+        ).sort((a, b) => a.label.localeCompare(b.label) || a.value.localeCompare(b.value)),
       );
       if (regions.size > 0) {
         setAvailableRegions((prev) =>
-          Array.from(new Set([...prev, ...regions])).sort((a, b) =>
-            a.localeCompare(b),
-          ),
+          Array.from(new Set([...prev, ...regions])).sort((a, b) => a.localeCompare(b)),
         );
       }
     } catch {
@@ -1006,9 +906,7 @@ export default function CitationsPage() {
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <Globe className="h-10 w-10 text-muted-foreground/40 mb-3" />
         <h2 className="text-lg font-semibold">{t('noBrandTitle')}</h2>
-        <p className="mt-1 max-w-md text-sm text-muted-foreground">
-          {t('noBrandDescription')}
-        </p>
+        <p className="mt-1 max-w-md text-sm text-muted-foreground">{t('noBrandDescription')}</p>
       </div>
     );
   }
@@ -1018,9 +916,7 @@ export default function CitationsPage() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold">{t('title')}</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {t('description')}
-          </p>
+          <p className="mt-1 text-sm text-muted-foreground">{t('description')}</p>
         </div>
       </div>
 
@@ -1070,9 +966,7 @@ export default function CitationsPage() {
 
             <Card className="lg:col-span-2">
               <CardHeader>
-                <CardTitle className="text-base">
-                  {t('sourceTypesTitle')}
-                </CardTitle>
+                <CardTitle className="text-base">{t('sourceTypesTitle')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <SourceTypeDonut

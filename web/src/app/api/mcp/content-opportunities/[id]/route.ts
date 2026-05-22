@@ -2,10 +2,7 @@ import { NextResponse } from 'next/server';
 import { authenticateMcpRequest } from '@/lib/mcp-auth';
 import { getContentOpportunityFor } from '@/lib/mcp/data';
 
-export async function GET(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const auth = await authenticateMcpRequest(req);
   if (auth instanceof NextResponse) return auth;
 
@@ -18,10 +15,7 @@ export async function GET(
   try {
     const opportunity = await getContentOpportunityFor(auth, opportunityId);
     if (!opportunity) {
-      return NextResponse.json(
-        { error: 'Content opportunity not found' },
-        { status: 404 },
-      );
+      return NextResponse.json({ error: 'Content opportunity not found' }, { status: 404 });
     }
     return NextResponse.json({ opportunity });
   } catch (err) {

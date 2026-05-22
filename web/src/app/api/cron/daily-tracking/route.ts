@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 
-const AEO_SERVER_URL =
-  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:80';
+const AEO_SERVER_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:80';
 
 export async function GET(request: Request) {
   const cronSecret = process.env.CRON_SECRET;
@@ -12,10 +11,7 @@ export async function GET(request: Request) {
   const token = vercelHeader ?? authHeader?.replace('Bearer ', '');
 
   if (!cronSecret || token !== cronSecret) {
-    return NextResponse.json(
-      { success: false, message: 'Unauthorized' },
-      { status: 401 },
-    );
+    return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
   }
 
   try {
@@ -31,9 +27,6 @@ export async function GET(request: Request) {
     return NextResponse.json(data);
   } catch (err) {
     console.error('[cron] daily-tracking failed:', err);
-    return NextResponse.json(
-      { success: false, message: 'Internal error' },
-      { status: 500 },
-    );
+    return NextResponse.json({ success: false, message: 'Internal error' }, { status: 500 });
   }
 }

@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { createContext, useContext } from "react";
-import type { PlanId } from "@/config/plans";
+import { createContext, useContext } from 'react';
+import type { PlanId } from '@/config/plans';
 
 interface PlanContextValue {
   planId: PlanId;
@@ -9,19 +9,13 @@ interface PlanContextValue {
 }
 
 const PlanContext = createContext<PlanContextValue>({
-  planId: "self_hosted",
+  planId: 'self_hosted',
   isCloud: false,
 });
 
-export function PlanProvider({
-  planId,
-  children,
-}: {
-  planId: PlanId;
-  children: React.ReactNode;
-}) {
-  const isCloud = process.env.NEXT_PUBLIC_IS_CLOUD === "true";
-  const effectivePlan: PlanId = isCloud ? planId : "self_hosted";
+export function PlanProvider({ planId, children }: { planId: PlanId; children: React.ReactNode }) {
+  const isCloud = process.env.NEXT_PUBLIC_IS_CLOUD === 'true';
+  const effectivePlan: PlanId = isCloud ? planId : 'self_hosted';
 
   return (
     <PlanContext.Provider value={{ planId: effectivePlan, isCloud }}>

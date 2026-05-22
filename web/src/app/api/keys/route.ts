@@ -53,10 +53,7 @@ export async function POST(req: Request) {
     .single();
 
   if (error || !data) {
-    return NextResponse.json(
-      { error: error?.message ?? 'Could not create key' },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: error?.message ?? 'Could not create key' }, { status: 500 });
   }
 
   return NextResponse.json({

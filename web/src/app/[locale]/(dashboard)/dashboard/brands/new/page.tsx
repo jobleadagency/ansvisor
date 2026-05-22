@@ -46,8 +46,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-const AEO_SERVER_URL =
-  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:80';
+const AEO_SERVER_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:80';
 
 // ── Step indicator ─────────────────────────────────────────────────────────────
 
@@ -78,16 +77,10 @@ function BrandHeader({ name, domain }: { name: string; domain: string }) {
     <div className="flex items-center gap-2.5 mb-8">
       {domain && (
         /* eslint-disable-next-line @next/next/no-img-element */
-        <img
-          src={getFaviconUrl(domain, 32)}
-          alt=""
-          className="h-6 w-6 rounded"
-        />
+        <img src={getFaviconUrl(domain, 32)} alt="" className="h-6 w-6 rounded" />
       )}
       <span className="text-sm font-medium">{name}</span>
-      {domain && (
-        <span className="text-sm text-muted-foreground">{domain}</span>
-      )}
+      {domain && <span className="text-sm text-muted-foreground">{domain}</span>}
     </div>
   );
 }
@@ -136,9 +129,7 @@ function TopicAccordion({
             <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
           )}
           <span className="font-medium">{data.topic}</span>
-          <span className="text-xs text-muted-foreground">
-            {data.prompts.length} prompts
-          </span>
+          <span className="text-xs text-muted-foreground">{data.prompts.length} prompts</span>
         </button>
         <DropdownMenu>
           <DropdownMenuTrigger className="p-1 rounded hover:bg-muted text-muted-foreground">
@@ -187,12 +178,7 @@ function TopicAccordion({
             >
               <Check className="h-4 w-4" />
             </Button>
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => setNewPrompt('')}
-              className="h-9 px-2"
-            >
+            <Button size="sm" variant="ghost" onClick={() => setNewPrompt('')} className="h-9 px-2">
               <X className="h-4 w-4" />
             </Button>
           </div>
@@ -262,8 +248,7 @@ export default function NewBrandPage() {
     topicMsgIdx.current = 0;
 
     const interval = setInterval(() => {
-      topicMsgIdx.current =
-        (topicMsgIdx.current + 1) % TOPIC_LOADING_MESSAGES.length;
+      topicMsgIdx.current = (topicMsgIdx.current + 1) % TOPIC_LOADING_MESSAGES.length;
       setTopicLoadingMsg(TOPIC_LOADING_MESSAGES[topicMsgIdx.current]);
     }, 2500);
 
@@ -280,9 +265,7 @@ export default function NewBrandPage() {
     domain: string;
     selected: boolean;
   }
-  const [suggestedCompetitors, setSuggestedCompetitors] = useState<
-    CompetitorItem[]
-  >([]);
+  const [suggestedCompetitors, setSuggestedCompetitors] = useState<CompetitorItem[]>([]);
   const [loadingCompetitors, setLoadingCompetitors] = useState(false);
   const [competitorName, setCompetitorName] = useState('');
   const [competitorDomain, setCompetitorDomain] = useState('');
@@ -311,9 +294,7 @@ export default function NewBrandPage() {
     const interval = setInterval(() => {
       competitorMsgIdx.current =
         (competitorMsgIdx.current + 1) % COMPETITOR_LOADING_MESSAGES.length;
-      setCompetitorLoadingMsg(
-        COMPETITOR_LOADING_MESSAGES[competitorMsgIdx.current],
-      );
+      setCompetitorLoadingMsg(COMPETITOR_LOADING_MESSAGES[competitorMsgIdx.current]);
     }, 2500);
 
     return () => clearInterval(interval);
@@ -321,12 +302,7 @@ export default function NewBrandPage() {
 
   // Auto-fetch competitor suggestions when arriving at step 5 with none loaded
   useEffect(() => {
-    if (
-      step === 5 &&
-      !loadingCompetitors &&
-      suggestedCompetitors.length === 0 &&
-      createdBrand
-    ) {
+    if (step === 5 && !loadingCompetitors && suggestedCompetitors.length === 0 && createdBrand) {
       fetchCompetitorSuggestions();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -385,8 +361,7 @@ export default function NewBrandPage() {
         .eq('id', user.id)
         .single();
 
-      if (!profile?.organization_id)
-        throw new Error('No organization found');
+      if (!profile?.organization_id) throw new Error('No organization found');
 
       const logoUrl = domain ? getFaviconUrl(domain) : undefined;
 
@@ -410,9 +385,7 @@ export default function NewBrandPage() {
         fetchTopicSuggestions();
       }
     } catch (err) {
-      toast.error(
-        err instanceof Error ? err.message : 'Failed to create brand',
-      );
+      toast.error(err instanceof Error ? err.message : 'Failed to create brand');
     } finally {
       setIsLoading(false);
     }
@@ -518,12 +491,10 @@ export default function NewBrandPage() {
       const data = await res.json();
 
       setTopicPrompts(
-        (data.topicPrompts || []).map(
-          (tp: { topic: string; prompts: string[] }) => ({
-            topic: tp.topic,
-            prompts: tp.prompts,
-          }),
-        ),
+        (data.topicPrompts || []).map((tp: { topic: string; prompts: string[] }) => ({
+          topic: tp.topic,
+          prompts: tp.prompts,
+        })),
       );
       setStep(4);
     } catch (err) {
@@ -565,9 +536,7 @@ export default function NewBrandPage() {
       setStep(5);
       fetchCompetitorSuggestions();
     } catch (err) {
-      toast.error(
-        err instanceof Error ? err.message : 'Failed to save prompts',
-      );
+      toast.error(err instanceof Error ? err.message : 'Failed to save prompts');
     } finally {
       setIsLoading(false);
     }
@@ -632,10 +601,7 @@ export default function NewBrandPage() {
       .replace(/^https?:\/\//, '')
       .replace(/\/+$/, '');
     if (!name) return;
-    setSuggestedCompetitors((prev) => [
-      ...prev,
-      { name, domain: d, selected: true },
-    ]);
+    setSuggestedCompetitors((prev) => [...prev, { name, domain: d, selected: true }]);
     setCompetitorName('');
     setCompetitorDomain('');
   };
@@ -649,9 +615,7 @@ export default function NewBrandPage() {
       const selected = suggestedCompetitors.filter((c) => c.selected);
       if (selected.length > 0) {
         await Promise.all(
-          selected.map((c) =>
-            addCompetitor(createdBrand.id, { name: c.name, domain: c.domain }),
-          ),
+          selected.map((c) => addCompetitor(createdBrand.id, { name: c.name, domain: c.domain })),
         );
       }
 
@@ -672,9 +636,7 @@ export default function NewBrandPage() {
       toast.success('Brand setup complete! Tracking is starting.');
       router.push('/dashboard/insights');
     } catch (err) {
-      toast.error(
-        err instanceof Error ? err.message : 'Failed to save competitors',
-      );
+      toast.error(err instanceof Error ? err.message : 'Failed to save competitors');
       setSavingCompetitors(false);
     }
   };
@@ -687,9 +649,7 @@ export default function NewBrandPage() {
 
   const addPromptToTopic = (topicIndex: number, prompt: string) => {
     setTopicPrompts((prev) =>
-      prev.map((tp, i) =>
-        i === topicIndex ? { ...tp, prompts: [...tp.prompts, prompt] } : tp,
-      ),
+      prev.map((tp, i) => (i === topicIndex ? { ...tp, prompts: [...tp.prompts, prompt] } : tp)),
     );
   };
 
@@ -703,10 +663,7 @@ export default function NewBrandPage() {
     );
   };
 
-  const totalPrompts = topicPrompts.reduce(
-    (sum, tp) => sum + tp.prompts.length,
-    0,
-  );
+  const totalPrompts = topicPrompts.reduce((sum, tp) => sum + tp.prompts.length, 0);
 
   // ── Step 1: Brand Info ──
 
@@ -718,12 +675,9 @@ export default function NewBrandPage() {
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground">
               <Globe className="h-6 w-6" />
             </div>
-            <h1 className="text-2xl font-bold tracking-tight">
-              Add a new brand
-            </h1>
+            <h1 className="text-2xl font-bold tracking-tight">Add a new brand</h1>
             <p className="text-sm text-muted-foreground">
-              See how AI platforms talk about your brand. Fill in the basics to
-              get started.
+              See how AI platforms talk about your brand. Fill in the basics to get started.
             </p>
           </div>
 
@@ -757,8 +711,7 @@ export default function NewBrandPage() {
 
             <div className="space-y-2">
               <Label htmlFor="description">
-                Describe your brand{' '}
-                <span className="text-muted-foreground">(optional)</span>
+                Describe your brand <span className="text-muted-foreground">(optional)</span>
               </Label>
               <Textarea
                 id="description"
@@ -797,12 +750,10 @@ export default function NewBrandPage() {
           <BrandHeader name={brandName} domain={domain} />
 
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">
-              Select your target market
-            </h1>
+            <h1 className="text-2xl font-bold tracking-tight">Select your target market</h1>
             <p className="text-sm text-muted-foreground mt-1">
-              Pick the region and language your audience uses. This helps us
-              deliver more accurate AI visibility data.
+              Pick the region and language your audience uses. This helps us deliver more accurate
+              AI visibility data.
             </p>
           </div>
 
@@ -825,10 +776,7 @@ export default function NewBrandPage() {
 
             <div className="space-y-2">
               <Label>Language</Label>
-              <Select
-                value={language}
-                onValueChange={(v) => v && setLanguage(v)}
-              >
+              <Select value={language} onValueChange={(v) => v && setLanguage(v)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -842,11 +790,7 @@ export default function NewBrandPage() {
               </Select>
             </div>
 
-            <Button
-              className="w-full"
-              onClick={handleCreateBrand}
-              disabled={isLoading}
-            >
+            <Button className="w-full" onClick={handleCreateBrand} disabled={isLoading}>
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -885,13 +829,9 @@ export default function NewBrandPage() {
           <div className="grid grid-cols-1 gap-10 lg:grid-cols-5">
             <div className="lg:col-span-3 space-y-6">
               <div>
-                <h1 className="text-2xl font-bold tracking-tight">
-                  Choose topics to monitor
-                </h1>
+                <h1 className="text-2xl font-bold tracking-tight">Choose topics to monitor</h1>
                 <div className="flex items-center gap-2 mt-3">
-                  <span className="text-sm text-muted-foreground">
-                    Select up to 10 topics
-                  </span>
+                  <span className="text-sm text-muted-foreground">Select up to 10 topics</span>
                   <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
                     <div
                       className="h-full bg-primary rounded-full transition-all"
@@ -906,10 +846,7 @@ export default function NewBrandPage() {
               {loadingTopics ? (
                 <div className="flex flex-col items-center gap-3 py-12 text-muted-foreground">
                   <Sparkles className="h-5 w-5 animate-pulse" />
-                  <span
-                    key={topicLoadingMsg}
-                    className="text-sm animate-in fade-in duration-500"
-                  >
+                  <span key={topicLoadingMsg} className="text-sm animate-in fade-in duration-500">
                     {topicLoadingMsg}
                   </span>
                 </div>
@@ -965,9 +902,7 @@ export default function NewBrandPage() {
 
               <Button
                 className="w-full"
-                disabled={
-                  selectedTopics.size === 0 || loadingPrompts || loadingTopics
-                }
+                disabled={selectedTopics.size === 0 || loadingPrompts || loadingTopics}
                 onClick={handleGeneratePrompts}
               >
                 {loadingPrompts ? (
@@ -983,31 +918,25 @@ export default function NewBrandPage() {
 
             <div className="lg:col-span-2">
               <div className="rounded-xl border bg-card p-5 sticky top-10">
-                <h3 className="text-sm font-semibold mb-4">
-                  Topic Selection Tips
-                </h3>
+                <h3 className="text-sm font-semibold mb-4">Topic Selection Tips</h3>
                 <div className="space-y-4">
                   <div className="flex gap-3">
                     <Check className="h-4 w-4 text-foreground shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-sm font-medium">
-                        5 prompts are created per topic
-                      </p>
+                      <p className="text-sm font-medium">5 prompts are created per topic</p>
                       <p className="text-xs text-muted-foreground mt-0.5">
-                        You can select up to 10 topics for a total of 50
-                        prompts. More can be added anytime from the dashboard.
+                        You can select up to 10 topics for a total of 50 prompts. More can be added
+                        anytime from the dashboard.
                       </p>
                     </div>
                   </div>
                   <div className="flex gap-3">
                     <Check className="h-4 w-4 text-foreground shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-sm font-medium">
-                        Think like your customers
-                      </p>
+                      <p className="text-sm font-medium">Think like your customers</p>
                       <p className="text-xs text-muted-foreground mt-0.5">
-                        Use terms your audience would search for when looking
-                        for products or services like yours.
+                        Use terms your audience would search for when looking for products or
+                        services like yours.
                       </p>
                     </div>
                   </div>
@@ -1016,8 +945,8 @@ export default function NewBrandPage() {
                     <div>
                       <p className="text-sm font-medium">Keep it short</p>
                       <p className="text-xs text-muted-foreground mt-0.5">
-                        Topics should be concise — we&apos;ll turn them into
-                        detailed prompts in the next step.
+                        Topics should be concise — we&apos;ll turn them into detailed prompts in the
+                        next step.
                       </p>
                     </div>
                   </div>
@@ -1052,12 +981,10 @@ export default function NewBrandPage() {
 
           <div className="flex items-start justify-between mb-6">
             <div>
-              <h1 className="text-2xl font-bold tracking-tight">
-                Review your prompts
-              </h1>
+              <h1 className="text-2xl font-bold tracking-tight">Review your prompts</h1>
               <p className="text-sm text-muted-foreground mt-1">
-                These prompts will be sent to AI platforms daily. Feel free to
-                edit, add, or remove any before starting.
+                These prompts will be sent to AI platforms daily. Feel free to edit, add, or remove
+                any before starting.
               </p>
             </div>
             <Button
@@ -1077,9 +1004,7 @@ export default function NewBrandPage() {
 
           <div className="mb-4">
             <p className="text-sm font-medium">Your Prompt List</p>
-            <p className="text-xs text-muted-foreground">
-              {totalPrompts} prompts total
-            </p>
+            <p className="text-xs text-muted-foreground">{totalPrompts} prompts total</p>
           </div>
 
           <div className="rounded-lg border">
@@ -1122,9 +1047,7 @@ export default function NewBrandPage() {
   // ── Step 5: Competitors ──
 
   if (step === 5) {
-    const selectedCompetitorCount = suggestedCompetitors.filter(
-      (c) => c.selected,
-    ).length;
+    const selectedCompetitorCount = suggestedCompetitors.filter((c) => c.selected).length;
 
     return (
       <div className="flex min-h-svh flex-col p-6 md:p-10">
@@ -1132,22 +1055,16 @@ export default function NewBrandPage() {
           <BrandHeader name={brandName} domain={domain} />
 
           <div className="mb-6">
-            <h1 className="text-2xl font-bold tracking-tight">
-              Add your competitors
-            </h1>
+            <h1 className="text-2xl font-bold tracking-tight">Add your competitors</h1>
             <p className="text-sm text-muted-foreground mt-1">
-              We&apos;ll track how often competitors appear alongside your brand
-              in AI responses.
+              We&apos;ll track how often competitors appear alongside your brand in AI responses.
             </p>
           </div>
 
           {loadingCompetitors ? (
             <div className="flex flex-col items-center gap-3 py-16 text-muted-foreground">
               <Sparkles className="h-5 w-5 animate-pulse" />
-              <span
-                key={competitorLoadingMsg}
-                className="text-sm animate-in fade-in duration-500"
-              >
+              <span key={competitorLoadingMsg} className="text-sm animate-in fade-in duration-500">
                 {competitorLoadingMsg}
               </span>
             </div>
@@ -1186,17 +1103,14 @@ export default function NewBrandPage() {
                           alt=""
                           className="h-5 w-5 rounded-sm"
                           onError={(e) => {
-                            (e.target as HTMLImageElement).style.display =
-                              'none';
+                            (e.target as HTMLImageElement).style.display = 'none';
                           }}
                         />
                       )}
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium truncate">{c.name}</p>
                         {c.domain && (
-                          <p className="text-xs text-muted-foreground truncate">
-                            {c.domain}
-                          </p>
+                          <p className="text-xs text-muted-foreground truncate">{c.domain}</p>
                         )}
                       </div>
                       <button
@@ -1228,9 +1142,7 @@ export default function NewBrandPage() {
                     placeholder="domain.com"
                     value={competitorDomain}
                     onChange={(e) => setCompetitorDomain(e.target.value)}
-                    onKeyDown={(e) =>
-                      e.key === 'Enter' && addManualCompetitor()
-                    }
+                    onKeyDown={(e) => e.key === 'Enter' && addManualCompetitor()}
                     className="text-sm"
                   />
                   <Button
@@ -1244,11 +1156,7 @@ export default function NewBrandPage() {
                 </div>
               </div>
 
-              <Button
-                className="w-full"
-                onClick={handleFinish}
-                disabled={savingCompetitors}
-              >
+              <Button className="w-full" onClick={handleFinish} disabled={savingCompetitors}>
                 {savingCompetitors ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />

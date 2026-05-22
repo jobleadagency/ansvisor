@@ -25,10 +25,7 @@ function mapDomainRow(d: Record<string, unknown>): BrandDomain {
   };
 }
 
-function mapBrandRow(
-  brand: Record<string, unknown>,
-  domains: Record<string, unknown>[],
-): Brand {
+function mapBrandRow(brand: Record<string, unknown>, domains: Record<string, unknown>[]): Brand {
   return {
     id: brand.id as string,
     organizationId: brand.organization_id as string,
@@ -58,10 +55,7 @@ export async function getBrands(organizationId: string): Promise<Brand[]> {
   if (error) throw new Error(error.message);
 
   return (data ?? []).map((b) =>
-    mapBrandRow(
-      b as Record<string, unknown>,
-      (b.brand_domains as Record<string, unknown>[]) ?? [],
-    ),
+    mapBrandRow(b as Record<string, unknown>, (b.brand_domains as Record<string, unknown>[]) ?? []),
   );
 }
 
@@ -120,8 +114,7 @@ export async function createBrand(input: CreateBrandInput): Promise<Brand> {
     .select()
     .single();
 
-  if (error || !brand)
-    throw new Error(error?.message ?? 'Failed to create brand');
+  if (error || !brand) throw new Error(error?.message ?? 'Failed to create brand');
 
   let insertedDomains: Record<string, unknown>[] = [];
 
@@ -153,10 +146,7 @@ interface UpdateBrandInput {
   description?: string | null;
 }
 
-export async function updateBrand(
-  id: string,
-  updates: UpdateBrandInput,
-): Promise<Brand> {
+export async function updateBrand(id: string, updates: UpdateBrandInput): Promise<Brand> {
   const supabase = await createClient();
 
   const payload: Record<string, unknown> = {};
@@ -166,8 +156,7 @@ export async function updateBrand(
   }
   if ('logoUrl' in updates) payload.logo_url = updates.logoUrl ?? null;
   if ('industry' in updates) payload.industry = updates.industry ?? null;
-  if ('description' in updates)
-    payload.description = updates.description ?? null;
+  if ('description' in updates) payload.description = updates.description ?? null;
 
   const { data, error } = await supabase
     .from('brands')
@@ -176,8 +165,7 @@ export async function updateBrand(
     .select('*, brand_domains(*)')
     .single();
 
-  if (error || !data)
-    throw new Error(error?.message ?? 'Failed to update brand');
+  if (error || !data) throw new Error(error?.message ?? 'Failed to update brand');
 
   revalidatePath('/dashboard/brands');
   return mapBrandRow(
@@ -315,8 +303,7 @@ export async function getBrandsCardSummary(
     const cur = b.current.count > 0 ? b.current.sum / b.current.count : 0;
     const prev = b.prev.count > 0 ? b.prev.sum / b.prev.count : 0;
     summary[id].visibility7d = Math.round(cur);
-    summary[id].visibilityDelta =
-      prev > 0 ? Math.round(((cur - prev) / prev) * 100) : 0;
+    summary[id].visibilityDelta = prev > 0 ? Math.round(((cur - prev) / prev) * 100) : 0;
     summary[id].mentions7d = b.current.mentions;
     summary[id].trend = dayKeys.map((k) => {
       const d = dailyByBrand[id][k];

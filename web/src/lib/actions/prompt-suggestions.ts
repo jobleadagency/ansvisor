@@ -63,13 +63,10 @@ export async function getPromptSuggestions(
   brandId: string,
 ): Promise<{ suggestions: PromptSuggestion[]; stale: boolean }> {
   const session = await getSession();
-  const res = await fetch(
-    `${AEO_SERVER_URL}/api/prompts/suggestions/${brandId}`,
-    {
-      headers: { Authorization: `Bearer ${session.access_token}` },
-      cache: 'no-store',
-    },
-  );
+  const res = await fetch(`${AEO_SERVER_URL}/api/prompts/suggestions/${brandId}`, {
+    headers: { Authorization: `Bearer ${session.access_token}` },
+    cache: 'no-store',
+  });
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
     throw new Error(body.error || `Server error: ${res.status}`);
@@ -84,17 +81,12 @@ export async function getPromptSuggestions(
   };
 }
 
-export async function refreshPromptSuggestions(
-  brandId: string,
-): Promise<PromptSuggestion[]> {
+export async function refreshPromptSuggestions(brandId: string): Promise<PromptSuggestion[]> {
   const session = await getSession();
-  const res = await fetch(
-    `${AEO_SERVER_URL}/api/prompts/suggestions/${brandId}/refresh`,
-    {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${session.access_token}` },
-    },
-  );
+  const res = await fetch(`${AEO_SERVER_URL}/api/prompts/suggestions/${brandId}/refresh`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${session.access_token}` },
+  });
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
     throw new Error(body.error || `Server error: ${res.status}`);
@@ -103,17 +95,12 @@ export async function refreshPromptSuggestions(
   return data.suggestions.map(mapRow);
 }
 
-export async function dismissSuggestion(
-  suggestionId: string,
-): Promise<{ success: boolean }> {
+export async function dismissSuggestion(suggestionId: string): Promise<{ success: boolean }> {
   const session = await getSession();
-  const res = await fetch(
-    `${AEO_SERVER_URL}/api/prompts/suggestions/${suggestionId}/dismiss`,
-    {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${session.access_token}` },
-    },
-  );
+  const res = await fetch(`${AEO_SERVER_URL}/api/prompts/suggestions/${suggestionId}/dismiss`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${session.access_token}` },
+  });
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
     throw new Error(body.error || `Server error: ${res.status}`);
@@ -164,8 +151,7 @@ export async function acceptSuggestion(
       ? (defaults!.platforms as string[])
       : ['chatgpt-web']);
   const models =
-    options?.models ??
-    (Array.isArray(defaults?.models) ? (defaults!.models as string[]) : []);
+    options?.models ?? (Array.isArray(defaults?.models) ? (defaults!.models as string[]) : []);
 
   const created = await addPromptToSet({
     promptSetId: ps.id,
@@ -175,22 +161,16 @@ export async function acceptSuggestion(
     models,
   });
 
-  const ack = await fetch(
-    `${AEO_SERVER_URL}/api/prompts/suggestions/${suggestionId}/accept`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${session.access_token}`,
-      },
-      body: JSON.stringify({ promptId: created.id }),
+  const ack = await fetch(`${AEO_SERVER_URL}/api/prompts/suggestions/${suggestionId}/accept`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${session.access_token}`,
     },
-  );
+    body: JSON.stringify({ promptId: created.id }),
+  });
   if (!ack.ok) {
-    console.error(
-      '[prompt-suggestions] accept ack failed:',
-      await ack.text().catch(() => ''),
-    );
+    console.error('[prompt-suggestions] accept ack failed:', await ack.text().catch(() => ''));
   }
 
   revalidatePath('/dashboard/prompts');

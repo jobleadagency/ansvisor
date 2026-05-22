@@ -7,12 +7,7 @@
  * listicles, comparisons, and reviews from mainstream publishers.
  */
 
-export type ArticleType =
-  | 'Topic Guide'
-  | 'How-to Guide'
-  | 'Review'
-  | 'Ranked List'
-  | 'Comparison';
+export type ArticleType = 'Topic Guide' | 'How-to Guide' | 'Review' | 'Ranked List' | 'Comparison';
 
 export const ARTICLE_TYPE_LABELS: Record<ArticleType, string> = {
   'Topic Guide': 'Topic Guide',
@@ -90,10 +85,7 @@ const RULES: Rule[] = [
  * Classify a citation by URL + optional title. Returns null if no rule
  * matches.
  */
-export function classifyArticleType(
-  url: string,
-  title?: string,
-): ArticleType | null {
+export function classifyArticleType(url: string, title?: string): ArticleType | null {
   const corpus = `${url ?? ''} ${title ?? ''}`;
   for (const rule of RULES) {
     if (rule.patterns.some((p) => p.test(corpus))) {

@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useFeatureGate } from "@/hooks/use-feature-gate";
-import type { Feature } from "@/config/plans";
-import { Badge } from "@/components/ui/badge";
-import { Crown } from "lucide-react";
+import { useFeatureGate } from '@/hooks/use-feature-gate';
+import type { Feature } from '@/config/plans';
+import { Badge } from '@/components/ui/badge';
+import { Crown } from 'lucide-react';
 
 interface UpgradeBadgeProps {
   feature: Feature;

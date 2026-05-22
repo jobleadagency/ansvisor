@@ -1,29 +1,25 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useCallback, useRef } from "react";
-import { useRouter } from "@/i18n/navigation";
-import { createPortal } from "react-dom";
-import { useTranslations } from "next-intl";
-import { useBrandStore } from "@/stores/use-brand-store";
-import { useFeatureGate } from "@/hooks/use-feature-gate";
-import {
-  getCompetitors,
-  addCompetitor,
-  deleteCompetitor,
-} from "@/lib/actions/competitor";
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useRouter } from '@/i18n/navigation';
+import { createPortal } from 'react-dom';
+import { useTranslations } from 'next-intl';
+import { useBrandStore } from '@/stores/use-brand-store';
+import { useFeatureGate } from '@/hooks/use-feature-gate';
+import { getCompetitors, addCompetitor, deleteCompetitor } from '@/lib/actions/competitor';
 import {
   getCompetitorComparison,
   getHeadToHeadComparison,
   type CompetitorComparisonData,
   type HeadToHeadData,
   type HeadToHeadPromptRow,
-} from "@/lib/actions/tracking";
-import { getFaviconUrl } from "@/lib/favicon";
-import type { Competitor } from "@/types";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from '@/lib/actions/tracking';
+import { getFaviconUrl } from '@/lib/favicon';
+import type { Competitor } from '@/types';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Dialog,
   DialogContent,
@@ -31,7 +27,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 import {
   Table,
   TableBody,
@@ -39,15 +35,12 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { toast } from "sonner";
-import { cn } from "@/lib/utils";
-import {
-  AIProviderAvatar,
-  resolveAIProvider,
-} from "@/components/ai-provider-avatar";
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
+import { AIProviderAvatar, resolveAIProvider } from '@/components/ai-provider-avatar';
 import {
   Plus,
   Trash2,
@@ -67,31 +60,31 @@ import {
   ChevronDown,
   Eye,
   HelpCircle,
-} from "lucide-react";
+} from 'lucide-react';
 
 // ─── Shared Visual Components (mirroring Insights) ───────────────────────────
 
 const MODEL_DISPLAY_NAME: Record<string, string> = {
-  "gpt-4o": "GPT-4o",
-  "gpt-4o-mini": "GPT-4o Mini",
-  "gpt-4.1": "GPT-4.1",
-  "gpt-4.1-mini": "GPT-4.1 Mini",
-  "gpt-4.1-nano": "GPT-4.1 Nano",
-  "gpt-5-chat-latest": "ChatGPT",
-  "claude-sonnet-4-6": "Claude Sonnet",
-  "claude-opus-4-6": "Claude Opus",
-  "claude-haiku-4-5": "Claude Haiku",
-  "gemini-2.5-pro": "Gemini 2.5 Pro",
-  "gemini-2.5-flash": "Gemini 2.5 Flash",
-  "grok-3": "Grok",
-  "grok-4-auto": "Grok",
-  "chatgpt-web": "ChatGPT",
-  "perplexity-web": "Perplexity",
-  "google-aio": "Google AI Overview",
-  "google-aimode": "Google AI Mode",
-  "copilot-web": "Microsoft Copilot",
-  "grok-web": "Grok",
-  "gemini-web": "Gemini",
+  'gpt-4o': 'GPT-4o',
+  'gpt-4o-mini': 'GPT-4o Mini',
+  'gpt-4.1': 'GPT-4.1',
+  'gpt-4.1-mini': 'GPT-4.1 Mini',
+  'gpt-4.1-nano': 'GPT-4.1 Nano',
+  'gpt-5-chat-latest': 'ChatGPT',
+  'claude-sonnet-4-6': 'Claude Sonnet',
+  'claude-opus-4-6': 'Claude Opus',
+  'claude-haiku-4-5': 'Claude Haiku',
+  'gemini-2.5-pro': 'Gemini 2.5 Pro',
+  'gemini-2.5-flash': 'Gemini 2.5 Flash',
+  'grok-3': 'Grok',
+  'grok-4-auto': 'Grok',
+  'chatgpt-web': 'ChatGPT',
+  'perplexity-web': 'Perplexity',
+  'google-aio': 'Google AI Overview',
+  'google-aimode': 'Google AI Mode',
+  'copilot-web': 'Microsoft Copilot',
+  'grok-web': 'Grok',
+  'gemini-web': 'Gemini',
 };
 
 function getModelDisplayName(model: string, platform?: string): string {
@@ -99,9 +92,7 @@ function getModelDisplayName(model: string, platform?: string): string {
   // so use it directly if available
   if (platform) {
     const modelName = MODEL_DISPLAY_NAME[model];
-    return modelName && modelName !== platform
-      ? `${platform} · ${modelName}`
-      : platform;
+    return modelName && modelName !== platform ? `${platform} · ${modelName}` : platform;
   }
   return MODEL_DISPLAY_NAME[model] ?? model;
 }
@@ -116,22 +107,18 @@ function ModelBadge({ model, platform }: { model: string; platform?: string }) {
   );
 }
 
-function SentimentBadge({
-  sentiment,
-}: {
-  sentiment: "positive" | "neutral" | "negative";
-}) {
+function SentimentBadge({ sentiment }: { sentiment: 'positive' | 'neutral' | 'negative' }) {
   return (
     <Badge
       variant="outline"
       className={cn(
-        "text-xs capitalize",
-        sentiment === "positive" &&
-          "border-green-500/30 bg-green-500/10 text-green-600 dark:text-green-400",
-        sentiment === "neutral" &&
-          "border-yellow-500/30 bg-yellow-500/10 text-yellow-600 dark:text-yellow-400",
-        sentiment === "negative" &&
-          "border-red-500/30 bg-red-500/10 text-red-600 dark:text-red-400",
+        'text-xs capitalize',
+        sentiment === 'positive' &&
+          'border-green-500/30 bg-green-500/10 text-green-600 dark:text-green-400',
+        sentiment === 'neutral' &&
+          'border-yellow-500/30 bg-yellow-500/10 text-yellow-600 dark:text-yellow-400',
+        sentiment === 'negative' &&
+          'border-red-500/30 bg-red-500/10 text-red-600 dark:text-red-400',
       )}
     >
       {sentiment}
@@ -146,12 +133,8 @@ function VisibilityBar({ score, max = 100 }: { score: number; max?: number }) {
       <div className="h-1.5 w-24 rounded-full bg-muted overflow-hidden">
         <div
           className={cn(
-            "h-full rounded-full transition-all",
-            score >= 60
-              ? "bg-green-500"
-              : score >= 40
-                ? "bg-yellow-500"
-                : "bg-red-500",
+            'h-full rounded-full transition-all',
+            score >= 60 ? 'bg-green-500' : score >= 40 ? 'bg-yellow-500' : 'bg-red-500',
           )}
           style={{ width: `${pct}%` }}
         />
@@ -183,7 +166,7 @@ function InfoTip({ content }: { content: string }) {
       {pos &&
         createPortal(
           <div
-            style={{ left: pos.x, top: pos.y, transform: "translateX(-50%)" }}
+            style={{ left: pos.x, top: pos.y, transform: 'translateX(-50%)' }}
             className="pointer-events-none fixed z-[9999] w-56 rounded-md border bg-popover px-3 py-2 text-xs text-popover-foreground shadow-md"
           >
             {content}
@@ -216,25 +199,23 @@ function ColHead({
 // ─── Plan Gate ────────────────────────────────────────────────────────────────
 
 function PlanGateOverlay() {
-  const t = useTranslations("competitors");
+  const t = useTranslations('competitors');
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
-        <p className="text-muted-foreground">{t("description")}</p>
+        <h1 className="text-2xl font-bold tracking-tight">{t('title')}</h1>
+        <p className="text-muted-foreground">{t('description')}</p>
       </div>
       <Card>
         <CardContent className="flex flex-col items-center justify-center py-16 text-center">
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/30 mb-4">
             <Crown className="h-7 w-7 text-amber-600 dark:text-amber-400" />
           </div>
-          <h3 className="text-lg font-semibold">{t("upgradeTitle")}</h3>
-          <p className="text-sm text-muted-foreground mt-1 max-w-sm">
-            {t("upgradeDescription")}
-          </p>
+          <h3 className="text-lg font-semibold">{t('upgradeTitle')}</h3>
+          <p className="text-sm text-muted-foreground mt-1 max-w-sm">{t('upgradeDescription')}</p>
           <Badge variant="outline" className="mt-4">
             <Crown className="mr-1 h-3 w-3" />
-            {t("upgradeRequiredPlan")}
+            {t('upgradeRequiredPlan')}
           </Badge>
         </CardContent>
       </Card>
@@ -245,22 +226,20 @@ function PlanGateOverlay() {
 // ─── No Brand ─────────────────────────────────────────────────────────────────
 
 function NoBrandSelected() {
-  const t = useTranslations("competitors");
+  const t = useTranslations('competitors');
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
-        <p className="text-muted-foreground">{t("description")}</p>
+        <h1 className="text-2xl font-bold tracking-tight">{t('title')}</h1>
+        <p className="text-muted-foreground">{t('description')}</p>
       </div>
       <Card>
         <CardContent className="flex flex-col items-center justify-center py-16 text-center">
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white mb-4">
             <AlertCircle className="h-7 w-7 text-muted-foreground" />
           </div>
-          <h3 className="text-lg font-semibold">{t("noBrandTitle")}</h3>
-          <p className="text-sm text-muted-foreground mt-1 max-w-sm">
-            {t("noBrandDescription")}
-          </p>
+          <h3 className="text-lg font-semibold">{t('noBrandTitle')}</h3>
+          <p className="text-sm text-muted-foreground mt-1 max-w-sm">{t('noBrandDescription')}</p>
         </CardContent>
       </Card>
     </div>
@@ -270,20 +249,18 @@ function NoBrandSelected() {
 // ─── Empty State ──────────────────────────────────────────────────────────────
 
 function EmptyState({ onAdd }: { onAdd: () => void }) {
-  const t = useTranslations("competitors");
+  const t = useTranslations('competitors');
   return (
     <Card>
       <CardContent className="flex flex-col items-center justify-center py-16 text-center">
         <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white mb-4">
           <Users className="h-7 w-7 text-muted-foreground" />
         </div>
-        <h3 className="text-lg font-semibold">{t("emptyTitle")}</h3>
-        <p className="text-sm text-muted-foreground mt-1 max-w-sm">
-          {t("emptyDescription")}
-        </p>
+        <h3 className="text-lg font-semibold">{t('emptyTitle')}</h3>
+        <p className="text-sm text-muted-foreground mt-1 max-w-sm">{t('emptyDescription')}</p>
         <Button className="mt-6 gap-2" onClick={onAdd}>
           <Plus className="h-4 w-4" />
-          {t("addCompetitor")}
+          {t('addCompetitor')}
         </Button>
       </CardContent>
     </Card>
@@ -301,14 +278,14 @@ function AddCompetitorDialog({
   onOpenChange: (open: boolean) => void;
   onAdd: (name: string, domain: string) => Promise<void>;
 }) {
-  const t = useTranslations("competitors");
-  const [name, setName] = useState("");
-  const [domain, setDomain] = useState("");
+  const t = useTranslations('competitors');
+  const [name, setName] = useState('');
+  const [domain, setDomain] = useState('');
   const [saving, setSaving] = useState(false);
 
   function reset() {
-    setName("");
-    setDomain("");
+    setName('');
+    setDomain('');
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -320,7 +297,7 @@ function AddCompetitorDialog({
       reset();
       onOpenChange(false);
     } catch {
-      toast.error(t("addError"));
+      toast.error(t('addError'));
     } finally {
       setSaving(false);
     }
@@ -331,41 +308,37 @@ function AddCompetitorDialog({
       <DialogContent className="sm:max-w-md">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>{t("addCompetitor")}</DialogTitle>
-            <DialogDescription>{t("addDescription")}</DialogDescription>
+            <DialogTitle>{t('addCompetitor')}</DialogTitle>
+            <DialogDescription>{t('addDescription')}</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="comp-name">{t("name")}</Label>
+              <Label htmlFor="comp-name">{t('name')}</Label>
               <Input
                 id="comp-name"
-                placeholder={t("namePlaceholder")}
+                placeholder={t('namePlaceholder')}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 autoFocus
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="comp-domain">{t("domain")}</Label>
+              <Label htmlFor="comp-domain">{t('domain')}</Label>
               <Input
                 id="comp-domain"
-                placeholder={t("domainPlaceholder")}
+                placeholder={t('domainPlaceholder')}
                 value={domain}
                 onChange={(e) => setDomain(e.target.value)}
               />
             </div>
           </div>
           <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-            >
-              {t("cancel")}
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              {t('cancel')}
             </Button>
             <Button type="submit" disabled={saving || !name.trim()}>
               {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {t("add")}
+              {t('add')}
             </Button>
           </DialogFooter>
         </form>
@@ -387,7 +360,8 @@ function DiffBadge({ diff }: { diff: number }) {
   if (diff < 0) {
     return (
       <span className="inline-flex items-center gap-0.5 text-xs font-medium text-red-600 dark:text-red-400">
-        <ArrowDownRight className="h-3 w-3" />{diff}
+        <ArrowDownRight className="h-3 w-3" />
+        {diff}
       </span>
     );
   }
@@ -415,13 +389,13 @@ function CompetitorCard({
   onDelete: () => void;
   deleting: boolean;
 }) {
-  const t = useTranslations("competitors");
+  const t = useTranslations('competitors');
 
   return (
     <div
       className={cn(
-        "group relative flex items-center gap-3 rounded-lg border p-3 transition-colors cursor-pointer hover:bg-accent/50",
-        isSelected && "border-primary bg-primary/5 ring-1 ring-primary/20",
+        'group relative flex items-center gap-3 rounded-lg border p-3 transition-colors cursor-pointer hover:bg-accent/50',
+        isSelected && 'border-primary bg-primary/5 ring-1 ring-primary/20',
       )}
       onClick={onSelect}
     >
@@ -434,7 +408,7 @@ function CompetitorCard({
             className="h-5 w-5 rounded-sm"
             onError={(e) => {
               const el = e.target as HTMLImageElement;
-              el.style.display = "none";
+              el.style.display = 'none';
               el.parentElement!.innerHTML =
                 '<svg class="h-5 w-5 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9" /></svg>';
             }}
@@ -449,12 +423,12 @@ function CompetitorCard({
           <span className="text-sm font-medium truncate">{competitor.name}</span>
           {isSelected && (
             <Badge variant="outline" className="text-[10px] px-1.5 py-0">
-              {t("selected")}
+              {t('selected')}
             </Badge>
           )}
         </div>
         <span className="text-xs text-muted-foreground truncate block">
-          {competitor.domain || "—"}
+          {competitor.domain || '—'}
         </span>
       </div>
 
@@ -468,15 +442,15 @@ function CompetitorCard({
           </div>
         ) : (
           <div className="text-right">
-            <span className="text-xs text-muted-foreground">{t("noData")}</span>
+            <span className="text-xs text-muted-foreground">{t('noData')}</span>
           </div>
         )}
 
         <Button
           variant="ghost"
           size="icon"
-          aria-label={t("delete")}
-          title={t("delete")}
+          aria-label={t('delete')}
+          title={t('delete')}
           className="h-7 w-7 opacity-0 group-hover:opacity-70 hover:opacity-100 focus-visible:opacity-100 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-opacity"
           onClick={(e) => {
             e.stopPropagation();
@@ -506,14 +480,12 @@ function PlatformBreakdown({
   brandName: string;
   competitorName: string;
 }) {
-  const t = useTranslations("competitors");
+  const t = useTranslations('competitors');
 
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium">
-          {t("h2h.platformBreakdown")}
-        </CardTitle>
+        <CardTitle className="text-sm font-medium">{t('h2h.platformBreakdown')}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
@@ -572,28 +544,22 @@ interface PromptComparisonGroup {
   promptId: string;
   promptText: string;
   promptCategory?: string;
-  rows: HeadToHeadData["promptRows"];
+  rows: HeadToHeadData['promptRows'];
   avgBrandScore: number;
   avgCompetitorScore: number;
   avgDiff: number;
 }
 
-function groupH2HByPrompt(
-  rows: HeadToHeadData["promptRows"],
-): PromptComparisonGroup[] {
-  const map = new Map<string, HeadToHeadData["promptRows"]>();
+function groupH2HByPrompt(rows: HeadToHeadData['promptRows']): PromptComparisonGroup[] {
+  const map = new Map<string, HeadToHeadData['promptRows']>();
   for (const r of rows) {
     const arr = map.get(r.promptId) || [];
     arr.push(r);
     map.set(r.promptId, arr);
   }
   return Array.from(map.entries()).map(([promptId, items]) => {
-    const avgB = Math.round(
-      items.reduce((s, r) => s + r.brandScore, 0) / items.length,
-    );
-    const avgC = Math.round(
-      items.reduce((s, r) => s + r.competitorScore, 0) / items.length,
-    );
+    const avgB = Math.round(items.reduce((s, r) => s + r.brandScore, 0) / items.length);
+    const avgC = Math.round(items.reduce((s, r) => s + r.competitorScore, 0) / items.length);
     return {
       promptId,
       promptText: items[0].promptText,
@@ -621,7 +587,7 @@ interface ModelComparisonGroup {
 function groupH2HByModel(rows: HeadToHeadPromptRow[]): ModelComparisonGroup[] {
   const map = new Map<string, HeadToHeadPromptRow[]>();
   for (const r of rows) {
-    const key = `${r.platform}|${r.modelUsed ?? ""}|${r.region ?? ""}`;
+    const key = `${r.platform}|${r.modelUsed ?? ''}|${r.region ?? ''}`;
     const arr = map.get(key) || [];
     arr.push(r);
     map.set(key, arr);
@@ -633,12 +599,8 @@ function groupH2HByModel(rows: HeadToHeadPromptRow[]): ModelComparisonGroup[] {
         (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
       );
       const latest = sorted[0];
-      const avgB = Math.round(
-        sorted.reduce((s, r) => s + r.brandScore, 0) / sorted.length,
-      );
-      const avgC = Math.round(
-        sorted.reduce((s, r) => s + r.competitorScore, 0) / sorted.length,
-      );
+      const avgB = Math.round(sorted.reduce((s, r) => s + r.brandScore, 0) / sorted.length);
+      const avgC = Math.round(sorted.reduce((s, r) => s + r.competitorScore, 0) / sorted.length);
       return {
         key,
         platform: latest.platform,
@@ -657,8 +619,8 @@ function groupH2HByModel(rows: HeadToHeadPromptRow[]): ModelComparisonGroup[] {
 function formatTimestamp(iso: string): string {
   const d = new Date(iso);
   return d.toLocaleDateString(undefined, {
-    month: "short",
-    day: "numeric",
+    month: 'short',
+    day: 'numeric',
   });
 }
 
@@ -677,7 +639,7 @@ function ModelSubGroup({
   brandName: string;
   competitorName: string;
 }) {
-  const t = useTranslations("competitors");
+  const t = useTranslations('competitors');
   const hasHistory = group.rows.length > 1;
 
   return (
@@ -687,54 +649,45 @@ function ModelSubGroup({
         tabIndex={0}
         onClick={onToggle}
         onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
+          if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
             onToggle();
           }
         }}
         className={cn(
-          "flex w-full items-center gap-3 px-3 py-2 transition-colors select-none",
-          hasHistory
-            ? "hover:bg-muted/40 cursor-pointer"
-            : "cursor-default",
+          'flex w-full items-center gap-3 px-3 py-2 transition-colors select-none',
+          hasHistory ? 'hover:bg-muted/40 cursor-pointer' : 'cursor-default',
         )}
       >
         <ChevronDown
           className={cn(
-            "h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform",
-            !expanded && "-rotate-90",
-            !hasHistory && "opacity-0",
+            'h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform',
+            !expanded && '-rotate-90',
+            !hasHistory && 'opacity-0',
           )}
         />
         <div className="flex-1 min-w-0 flex items-center gap-2">
-          <ModelBadge
-            model={group.modelUsed || group.platform}
-            platform={group.platform}
-          />
+          <ModelBadge model={group.modelUsed || group.platform} platform={group.platform} />
           {group.region && (
             <Badge variant="outline" className="text-[10px]">
               {group.region}
             </Badge>
           )}
           <span className="text-[10px] text-muted-foreground tabular-nums ml-1">
-            {group.rows.length} run{group.rows.length !== 1 ? "s" : ""}
+            {group.rows.length} run{group.rows.length !== 1 ? 's' : ''}
           </span>
         </div>
         <div className="flex items-center gap-4 shrink-0">
           <div className="text-right">
-            <p className="text-[10px] text-muted-foreground">{t("h2h.you")}</p>
-            <p className="text-xs font-semibold tabular-nums">
-              {group.avgBrandScore}%
-            </p>
+            <p className="text-[10px] text-muted-foreground">{t('h2h.you')}</p>
+            <p className="text-xs font-semibold tabular-nums">{group.avgBrandScore}%</p>
           </div>
           <div className="text-right">
-            <p className="text-[10px] text-muted-foreground">{t("h2h.them")}</p>
-            <p className="text-xs font-semibold tabular-nums">
-              {group.avgCompetitorScore}%
-            </p>
+            <p className="text-[10px] text-muted-foreground">{t('h2h.them')}</p>
+            <p className="text-xs font-semibold tabular-nums">{group.avgCompetitorScore}%</p>
           </div>
           <div className="text-right min-w-[48px]">
-            <p className="text-[10px] text-muted-foreground">{t("h2h.diff")}</p>
+            <p className="text-[10px] text-muted-foreground">{t('h2h.diff')}</p>
             <DiffBadge diff={group.avgDiff} />
           </div>
           <SentimentBadge sentiment={group.latest.sentiment} />
@@ -762,18 +715,10 @@ function ModelSubGroup({
             <TableHeader>
               <TableRow>
                 <TableHead className="text-[10px] h-7">Date</TableHead>
-                <TableHead className="text-[10px] h-7 text-center">
-                  {brandName}
-                </TableHead>
-                <TableHead className="text-[10px] h-7 text-center">
-                  {competitorName}
-                </TableHead>
-                <TableHead className="text-[10px] h-7 text-center">
-                  {t("h2h.diff")}
-                </TableHead>
-                <TableHead className="text-[10px] h-7 text-center">
-                  Sentiment
-                </TableHead>
+                <TableHead className="text-[10px] h-7 text-center">{brandName}</TableHead>
+                <TableHead className="text-[10px] h-7 text-center">{competitorName}</TableHead>
+                <TableHead className="text-[10px] h-7 text-center">{t('h2h.diff')}</TableHead>
+                <TableHead className="text-[10px] h-7 text-center">Sentiment</TableHead>
                 <TableHead className="text-[10px] h-7 w-[60px]" />
               </TableRow>
             </TableHeader>
@@ -790,9 +735,7 @@ function ModelSubGroup({
                     {Math.round(row.competitorScore)}%
                   </TableCell>
                   <TableCell className="text-center py-1.5">
-                    <DiffBadge
-                      diff={Math.round(row.brandScore - row.competitorScore)}
-                    />
+                    <DiffBadge diff={Math.round(row.brandScore - row.competitorScore)} />
                   </TableCell>
                   <TableCell className="text-center py-1.5">
                     <SentimentBadge sentiment={row.sentiment} />
@@ -827,12 +770,12 @@ function PromptComparisonGrouped({
   competitorName,
   onViewRow,
 }: {
-  rows: HeadToHeadData["promptRows"];
+  rows: HeadToHeadData['promptRows'];
   brandName: string;
   competitorName: string;
   onViewRow: (row: HeadToHeadPromptRow) => void;
 }) {
-  const t = useTranslations("competitors");
+  const t = useTranslations('competitors');
   const groups = groupH2HByPrompt(rows);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [expandedModels, setExpandedModels] = useState<Set<string>>(new Set());
@@ -840,21 +783,23 @@ function PromptComparisonGrouped({
   const toggle = (id: string) =>
     setExpanded((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id); else next.add(id);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
       return next;
     });
 
   const toggleModel = (id: string) =>
     setExpandedModels((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id); else next.add(id);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
       return next;
     });
 
   if (groups.length === 0) {
     return (
       <div className="flex items-center justify-center py-12 text-sm text-muted-foreground">
-        {t("h2h.noPromptData")}
+        {t('h2h.noPromptData')}
       </div>
     );
   }
@@ -865,17 +810,14 @@ function PromptComparisonGrouped({
         const isOpen = expanded.has(group.promptId);
         const modelGroups = groupH2HByModel(group.rows);
         return (
-          <div
-            key={group.promptId}
-            className="rounded-lg border overflow-hidden"
-          >
+          <div key={group.promptId} className="rounded-lg border overflow-hidden">
             {/* Group Header */}
             <div
               role="button"
               tabIndex={0}
               onClick={() => toggle(group.promptId)}
               onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
+                if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault();
                   toggle(group.promptId);
                 }
@@ -884,14 +826,12 @@ function PromptComparisonGrouped({
             >
               <ChevronDown
                 className={cn(
-                  "h-4 w-4 shrink-0 text-muted-foreground transition-transform",
-                  !isOpen && "-rotate-90",
+                  'h-4 w-4 shrink-0 text-muted-foreground transition-transform',
+                  !isOpen && '-rotate-90',
                 )}
               />
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium line-clamp-1">
-                  {group.promptText}
-                </p>
+                <p className="text-sm font-medium line-clamp-1">{group.promptText}</p>
                 <div className="flex items-center gap-2 mt-0.5">
                   {group.promptCategory && (
                     <Badge variant="outline" className="text-[10px]">
@@ -900,26 +840,22 @@ function PromptComparisonGrouped({
                   )}
                   <span className="text-[11px] text-muted-foreground">
                     {modelGroups.length} platform
-                    {modelGroups.length !== 1 ? "s" : ""} · {group.rows.length}{" "}
-                    result{group.rows.length !== 1 ? "s" : ""}
+                    {modelGroups.length !== 1 ? 's' : ''} · {group.rows.length} result
+                    {group.rows.length !== 1 ? 's' : ''}
                   </span>
                 </div>
               </div>
               <div className="flex items-center gap-4 shrink-0">
                 <div className="text-right">
-                  <p className="text-[10px] text-muted-foreground">{t("h2h.you")}</p>
-                  <p className="text-sm font-semibold tabular-nums">
-                    {group.avgBrandScore}%
-                  </p>
+                  <p className="text-[10px] text-muted-foreground">{t('h2h.you')}</p>
+                  <p className="text-sm font-semibold tabular-nums">{group.avgBrandScore}%</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-[10px] text-muted-foreground">{t("h2h.them")}</p>
-                  <p className="text-sm font-semibold tabular-nums">
-                    {group.avgCompetitorScore}%
-                  </p>
+                  <p className="text-[10px] text-muted-foreground">{t('h2h.them')}</p>
+                  <p className="text-sm font-semibold tabular-nums">{group.avgCompetitorScore}%</p>
                 </div>
                 <div className="text-right min-w-[48px]">
-                  <p className="text-[10px] text-muted-foreground">{t("h2h.diff")}</p>
+                  <p className="text-[10px] text-muted-foreground">{t('h2h.diff')}</p>
                   <DiffBadge diff={group.avgDiff} />
                 </div>
               </div>
@@ -956,16 +892,14 @@ function PromptComparisonGrouped({
 interface GapStrengthGroup {
   promptId: string;
   promptText: string;
-  items: HeadToHeadData["gaps"];
+  items: HeadToHeadData['gaps'];
   avgBrandScore: number;
   avgCompetitorScore: number;
   avgDiff: number;
 }
 
-function groupGapStrengthByPrompt(
-  items: HeadToHeadData["gaps"],
-): GapStrengthGroup[] {
-  const map = new Map<string, HeadToHeadData["gaps"]>();
+function groupGapStrengthByPrompt(items: HeadToHeadData['gaps']): GapStrengthGroup[] {
+  const map = new Map<string, HeadToHeadData['gaps']>();
   for (const item of items) {
     const arr = map.get(item.promptId) || [];
     arr.push(item);
@@ -973,9 +907,7 @@ function groupGapStrengthByPrompt(
   }
   return Array.from(map.entries())
     .map(([promptId, groupItems]) => {
-      const avgB = Math.round(
-        groupItems.reduce((s, r) => s + r.brandScore, 0) / groupItems.length,
-      );
+      const avgB = Math.round(groupItems.reduce((s, r) => s + r.brandScore, 0) / groupItems.length);
       const avgC = Math.round(
         groupItems.reduce((s, r) => s + r.competitorScore, 0) / groupItems.length,
       );
@@ -988,32 +920,33 @@ function groupGapStrengthByPrompt(
         avgDiff: avgB - avgC,
       };
     })
-    .sort((a, b) => (a.avgDiff - b.avgDiff));
+    .sort((a, b) => a.avgDiff - b.avgDiff);
 }
 
 function GapStrengthList({
   items,
   type,
 }: {
-  items: HeadToHeadData["gaps"];
-  type: "gap" | "strength";
+  items: HeadToHeadData['gaps'];
+  type: 'gap' | 'strength';
 }) {
-  const t = useTranslations("competitors");
-  const isGap = type === "gap";
+  const t = useTranslations('competitors');
+  const isGap = type === 'gap';
   const groups = groupGapStrengthByPrompt(items);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
 
   const toggle = (id: string) =>
     setExpanded((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id); else next.add(id);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
       return next;
     });
 
   if (groups.length === 0) {
     return (
       <div className="flex items-center justify-center py-8 text-sm text-muted-foreground">
-        {isGap ? t("h2h.noGaps") : t("h2h.noStrengths")}
+        {isGap ? t('h2h.noGaps') : t('h2h.noStrengths')}
       </div>
     );
   }
@@ -1031,34 +964,35 @@ function GapStrengthList({
           <div
             key={group.promptId}
             className={cn(
-              "rounded-lg border overflow-hidden",
+              'rounded-lg border overflow-hidden',
               isGap
-                ? "border-red-200/50 bg-red-50/50 dark:border-red-900/30 dark:bg-red-950/20"
-                : "border-green-200/50 bg-green-50/50 dark:border-green-900/30 dark:bg-green-950/20",
+                ? 'border-red-200/50 bg-red-50/50 dark:border-red-900/30 dark:bg-red-950/20'
+                : 'border-green-200/50 bg-green-50/50 dark:border-green-900/30 dark:bg-green-950/20',
             )}
           >
             {/* Group Header */}
             <div
-              role={hasMultiple ? "button" : undefined}
+              role={hasMultiple ? 'button' : undefined}
               tabIndex={hasMultiple ? 0 : undefined}
               onClick={() => hasMultiple && toggle(group.promptId)}
               onKeyDown={(e) => {
-                if (hasMultiple && (e.key === "Enter" || e.key === " ")) {
+                if (hasMultiple && (e.key === 'Enter' || e.key === ' ')) {
                   e.preventDefault();
                   toggle(group.promptId);
                 }
               }}
               className={cn(
-                "flex items-start gap-3 p-3",
-                hasMultiple && "cursor-pointer hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors select-none",
+                'flex items-start gap-3 p-3',
+                hasMultiple &&
+                  'cursor-pointer hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors select-none',
               )}
             >
               <div
                 className={cn(
-                  "flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold mt-0.5",
+                  'flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold mt-0.5',
                   isGap
-                    ? "bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-400"
-                    : "bg-green-100 text-green-600 dark:bg-green-900/40 dark:text-green-400",
+                    ? 'bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-400'
+                    : 'bg-green-100 text-green-600 dark:bg-green-900/40 dark:text-green-400',
                 )}
               >
                 {i + 1}
@@ -1068,26 +1002,37 @@ function GapStrengthList({
                   {hasMultiple && (
                     <ChevronDown
                       className={cn(
-                        "h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform",
-                        !isOpen && "-rotate-90",
+                        'h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform',
+                        !isOpen && '-rotate-90',
                       )}
                     />
                   )}
                   <p className="text-sm line-clamp-2">{group.promptText}</p>
                 </div>
                 <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
-                  <span>{t("h2h.you")}: {group.avgBrandScore}%</span>
-                  <span>{t("h2h.them")}: {group.avgCompetitorScore}%</span>
+                  <span>
+                    {t('h2h.you')}: {group.avgBrandScore}%
+                  </span>
+                  <span>
+                    {t('h2h.them')}: {group.avgCompetitorScore}%
+                  </span>
                   {hasMultiple ? (
                     <span>{group.items.length} models</span>
-                  ) : (group.items[0].modelUsed || group.items[0].platform) ? (
-                    <ModelBadge model={group.items[0].modelUsed || group.items[0].platform} platform={group.items[0].platform} />
+                  ) : group.items[0].modelUsed || group.items[0].platform ? (
+                    <ModelBadge
+                      model={group.items[0].modelUsed || group.items[0].platform}
+                      platform={group.items[0].platform}
+                    />
                   ) : (
                     <span className="text-xs text-muted-foreground">—</span>
                   )}
                   {!hasMultiple && group.items[0].createdAt && (
                     <span className="text-muted-foreground">
-                      {new Date(group.items[0].createdAt).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" })}
+                      {new Date(group.items[0].createdAt).toLocaleDateString(undefined, {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric',
+                      })}
                     </span>
                   )}
                 </div>
@@ -1104,15 +1049,18 @@ function GapStrengthList({
                   <div
                     key={`${item.promptId}-${item.modelUsed}-${j}`}
                     className={cn(
-                      "flex items-center gap-3 rounded-md px-3 py-2 text-xs",
+                      'flex items-center gap-3 rounded-md px-3 py-2 text-xs',
                       isGap
-                        ? "bg-red-100/50 dark:bg-red-900/20"
-                        : "bg-green-100/50 dark:bg-green-900/20",
+                        ? 'bg-red-100/50 dark:bg-red-900/20'
+                        : 'bg-green-100/50 dark:bg-green-900/20',
                     )}
                   >
                     <div className="flex-1 min-w-0">
-                      {(item.modelUsed || item.platform) ? (
-                        <ModelBadge model={item.modelUsed || item.platform} platform={item.platform} />
+                      {item.modelUsed || item.platform ? (
+                        <ModelBadge
+                          model={item.modelUsed || item.platform}
+                          platform={item.platform}
+                        />
                       ) : (
                         <span className="text-xs text-muted-foreground">—</span>
                       )}
@@ -1123,14 +1071,17 @@ function GapStrengthList({
                       </Badge>
                     )}
                     <span className="tabular-nums text-muted-foreground">
-                      {t("h2h.you")}: {Math.round(item.brandScore)}%
+                      {t('h2h.you')}: {Math.round(item.brandScore)}%
                     </span>
                     <span className="tabular-nums text-muted-foreground">
-                      {t("h2h.them")}: {Math.round(item.competitorScore)}%
+                      {t('h2h.them')}: {Math.round(item.competitorScore)}%
                     </span>
                     {item.createdAt && (
                       <span className="text-muted-foreground whitespace-nowrap">
-                        {new Date(item.createdAt).toLocaleDateString(undefined, { day: "numeric", month: "short" })}
+                        {new Date(item.createdAt).toLocaleDateString(undefined, {
+                          day: 'numeric',
+                          month: 'short',
+                        })}
                       </span>
                     )}
                     <DiffBadge diff={Math.round(item.diff)} />
@@ -1156,7 +1107,7 @@ function HeadToHeadSection({
   brandName: string;
   competitorName: string;
 }) {
-  const t = useTranslations("competitors");
+  const t = useTranslations('competitors');
   const router = useRouter();
   const overallDiff = data.brandAvg - data.competitorAvg;
 
@@ -1168,7 +1119,7 @@ function HeadToHeadSection({
           <CardContent className="pt-5 pb-4">
             <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
               <Target className="h-3.5 w-3.5" />
-              {t("h2h.yourAvg")}
+              {t('h2h.yourAvg')}
             </div>
             <div className="text-2xl font-bold tabular-nums">{data.brandAvg}%</div>
           </CardContent>
@@ -1177,7 +1128,7 @@ function HeadToHeadSection({
           <CardContent className="pt-5 pb-4">
             <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
               <Swords className="h-3.5 w-3.5" />
-              {t("h2h.theirAvg")}
+              {t('h2h.theirAvg')}
             </div>
             <div className="text-2xl font-bold tabular-nums">{data.competitorAvg}%</div>
           </CardContent>
@@ -1190,16 +1141,17 @@ function HeadToHeadSection({
               ) : (
                 <TrendingDown className="h-3.5 w-3.5" />
               )}
-              {t("h2h.overallDiff")}
+              {t('h2h.overallDiff')}
             </div>
             <div
               className={cn(
-                "text-2xl font-bold tabular-nums",
-                overallDiff > 0 && "text-green-600 dark:text-green-400",
-                overallDiff < 0 && "text-red-600 dark:text-red-400",
+                'text-2xl font-bold tabular-nums',
+                overallDiff > 0 && 'text-green-600 dark:text-green-400',
+                overallDiff < 0 && 'text-red-600 dark:text-red-400',
               )}
             >
-              {overallDiff > 0 ? "+" : ""}{overallDiff}%
+              {overallDiff > 0 ? '+' : ''}
+              {overallDiff}%
             </div>
           </CardContent>
         </Card>
@@ -1207,11 +1159,7 @@ function HeadToHeadSection({
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         {/* Platform Breakdown */}
-        <PlatformBreakdown
-          data={data}
-          brandName={brandName}
-          competitorName={competitorName}
-        />
+        <PlatformBreakdown data={data} brandName={brandName} competitorName={competitorName} />
 
         {/* Gaps & Strengths */}
         <Card className="lg:col-span-2">
@@ -1220,11 +1168,11 @@ function HeadToHeadSection({
               <TabsList className="mb-3">
                 <TabsTrigger value="gaps" className="gap-1.5 text-xs">
                   <ShieldAlert className="h-3.5 w-3.5" />
-                  {t("h2h.gaps")} ({data.gaps.length})
+                  {t('h2h.gaps')} ({data.gaps.length})
                 </TabsTrigger>
                 <TabsTrigger value="strengths" className="gap-1.5 text-xs">
                   <TrendingUp className="h-3.5 w-3.5" />
-                  {t("h2h.strengths")} ({data.strengths.length})
+                  {t('h2h.strengths')} ({data.strengths.length})
                 </TabsTrigger>
               </TabsList>
               <TabsContent value="gaps">
@@ -1241,10 +1189,8 @@ function HeadToHeadSection({
       {/* Grouped Prompt-by-Prompt Comparison */}
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium">
-            {t("h2h.promptByPrompt")}
-          </CardTitle>
-          <p className="text-xs text-muted-foreground">{t("h2h.promptByPromptDesc")}</p>
+          <CardTitle className="text-sm font-medium">{t('h2h.promptByPrompt')}</CardTitle>
+          <p className="text-xs text-muted-foreground">{t('h2h.promptByPromptDesc')}</p>
         </CardHeader>
         <CardContent className="pt-0">
           <PromptComparisonGrouped
@@ -1262,13 +1208,12 @@ function HeadToHeadSection({
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function CompetitorsPage() {
-  const t = useTranslations("competitors");
+  const t = useTranslations('competitors');
   const { canUse, isCloud } = useFeatureGate();
   const brand = useBrandStore((s) => s.getActiveBrand());
 
   const [competitors, setCompetitors] = useState<Competitor[]>([]);
-  const [comparisonData, setComparisonData] =
-    useState<CompetitorComparisonData | null>(null);
+  const [comparisonData, setComparisonData] = useState<CompetitorComparisonData | null>(null);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
@@ -1290,7 +1235,7 @@ export default function CompetitorsPage() {
       setCompetitors(comps);
       setComparisonData(comparison.brands.length > 1 ? comparison : null);
     } catch {
-      toast.error(t("loadError"));
+      toast.error(t('loadError'));
     } finally {
       setLoading(false);
     }
@@ -1310,7 +1255,7 @@ export default function CompetitorsPage() {
         const data = await getHeadToHeadComparison(brand.id, competitorId);
         setH2hData(data);
       } catch {
-        toast.error(t("h2h.loadError"));
+        toast.error(t('h2h.loadError'));
       } finally {
         setH2hLoading(false);
       }
@@ -1326,7 +1271,7 @@ export default function CompetitorsPage() {
     }
   }, [selectedCompetitorId, loadH2H]);
 
-  if (isCloud && !canUse("competitor_tracking")) {
+  if (isCloud && !canUse('competitor_tracking')) {
     return <PlanGateOverlay />;
   }
 
@@ -1349,7 +1294,7 @@ export default function CompetitorsPage() {
   async function handleAdd(name: string, domain: string) {
     if (!brand) return;
     await addCompetitor(brand.id, { name, domain });
-    toast.success(t("addSuccess"));
+    toast.success(t('addSuccess'));
     loadData();
   }
 
@@ -1357,13 +1302,13 @@ export default function CompetitorsPage() {
     setDeleting(id);
     try {
       await deleteCompetitor(id);
-      toast.success(t("deleteSuccess"));
+      toast.success(t('deleteSuccess'));
       if (selectedCompetitorId === id) {
         setSelectedCompetitorId(null);
       }
       loadData();
     } catch {
-      toast.error(t("deleteError"));
+      toast.error(t('deleteError'));
     } finally {
       setDeleting(null);
     }
@@ -1375,8 +1320,8 @@ export default function CompetitorsPage() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
-          <p className="text-muted-foreground">{t("description")}</p>
+          <h1 className="text-2xl font-bold tracking-tight">{t('title')}</h1>
+          <p className="text-muted-foreground">{t('description')}</p>
         </div>
         <div className="flex items-center justify-center py-20">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -1390,12 +1335,12 @@ export default function CompetitorsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
-          <p className="text-muted-foreground">{t("description")}</p>
+          <h1 className="text-2xl font-bold tracking-tight">{t('title')}</h1>
+          <p className="text-muted-foreground">{t('description')}</p>
         </div>
         <Button className="gap-2" onClick={() => setDialogOpen(true)}>
           <Plus className="h-4 w-4" />
-          {t("addCompetitor")}
+          {t('addCompetitor')}
         </Button>
       </div>
 
@@ -1408,12 +1353,12 @@ export default function CompetitorsPage() {
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-base">
                 <Users className="h-4 w-4" />
-                {t("trackedCompetitors")}
+                {t('trackedCompetitors')}
                 <Badge variant="secondary" className="text-xs">
                   {competitors.length}
                 </Badge>
               </CardTitle>
-              <p className="text-xs text-muted-foreground">{t("selectToCompare")}</p>
+              <p className="text-xs text-muted-foreground">{t('selectToCompare')}</p>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
@@ -1424,9 +1369,7 @@ export default function CompetitorsPage() {
                     stats={scoreMap.get(comp.name) ?? null}
                     isSelected={selectedCompetitorId === comp.id}
                     onSelect={() =>
-                      setSelectedCompetitorId(
-                        selectedCompetitorId === comp.id ? null : comp.id,
-                      )
+                      setSelectedCompetitorId(selectedCompetitorId === comp.id ? null : comp.id)
                     }
                     onDelete={() => setConfirmDelete(comp)}
                     deleting={deleting === comp.id}
@@ -1442,9 +1385,9 @@ export default function CompetitorsPage() {
               <div className="flex items-center gap-2 pt-2">
                 <Swords className="h-5 w-5 text-primary" />
                 <h2 className="text-lg font-semibold">
-                  {t("h2h.title", {
+                  {t('h2h.title', {
                     brand: brand.name,
-                    competitor: selectedCompetitor?.name ?? "",
+                    competitor: selectedCompetitor?.name ?? '',
                   })}
                 </h2>
               </div>
@@ -1457,15 +1400,15 @@ export default function CompetitorsPage() {
                 <HeadToHeadSection
                   data={h2hData}
                   brandName={brand.name}
-                  competitorName={selectedCompetitor?.name ?? ""}
+                  competitorName={selectedCompetitor?.name ?? ''}
                 />
               ) : (
                 <Card>
                   <CardContent className="flex flex-col items-center justify-center py-12 text-center">
                     <Swords className="h-8 w-8 text-muted-foreground mb-3" />
-                    <h3 className="text-sm font-semibold">{t("h2h.noDataTitle")}</h3>
+                    <h3 className="text-sm font-semibold">{t('h2h.noDataTitle')}</h3>
                     <p className="text-xs text-muted-foreground mt-1 max-w-sm">
-                      {t("h2h.noDataDescription")}
+                      {t('h2h.noDataDescription')}
                     </p>
                   </CardContent>
                 </Card>
@@ -1475,11 +1418,7 @@ export default function CompetitorsPage() {
         </>
       )}
 
-      <AddCompetitorDialog
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        onAdd={handleAdd}
-      />
+      <AddCompetitorDialog open={dialogOpen} onOpenChange={setDialogOpen} onAdd={handleAdd} />
 
       <ConfirmDeleteCompetitorDialog
         competitor={confirmDelete}
@@ -1492,9 +1431,7 @@ export default function CompetitorsPage() {
           setConfirmDelete(null);
           await handleDelete(id);
         }}
-        deleting={
-          confirmDelete !== null && deleting === confirmDelete.id
-        }
+        deleting={confirmDelete !== null && deleting === confirmDelete.id}
       />
     </div>
   );
@@ -1511,8 +1448,8 @@ function ConfirmDeleteCompetitorDialog({
   onConfirm: () => void;
   deleting: boolean;
 }) {
-  const t = useTranslations("competitors");
-  const name = competitor?.name ?? "";
+  const t = useTranslations('competitors');
+  const name = competitor?.name ?? '';
 
   return (
     <Dialog open={competitor !== null} onOpenChange={onOpenChange}>
@@ -1520,11 +1457,9 @@ function ConfirmDeleteCompetitorDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <AlertCircle className="h-5 w-5 text-destructive" />
-            {t("confirmDeleteTitle", { name })}
+            {t('confirmDeleteTitle', { name })}
           </DialogTitle>
-          <DialogDescription>
-            {t("confirmDeleteDescription", { name })}
-          </DialogDescription>
+          <DialogDescription>{t('confirmDeleteDescription', { name })}</DialogDescription>
         </DialogHeader>
         <DialogFooter className="gap-2 sm:gap-2">
           <Button
@@ -1533,7 +1468,7 @@ function ConfirmDeleteCompetitorDialog({
             onClick={() => onOpenChange(false)}
             disabled={deleting}
           >
-            {t("cancel")}
+            {t('cancel')}
           </Button>
           <Button
             type="button"
@@ -1543,7 +1478,7 @@ function ConfirmDeleteCompetitorDialog({
           >
             {deleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             <Trash2 className="mr-1.5 h-4 w-4" />
-            {t("confirmDeleteAction")}
+            {t('confirmDeleteAction')}
           </Button>
         </DialogFooter>
       </DialogContent>

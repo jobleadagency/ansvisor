@@ -17,9 +17,7 @@ export interface BrandRow {
   created_at: string;
 }
 
-export async function listBrandsFor(
-  auth: McpAuthContext,
-): Promise<BrandRow[]> {
+export async function listBrandsFor(auth: McpAuthContext): Promise<BrandRow[]> {
   if (!auth.organizationId) return [];
 
   const { data, error } = await supabaseAdmin
@@ -144,8 +142,7 @@ export async function getVisibilitySummaryFor(
     .map(([name, agg]) => ({
       name,
       mentions: agg.mentions,
-      avgVisibility:
-        Math.round((agg.visSum / Math.max(agg.mentions, 1)) * 10) / 10,
+      avgVisibility: Math.round((agg.visSum / Math.max(agg.mentions, 1)) * 10) / 10,
     }))
     .sort((a, b) => b.mentions - a.mentions)
     .slice(0, 5);
@@ -212,8 +209,7 @@ export async function listTopicsFor(
     .eq('prompt_sets.brand_id', brandId)
     .not('topic_id', 'is', null);
 
-  const promptRows =
-    (prompts as Array<{ topic_id: string | null }> | null) ?? [];
+  const promptRows = (prompts as Array<{ topic_id: string | null }> | null) ?? [];
   const countByTopic = new Map<string, number>();
   for (const row of promptRows) {
     if (!row.topic_id) continue;
@@ -307,7 +303,7 @@ export async function listPromptsFor(
     }> | null) ?? [];
 
   return rows.map((r) => {
-    const topic = Array.isArray(r.topics) ? r.topics[0] ?? null : r.topics;
+    const topic = Array.isArray(r.topics) ? (r.topics[0] ?? null) : r.topics;
     return {
       id: r.id,
       text: r.text,
@@ -398,7 +394,7 @@ export async function listContentOpportunitiesFor(
     }> | null) ?? [];
 
   return rows.map((r) => {
-    const prompt = Array.isArray(r.prompts) ? r.prompts[0] ?? null : r.prompts;
+    const prompt = Array.isArray(r.prompts) ? (r.prompts[0] ?? null) : r.prompts;
     return {
       id: r.id,
       title: r.title,
@@ -466,7 +462,7 @@ export async function getContentOpportunityFor(
     prompts: Array<{ text: string }> | { text: string } | null;
   };
 
-  const prompt = Array.isArray(r.prompts) ? r.prompts[0] ?? null : r.prompts;
+  const prompt = Array.isArray(r.prompts) ? (r.prompts[0] ?? null) : r.prompts;
 
   return {
     id: r.id,

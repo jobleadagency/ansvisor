@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { usePlanContext } from "@/components/providers/plan-provider";
+import { usePlanContext } from '@/components/providers/plan-provider';
 import {
   type Feature,
   type PlanLimits,
@@ -8,7 +8,7 @@ import {
   hasFeature,
   isWithinLimit,
   getMinimumPlanForFeature,
-} from "@/config/plans";
+} from '@/config/plans';
 
 export function useFeatureGate() {
   const { planId, isCloud } = usePlanContext();
@@ -24,13 +24,15 @@ export function useFeatureGate() {
     },
 
     withinLimit(
-      key: keyof Omit<PlanLimits, "features" | "allowedScrapers" | "allowedModels">,
+      key: keyof Omit<PlanLimits, 'features' | 'allowedScrapers' | 'allowedModels'>,
       currentCount: number,
     ): boolean {
       return isWithinLimit(plan, key, currentCount);
     },
 
-    getLimit(key: keyof Omit<PlanLimits, "features" | "allowedScrapers" | "allowedModels">): number {
+    getLimit(
+      key: keyof Omit<PlanLimits, 'features' | 'allowedScrapers' | 'allowedModels'>,
+    ): number {
       return plan.limits[key];
     },
 

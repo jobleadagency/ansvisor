@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useCallback } from "react";
-import { ReferralTrendChart, PlatformBreakdownChart, getPlatformName } from "./_charts";
-import { useBrandStore } from "@/stores/use-brand-store";
+import { useState, useEffect, useCallback } from 'react';
+import { ReferralTrendChart, PlatformBreakdownChart, getPlatformName } from './_charts';
+import { useBrandStore } from '@/stores/use-brand-store';
 import {
   getTrafficSummary,
   getTrafficTrend,
@@ -10,9 +10,9 @@ import {
   type TrafficSummary,
   type TrafficTrendPoint,
   type TrafficLog,
-} from "@/lib/actions/traffic";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+} from '@/lib/actions/traffic';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import {
   Table,
   TableBody,
@@ -20,8 +20,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Skeleton } from "@/components/ui/skeleton";
+} from '@/components/ui/table';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Globe,
   TrendingUp,
@@ -31,9 +31,9 @@ import {
   Code,
   Copy,
   Check,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
@@ -62,12 +62,12 @@ function KpiCard({
         <div className="text-3xl font-bold">{value}</div>
         <p
           className={cn(
-            "text-xs mt-1 flex items-center gap-0.5",
+            'text-xs mt-1 flex items-center gap-0.5',
             subPositive === true
-              ? "text-green-600 dark:text-green-400"
+              ? 'text-green-600 dark:text-green-400'
               : subPositive === false
-                ? "text-red-500"
-                : "text-muted-foreground"
+                ? 'text-red-500'
+                : 'text-muted-foreground',
           )}
         >
           {sub}
@@ -78,33 +78,37 @@ function KpiCard({
 }
 
 function DeltaBadge({ current, previous }: { current: number; previous: number }) {
-  if (previous === 0 && current === 0) return <span className="text-xs text-muted-foreground">—</span>;
-  if (previous === 0) return (
-    <span className="flex items-center gap-0.5 text-xs font-medium text-green-600 dark:text-green-400">
-      <TrendingUp className="h-3 w-3" />new
-    </span>
-  );
+  if (previous === 0 && current === 0)
+    return <span className="text-xs text-muted-foreground">—</span>;
+  if (previous === 0)
+    return (
+      <span className="flex items-center gap-0.5 text-xs font-medium text-green-600 dark:text-green-400">
+        <TrendingUp className="h-3 w-3" />
+        new
+      </span>
+    );
   const delta = Math.round(((current - previous) / previous) * 100);
   if (delta === 0) return <span className="text-xs text-muted-foreground">—</span>;
   const pos = delta > 0;
   return (
     <span
       className={cn(
-        "flex items-center gap-0.5 text-xs font-medium",
-        pos ? "text-green-600 dark:text-green-400" : "text-red-500"
+        'flex items-center gap-0.5 text-xs font-medium',
+        pos ? 'text-green-600 dark:text-green-400' : 'text-red-500',
       )}
     >
       {pos ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
-      {pos ? "+" : ""}{delta}%
+      {pos ? '+' : ''}
+      {delta}%
     </span>
   );
 }
 
 function SnippetBanner({ trackingCode }: { trackingCode?: string }) {
   const [copied, setCopied] = useState(false);
-  const isCloud = process.env.NEXT_PUBLIC_IS_CLOUD === "true";
-  const apiUrl = isCloud ? "https://api.ansops.ai" : process.env.NEXT_PUBLIC_API_URL;
-  const snippet = `<script src="${apiUrl}/t.js" data-t="${trackingCode || "YOUR_TRACKING_CODE"}" defer></script>`;
+  const isCloud = process.env.NEXT_PUBLIC_IS_CLOUD === 'true';
+  const apiUrl = isCloud ? 'https://api.ansops.ai' : process.env.NEXT_PUBLIC_API_URL;
+  const snippet = `<script src="${apiUrl}/t.js" data-t="${trackingCode || 'YOUR_TRACKING_CODE'}" defer></script>`;
 
   if (!trackingCode || !apiUrl) return null;
 
@@ -121,7 +125,8 @@ function SnippetBanner({ trackingCode }: { trackingCode?: string }) {
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium">Add this snippet to your website</p>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Paste this before the closing <code className="text-[11px]">&lt;/head&gt;</code> tag to track AI-referred visits.
+            Paste this before the closing <code className="text-[11px]">&lt;/head&gt;</code> tag to
+            track AI-referred visits.
           </p>
           <div className="mt-2 relative">
             <pre className="text-[11px] bg-muted/50 rounded-md px-3 py-2 overflow-x-auto font-mono">
@@ -130,7 +135,11 @@ function SnippetBanner({ trackingCode }: { trackingCode?: string }) {
           </div>
         </div>
         <Button variant="ghost" size="icon" className="shrink-0 h-8 w-8" onClick={handleCopy}>
-          {copied ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5" />}
+          {copied ? (
+            <Check className="h-3.5 w-3.5 text-green-500" />
+          ) : (
+            <Copy className="h-3.5 w-3.5" />
+          )}
         </Button>
       </CardContent>
     </Card>
@@ -140,7 +149,7 @@ function SnippetBanner({ trackingCode }: { trackingCode?: string }) {
 function timeAgo(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
   const mins = Math.floor(diff / 60000);
-  if (mins < 1) return "just now";
+  if (mins < 1) return 'just now';
   if (mins < 60) return `${mins}m ago`;
   const hrs = Math.floor(mins / 60);
   if (hrs < 24) return `${hrs}h ago`;
@@ -174,7 +183,7 @@ export default function TrafficPage() {
       setLogs(l.logs);
       setLogsTotal(l.total);
     } catch (err) {
-      console.error("Failed to load traffic data:", err);
+      console.error('Failed to load traffic data:', err);
     } finally {
       setIsLoading(false);
     }
@@ -219,9 +228,8 @@ export default function TrafficPage() {
 
   const totalVisits = summary?.totalVisits ?? 0;
   const totalVisitsPrev = summary?.totalVisitsPrev ?? 0;
-  const visitsDelta = totalVisitsPrev > 0
-    ? Math.round(((totalVisits - totalVisitsPrev) / totalVisitsPrev) * 100)
-    : 0;
+  const visitsDelta =
+    totalVisitsPrev > 0 ? Math.round(((totalVisits - totalVisitsPrev) / totalVisitsPrev) * 100) : 0;
   const topPlatform = summary?.platformBreakdown[0];
 
   const isEmpty = totalVisits === 0 && logs.length === 0;
@@ -232,7 +240,7 @@ export default function TrafficPage() {
       <div>
         <h1 className="text-2xl font-bold tracking-tight">AI Traffic Analytics</h1>
         <p className="text-muted-foreground text-sm">
-          {primaryDomain ? `${primaryDomain} · ` : ""}AI-referred visits to your website
+          {primaryDomain ? `${primaryDomain} · ` : ''}AI-referred visits to your website
         </p>
       </div>
 
@@ -246,8 +254,8 @@ export default function TrafficPage() {
             <h3 className="text-lg font-semibold mt-4">No traffic data yet</h3>
             <p className="text-sm text-muted-foreground mt-1 max-w-md mx-auto">
               {brand.trackingCode
-                ? "Once visitors arrive from AI platforms, their visits will appear here."
-                : "Add the tracking snippet to your website to start collecting AI-referred traffic data."}
+                ? 'Once visitors arrive from AI platforms, their visits will appear here.'
+                : 'Add the tracking snippet to your website to start collecting AI-referred traffic data.'}
             </p>
           </CardContent>
         </Card>
@@ -262,11 +270,16 @@ export default function TrafficPage() {
               sub={
                 totalVisitsPrev > 0 ? (
                   <>
-                    {visitsDelta >= 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
-                    {visitsDelta >= 0 ? "+" : ""}{visitsDelta}% vs previous period
+                    {visitsDelta >= 0 ? (
+                      <TrendingUp className="h-3 w-3" />
+                    ) : (
+                      <TrendingDown className="h-3 w-3" />
+                    )}
+                    {visitsDelta >= 0 ? '+' : ''}
+                    {visitsDelta}% vs previous period
                   </>
                 ) : (
-                  "last 7 days"
+                  'last 7 days'
                 )
               }
               subPositive={visitsDelta > 0 ? true : visitsDelta < 0 ? false : undefined}
@@ -274,8 +287,8 @@ export default function TrafficPage() {
             <KpiCard
               title="Top Platform"
               icon={Globe}
-              value={topPlatform ? getPlatformName(topPlatform.platform) : "—"}
-              sub={topPlatform ? `${topPlatform.visits} visits` : "no data"}
+              value={topPlatform ? getPlatformName(topPlatform.platform) : '—'}
+              sub={topPlatform ? `${topPlatform.visits} visits` : 'no data'}
             />
             <KpiCard
               title="Platforms"
@@ -289,7 +302,9 @@ export default function TrafficPage() {
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
             <Card className="lg:col-span-2">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">AI Referral Trend — Last 7 Days</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  AI Referral Trend — Last 7 Days
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <ReferralTrendChart data={trend} />
@@ -326,7 +341,9 @@ export default function TrafficPage() {
                     {(summary?.platformBreakdown ?? []).map((row) => (
                       <TableRow key={row.platform} className="hover:bg-muted/50">
                         <TableCell className="pl-6">
-                          <span className="font-medium text-sm">{getPlatformName(row.platform)}</span>
+                          <span className="font-medium text-sm">
+                            {getPlatformName(row.platform)}
+                          </span>
                         </TableCell>
                         <TableCell className="text-right font-semibold tabular-nums">
                           {row.visits.toLocaleString()}
@@ -390,7 +407,9 @@ export default function TrafficPage() {
                   <CardTitle className="text-sm font-medium">Recent AI Referral Visits</CardTitle>
                 </div>
                 {logsTotal > 10 && (
-                  <Badge variant="secondary" className="text-xs">{logsTotal} total</Badge>
+                  <Badge variant="secondary" className="text-xs">
+                    {logsTotal} total
+                  </Badge>
                 )}
               </div>
             </CardHeader>
@@ -411,17 +430,23 @@ export default function TrafficPage() {
                         {timeAgo(row.createdAt)}
                       </TableCell>
                       <TableCell>
-                        <span className="text-sm">{getPlatformName(row.sourcePlatform ?? "unknown")}</span>
+                        <span className="text-sm">
+                          {getPlatformName(row.sourcePlatform ?? 'unknown')}
+                        </span>
                       </TableCell>
                       <TableCell>
                         <span className="font-mono text-xs text-muted-foreground line-clamp-1">
                           {(() => {
-                            try { return new URL(row.url).pathname; } catch { return row.url; }
+                            try {
+                              return new URL(row.url).pathname;
+                            } catch {
+                              return row.url;
+                            }
                           })()}
                         </span>
                       </TableCell>
                       <TableCell className="text-right pr-6">
-                        <span className="text-xs text-muted-foreground">{row.country ?? "—"}</span>
+                        <span className="text-xs text-muted-foreground">{row.country ?? '—'}</span>
                       </TableCell>
                     </TableRow>
                   ))}

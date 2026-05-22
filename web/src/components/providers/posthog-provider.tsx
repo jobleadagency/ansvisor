@@ -23,8 +23,7 @@ export function PostHogProvider() {
     if (!key) return;
 
     posthog.init(key, {
-      api_host:
-        process.env.NEXT_PUBLIC_POSTHOG_HOST ?? 'https://us.i.posthog.com',
+      api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST ?? 'https://us.i.posthog.com',
       capture_pageview: 'history_change',
       capture_pageleave: true,
       autocapture: false,

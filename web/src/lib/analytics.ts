@@ -24,17 +24,11 @@ function getClient(): PostHogInterface | null {
   return window.__ansvisor_posthog__ ?? null;
 }
 
-export function track(
-  event: string,
-  properties?: Record<string, unknown>,
-): void {
+export function track(event: string, properties?: Record<string, unknown>): void {
   getClient()?.capture(event, properties);
 }
 
-export function identify(
-  distinctId: string,
-  properties?: Record<string, unknown>,
-): void {
+export function identify(distinctId: string, properties?: Record<string, unknown>): void {
   getClient()?.identify(distinctId, properties);
 }
 
@@ -46,8 +40,6 @@ export function reset(): void {
  * Set properties on the current person without sending an event.
  * Useful for hydrating subscription_status, plan_id, org_id once after login.
  */
-export function setPersonProperties(
-  properties: Record<string, unknown>,
-): void {
+export function setPersonProperties(properties: Record<string, unknown>): void {
   getClient()?.setPersonProperties(properties);
 }

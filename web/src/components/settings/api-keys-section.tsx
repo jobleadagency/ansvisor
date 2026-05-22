@@ -1,17 +1,11 @@
-"use client";
+'use client';
 
-import { useCallback, useEffect, useState } from "react";
-import { toast } from "sonner";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { useCallback, useEffect, useState } from 'react';
+import { toast } from 'sonner';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Dialog,
   DialogClose,
@@ -20,10 +14,10 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
-import { Copy, KeyRound, Loader2, Plus, Trash2 } from "lucide-react";
+} from '@/components/ui/dialog';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Badge } from '@/components/ui/badge';
+import { Copy, KeyRound, Loader2, Plus, Trash2 } from 'lucide-react';
 
 interface ApiKey {
   id: string;
@@ -34,21 +28,19 @@ interface ApiKey {
   created_at: string;
 }
 
-const configuredAppUrl = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ?? "";
+const configuredAppUrl = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, '') ?? '';
 
 function getMcpEndpoint(): string {
-  const appUrl =
-    configuredAppUrl ||
-    (typeof window !== "undefined" ? window.location.origin : "");
+  const appUrl = configuredAppUrl || (typeof window !== 'undefined' ? window.location.origin : '');
   return `${appUrl}/api/mcp`;
 }
 
 function formatDate(iso: string | null): string {
-  if (!iso) return "—";
+  if (!iso) return '—';
   return new Date(iso).toLocaleDateString(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
   });
 }
 
@@ -56,7 +48,7 @@ export function ApiKeysSection() {
   const [keys, setKeys] = useState<ApiKey[]>([]);
   const [loading, setLoading] = useState(true);
   const [createOpen, setCreateOpen] = useState(false);
-  const [newName, setNewName] = useState("");
+  const [newName, setNewName] = useState('');
   const [creating, setCreating] = useState(false);
   const [revealedToken, setRevealedToken] = useState<string | null>(null);
   const mcpEndpoint = getMcpEndpoint();
@@ -64,12 +56,12 @@ export function ApiKeysSection() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/keys");
+      const res = await fetch('/api/keys');
       const body = (await res.json()) as { keys?: ApiKey[]; error?: string };
-      if (!res.ok) throw new Error(body.error || "Failed to load");
+      if (!res.ok) throw new Error(body.error || 'Failed to load');
       setKeys(body.keys ?? []);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to load");
+      toast.error(err instanceof Error ? err.message : 'Failed to load');
     } finally {
       setLoading(false);
     }
@@ -83,47 +75,47 @@ export function ApiKeysSection() {
     if (!newName.trim()) return;
     setCreating(true);
     try {
-      const res = await fetch("/api/keys", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch('/api/keys', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: newName.trim() }),
       });
       const body = (await res.json()) as {
         key?: ApiKey & { token: string };
         error?: string;
       };
-      if (!res.ok || !body.key) throw new Error(body.error || "Failed to create");
+      if (!res.ok || !body.key) throw new Error(body.error || 'Failed to create');
       setRevealedToken(body.key.token);
-      setNewName("");
+      setNewName('');
       setCreateOpen(false);
       await load();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to create");
+      toast.error(err instanceof Error ? err.message : 'Failed to create');
     } finally {
       setCreating(false);
     }
   };
 
   const handleRevoke = async (id: string) => {
-    if (!confirm("Revoke this API key? Clients using it will lose access immediately.")) {
+    if (!confirm('Revoke this API key? Clients using it will lose access immediately.')) {
       return;
     }
     try {
-      const res = await fetch(`/api/keys/${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/keys/${id}`, { method: 'DELETE' });
       if (!res.ok) {
         const body = (await res.json().catch(() => ({}))) as { error?: string };
-        throw new Error(body.error || "Failed to revoke");
+        throw new Error(body.error || 'Failed to revoke');
       }
-      toast.success("Key revoked");
+      toast.success('Key revoked');
       await load();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to revoke");
+      toast.error(err instanceof Error ? err.message : 'Failed to revoke');
     }
   };
 
   const copy = async (text: string) => {
     await navigator.clipboard.writeText(text);
-    toast.success("Copied to clipboard");
+    toast.success('Copied to clipboard');
   };
 
   return (
@@ -136,8 +128,8 @@ export function ApiKeysSection() {
               API Keys
             </CardTitle>
             <CardDescription>
-              Long-lived tokens for the Ansvisor MCP server and other external
-              clients. Keys are shown once at creation — store them somewhere safe.
+              Long-lived tokens for the Ansvisor MCP server and other external clients. Keys are
+              shown once at creation — store them somewhere safe.
             </CardDescription>
           </div>
           <Button size="sm" onClick={() => setCreateOpen(true)} className="gap-1.5 shrink-0">
@@ -150,9 +142,7 @@ export function ApiKeysSection() {
         <div className="rounded-md border bg-muted/40 p-3 text-xs space-y-1.5">
           <p className="font-medium text-foreground">MCP endpoint</p>
           <div className="flex items-center gap-2">
-            <code className="flex-1 truncate font-mono">
-              {mcpEndpoint}
-            </code>
+            <code className="flex-1 truncate font-mono">{mcpEndpoint}</code>
             <Button
               size="sm"
               variant="ghost"
@@ -163,8 +153,7 @@ export function ApiKeysSection() {
             </Button>
           </div>
           <p className="text-muted-foreground">
-            Paste this URL + a key below into Claude Desktop / Claude Code /
-            Cursor. See the{" "}
+            Paste this URL + a key below into Claude Desktop / Claude Code / Cursor. See the{' '}
             <a
               href="https://github.com/aeohub/ansvisor#whats-next"
               target="_blank"
@@ -191,10 +180,7 @@ export function ApiKeysSection() {
             {keys.map((k) => {
               const revoked = !!k.revoked_at;
               return (
-                <div
-                  key={k.id}
-                  className="flex items-center justify-between gap-4 p-3"
-                >
+                <div key={k.id} className="flex items-center justify-between gap-4 p-3">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <p className="text-sm font-medium truncate">{k.name}</p>
@@ -204,12 +190,9 @@ export function ApiKeysSection() {
                         </Badge>
                       )}
                     </div>
-                    <p className="text-xs text-muted-foreground font-mono">
-                      {k.prefix}…
-                    </p>
+                    <p className="text-xs text-muted-foreground font-mono">{k.prefix}…</p>
                     <p className="text-[11px] text-muted-foreground">
-                      Created {formatDate(k.created_at)} · Last used{" "}
-                      {formatDate(k.last_used_at)}
+                      Created {formatDate(k.created_at)} · Last used {formatDate(k.last_used_at)}
                     </p>
                   </div>
                   {!revoked && (
@@ -252,10 +235,7 @@ export function ApiKeysSection() {
             <DialogClose render={<Button variant="outline" disabled={creating} />}>
               Cancel
             </DialogClose>
-            <Button
-              onClick={handleCreate}
-              disabled={creating || !newName.trim()}
-            >
+            <Button onClick={handleCreate} disabled={creating || !newName.trim()}>
               {creating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Create
             </Button>
@@ -263,10 +243,7 @@ export function ApiKeysSection() {
         </DialogContent>
       </Dialog>
 
-      <Dialog
-        open={!!revealedToken}
-        onOpenChange={(v) => !v && setRevealedToken(null)}
-      >
+      <Dialog open={!!revealedToken} onOpenChange={(v) => !v && setRevealedToken(null)}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Copy your API key</DialogTitle>

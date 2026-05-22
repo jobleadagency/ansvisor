@@ -34,9 +34,7 @@ export function createMcpServer(auth: McpAuthContext): McpServer {
     async () => {
       const brands = await listBrandsFor(auth);
       return {
-        content: [
-          { type: 'text', text: JSON.stringify(brands, null, 2) },
-        ],
+        content: [{ type: 'text', text: JSON.stringify(brands, null, 2) }],
       };
     },
   );
@@ -47,30 +45,19 @@ export function createMcpServer(auth: McpAuthContext): McpServer {
       description:
         'Get aggregate visibility metrics for a brand over an optional date range and filter. Returns result count, average visibility score (0-100), total mentions, total citations, and the top 5 competitors by mention count. Use this for "how is my brand doing" / "what changed" style questions.',
       inputSchema: {
-        brand_id: z
-          .string()
-          .uuid()
-          .describe('Brand UUID, from list_brands.'),
+        brand_id: z.string().uuid().describe('Brand UUID, from list_brands.'),
         date_from: z
           .string()
           .optional()
-          .describe(
-            'ISO timestamp (inclusive) lower bound, e.g. 2026-05-01T00:00:00Z.',
-          ),
-        date_to: z
-          .string()
-          .optional()
-          .describe('ISO timestamp (inclusive) upper bound.'),
+          .describe('ISO timestamp (inclusive) lower bound, e.g. 2026-05-01T00:00:00Z.'),
+        date_to: z.string().optional().describe('ISO timestamp (inclusive) upper bound.'),
         model: z
           .string()
           .optional()
           .describe(
             'Optional model slug filter, or comma-separated list of slugs to filter a provider family.',
           ),
-        region: z
-          .string()
-          .optional()
-          .describe('Optional region code filter (e.g. "US", "TR").'),
+        region: z.string().optional().describe('Optional region code filter (e.g. "US", "TR").'),
       },
     },
     async (args) => {
@@ -88,9 +75,7 @@ export function createMcpServer(auth: McpAuthContext): McpServer {
         };
       }
       return {
-        content: [
-          { type: 'text', text: JSON.stringify(summary, null, 2) },
-        ],
+        content: [{ type: 'text', text: JSON.stringify(summary, null, 2) }],
       };
     },
   );
@@ -101,10 +86,7 @@ export function createMcpServer(auth: McpAuthContext): McpServer {
       description:
         'List topics for a brand, each with the number of prompts attached to it. Use this to audit prompt coverage ("are any topics empty / under-represented?") or before drilling into prompts for a specific theme. Topic-less prompts are not counted here — call list_prompts without a topic filter to see them.',
       inputSchema: {
-        brand_id: z
-          .string()
-          .uuid()
-          .describe('Brand UUID, from list_brands.'),
+        brand_id: z.string().uuid().describe('Brand UUID, from list_brands.'),
       },
     },
     async (args) => {
@@ -116,9 +98,7 @@ export function createMcpServer(auth: McpAuthContext): McpServer {
         };
       }
       return {
-        content: [
-          { type: 'text', text: JSON.stringify(topics, null, 2) },
-        ],
+        content: [{ type: 'text', text: JSON.stringify(topics, null, 2) }],
       };
     },
   );
@@ -129,32 +109,23 @@ export function createMcpServer(auth: McpAuthContext): McpServer {
       description:
         'List the prompts tracked for a brand, optionally filtered by topic or active status. Returns each prompt with its text, topic, platforms, models, regions, and active flag. Use this when the user asks what is being tracked, wants to drill into a specific topic, or wants to spot inactive / mis-targeted prompts.',
       inputSchema: {
-        brand_id: z
-          .string()
-          .uuid()
-          .describe('Brand UUID, from list_brands.'),
+        brand_id: z.string().uuid().describe('Brand UUID, from list_brands.'),
         topic_id: z
           .string()
           .uuid()
           .optional()
-          .describe(
-            'Optional topic UUID (from list_topics) to filter to one topic.',
-          ),
+          .describe('Optional topic UUID (from list_topics) to filter to one topic.'),
         is_active: z
           .boolean()
           .optional()
-          .describe(
-            'Optional filter — true returns only active prompts, false only inactive.',
-          ),
+          .describe('Optional filter — true returns only active prompts, false only inactive.'),
         limit: z
           .number()
           .int()
           .min(1)
           .max(500)
           .optional()
-          .describe(
-            'Optional row cap (default 100, max 500). Newest prompts come first.',
-          ),
+          .describe('Optional row cap (default 100, max 500). Newest prompts come first.'),
       },
     },
     async (args) => {
@@ -171,9 +142,7 @@ export function createMcpServer(auth: McpAuthContext): McpServer {
         };
       }
       return {
-        content: [
-          { type: 'text', text: JSON.stringify(prompts, null, 2) },
-        ],
+        content: [{ type: 'text', text: JSON.stringify(prompts, null, 2) }],
       };
     },
   );
@@ -184,10 +153,7 @@ export function createMcpServer(auth: McpAuthContext): McpServer {
       description:
         'List content opportunities / gaps for a brand, showing which prompts represent the highest-impact areas where the brand is currently losing visibility. Sorts by opportunity score descending by default. Use this to audit open gaps, see what content needs to be written, or list open strategy priorities.',
       inputSchema: {
-        brand_id: z
-          .string()
-          .uuid()
-          .describe('Brand UUID, from list_brands.'),
+        brand_id: z.string().uuid().describe('Brand UUID, from list_brands.'),
         status: z
           .enum(['new', 'sent', 'in_progress', 'done', 'dismissed'])
           .optional()
@@ -226,9 +192,7 @@ export function createMcpServer(auth: McpAuthContext): McpServer {
         };
       }
       return {
-        content: [
-          { type: 'text', text: JSON.stringify(opportunities, null, 2) },
-        ],
+        content: [{ type: 'text', text: JSON.stringify(opportunities, null, 2) }],
       };
     },
   );
@@ -254,9 +218,7 @@ export function createMcpServer(auth: McpAuthContext): McpServer {
         };
       }
       return {
-        content: [
-          { type: 'text', text: JSON.stringify(opportunity, null, 2) },
-        ],
+        content: [{ type: 'text', text: JSON.stringify(opportunity, null, 2) }],
       };
     },
   );

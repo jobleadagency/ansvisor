@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { useTranslations } from "next-intl";
-import { useParams } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
+import { useParams } from 'next/navigation';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   ArrowLeft,
   Send,
@@ -21,41 +21,41 @@ import {
   FileText,
   Target,
   ListOrdered,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Link } from "@/i18n/navigation";
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Link } from '@/i18n/navigation';
 import {
   getOpportunity,
   updateOpportunityStatus,
   sendToWebhook,
   generateBrief,
-} from "@/lib/actions/content";
-import type { ContentBrief, ContentOpportunity } from "@/types";
-import { toast } from "sonner";
+} from '@/lib/actions/content';
+import type { ContentBrief, ContentOpportunity } from '@/types';
+import { toast } from 'sonner';
 
 const IMPACT_COLORS: Record<string, string> = {
-  high: "border-red-500/30 bg-red-500/10 text-red-600 dark:text-red-400",
-  medium: "border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400",
-  low: "border-slate-500/30 bg-slate-500/10 text-slate-600 dark:text-slate-400",
+  high: 'border-red-500/30 bg-red-500/10 text-red-600 dark:text-red-400',
+  medium: 'border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400',
+  low: 'border-slate-500/30 bg-slate-500/10 text-slate-600 dark:text-slate-400',
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  new: "border-blue-500/30 bg-blue-500/10 text-blue-600 dark:text-blue-400",
-  sent: "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
-  in_progress: "border-violet-500/30 bg-violet-500/10 text-violet-600 dark:text-violet-400",
-  done: "border-green-500/30 bg-green-500/10 text-green-600 dark:text-green-400",
-  dismissed: "border-zinc-500/30 bg-zinc-500/10 text-zinc-500 dark:text-zinc-400",
+  new: 'border-blue-500/30 bg-blue-500/10 text-blue-600 dark:text-blue-400',
+  sent: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+  in_progress: 'border-violet-500/30 bg-violet-500/10 text-violet-600 dark:text-violet-400',
+  done: 'border-green-500/30 bg-green-500/10 text-green-600 dark:text-green-400',
+  dismissed: 'border-zinc-500/30 bg-zinc-500/10 text-zinc-500 dark:text-zinc-400',
 };
 
 const INTENT_LABELS: Record<string, string> = {
-  comparison: "Comparison",
-  "how-to": "How-to",
-  "what-is": "What is",
-  "best-top": "Best / Top",
-  "vs-review": "vs. / Review",
-  recommendation: "Recommendation",
-  "problem-solving": "Problem Solving",
-  other: "Other",
+  comparison: 'Comparison',
+  'how-to': 'How-to',
+  'what-is': 'What is',
+  'best-top': 'Best / Top',
+  'vs-review': 'vs. / Review',
+  recommendation: 'Recommendation',
+  'problem-solving': 'Problem Solving',
+  other: 'Other',
 };
 
 function StatCard({
@@ -70,7 +70,7 @@ function StatCard({
   className?: string;
 }) {
   return (
-    <div className={cn("flex items-center gap-3 rounded-lg border p-3", className)}>
+    <div className={cn('flex items-center gap-3 rounded-lg border p-3', className)}>
       <Icon className="h-4 w-4 text-muted-foreground shrink-0" />
       <div>
         <p className="text-xs text-muted-foreground">{label}</p>
@@ -81,7 +81,7 @@ function StatCard({
 }
 
 export default function ContentDetailPage() {
-  const t = useTranslations("content");
+  const t = useTranslations('content');
   const params = useParams();
   const id = params.id as string;
 
@@ -99,8 +99,8 @@ export default function ContentDetailPage() {
         if (opp.brief) setBrief(opp.brief);
       })
       .catch((err) => {
-        console.error("Failed to load opportunity:", err);
-        toast.error("Failed to load opportunity");
+        console.error('Failed to load opportunity:', err);
+        toast.error('Failed to load opportunity');
       })
       .finally(() => setLoading(false));
   }, [id]);
@@ -109,12 +109,12 @@ export default function ContentDetailPage() {
     setSending(true);
     try {
       await sendToWebhook(id);
-      toast.success("Sent to workflow!");
+      toast.success('Sent to workflow!');
       const updated = await getOpportunity(id);
       setOpportunity(updated);
     } catch (err) {
-      console.error("Send failed:", err);
-      toast.error(err instanceof Error ? err.message : "Failed to send");
+      console.error('Send failed:', err);
+      toast.error(err instanceof Error ? err.message : 'Failed to send');
     } finally {
       setSending(false);
     }
@@ -122,12 +122,12 @@ export default function ContentDetailPage() {
 
   const handleDismiss = async () => {
     try {
-      await updateOpportunityStatus(id, "dismissed");
-      toast.success("Opportunity dismissed");
+      await updateOpportunityStatus(id, 'dismissed');
+      toast.success('Opportunity dismissed');
       const updated = await getOpportunity(id);
       setOpportunity(updated);
     } catch {
-      toast.error("Failed to dismiss");
+      toast.error('Failed to dismiss');
     }
   };
 
@@ -136,10 +136,10 @@ export default function ContentDetailPage() {
     try {
       const result = await generateBrief(id);
       setBrief(result);
-      toast.success("Content brief generated!");
+      toast.success('Content brief generated!');
     } catch (err) {
-      console.error("Brief generation failed:", err);
-      toast.error(err instanceof Error ? err.message : "Failed to generate brief");
+      console.error('Brief generation failed:', err);
+      toast.error(err instanceof Error ? err.message : 'Failed to generate brief');
     } finally {
       setGeneratingBrief(false);
     }
@@ -174,13 +174,11 @@ export default function ContentDetailPage() {
         <div className="flex-1">
           <h1 className="text-xl font-bold tracking-tight">{opportunity.title}</h1>
           {opportunity.description && (
-            <p className="text-sm text-muted-foreground mt-1">
-              {opportunity.description}
-            </p>
+            <p className="text-sm text-muted-foreground mt-1">{opportunity.description}</p>
           )}
         </div>
         <div className="flex items-center gap-2">
-          {opportunity.status === "new" && (
+          {opportunity.status === 'new' && (
             <>
               <Button
                 variant="outline"
@@ -189,20 +187,15 @@ export default function ContentDetailPage() {
                 className="gap-2 text-muted-foreground"
               >
                 <X className="h-4 w-4" />
-                {t("dismiss")}
+                {t('dismiss')}
               </Button>
-              <Button
-                size="sm"
-                onClick={handleSend}
-                disabled={sending}
-                className="gap-2"
-              >
+              <Button size="sm" onClick={handleSend} disabled={sending} className="gap-2">
                 {sending ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
                   <Send className="h-4 w-4" />
                 )}
-                {sending ? t("sending") : t("sendToWorkflow")}
+                {sending ? t('sending') : t('sendToWorkflow')}
               </Button>
             </>
           )}
@@ -211,18 +204,12 @@ export default function ContentDetailPage() {
 
       <div className="flex items-center gap-2">
         <Badge variant="outline" className="text-xs">
-          {t(`type.${opportunity.type}` as "type.owned" | "type.earned")}
+          {t(`type.${opportunity.type}` as 'type.owned' | 'type.earned')}
         </Badge>
-        <Badge
-          variant="outline"
-          className={cn("text-xs", IMPACT_COLORS[opportunity.impact])}
-        >
-          {t(`impact.${opportunity.impact}` as "impact.high" | "impact.medium" | "impact.low")}
+        <Badge variant="outline" className={cn('text-xs', IMPACT_COLORS[opportunity.impact])}>
+          {t(`impact.${opportunity.impact}` as 'impact.high' | 'impact.medium' | 'impact.low')}
         </Badge>
-        <Badge
-          variant="outline"
-          className={cn("text-xs", STATUS_COLORS[opportunity.status])}
-        >
+        <Badge variant="outline" className={cn('text-xs', STATUS_COLORS[opportunity.status])}>
           {t(`status.${opportunity.status}` as `status.${typeof opportunity.status}`)}
         </Badge>
         <Badge variant="outline" className="text-xs tabular-nums">
@@ -231,9 +218,9 @@ export default function ContentDetailPage() {
         <span className="text-xs text-muted-foreground ml-auto flex items-center gap-1.5">
           <Clock className="h-3.5 w-3.5" />
           {new Date(opportunity.createdAt).toLocaleDateString(undefined, {
-            day: "numeric",
-            month: "short",
-            year: "numeric",
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric',
           })}
         </span>
       </div>
@@ -241,45 +228,39 @@ export default function ContentDetailPage() {
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">
-              {t("detail.sourceData")}
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">{t('detail.sourceData')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             {sd.promptText && (
-              <StatCard
-                icon={Search}
-                label={t("detail.relatedPrompt")}
-                value={sd.promptText}
-              />
+              <StatCard icon={Search} label={t('detail.relatedPrompt')} value={sd.promptText} />
             )}
 
             <div className="grid grid-cols-2 gap-3">
               {sd.estAiVolume !== undefined && (
                 <StatCard
                   icon={TrendingUp}
-                  label={t("detail.estAiVolume")}
+                  label={t('detail.estAiVolume')}
                   value={`~${sd.estAiVolume.toLocaleString()}/mo`}
                 />
               )}
               {sd.visibilityScore !== undefined && (
                 <StatCard
                   icon={Eye}
-                  label={t("detail.visibility")}
+                  label={t('detail.visibility')}
                   value={`${Math.round(sd.visibilityScore)}%`}
                 />
               )}
               {sd.competitorGap !== undefined && (
                 <StatCard
                   icon={Users}
-                  label={t("detail.competitorGap")}
-                  value={`${sd.competitorGap > 0 ? "+" : ""}${Math.round(sd.competitorGap)}%`}
+                  label={t('detail.competitorGap')}
+                  value={`${sd.competitorGap > 0 ? '+' : ''}${Math.round(sd.competitorGap)}%`}
                 />
               )}
               {sd.intent && (
                 <StatCard
                   icon={Tag}
-                  label={t("detail.intent")}
+                  label={t('detail.intent')}
                   value={INTENT_LABELS[sd.intent] || sd.intent}
                 />
               )}
@@ -287,9 +268,7 @@ export default function ContentDetailPage() {
 
             {sd.keywords && sd.keywords.length > 0 && (
               <div>
-                <p className="text-xs text-muted-foreground mb-1.5">
-                  {t("detail.keywords")}
-                </p>
+                <p className="text-xs text-muted-foreground mb-1.5">{t('detail.keywords')}</p>
                 <div className="flex flex-wrap gap-1">
                   {sd.keywords.map((kw) => (
                     <Badge key={kw} variant="outline" className="text-xs">
@@ -303,7 +282,7 @@ export default function ContentDetailPage() {
             {sd.competitorsCited && sd.competitorsCited.length > 0 && (
               <div>
                 <p className="text-xs text-muted-foreground mb-1.5">
-                  {t("detail.competitorsCited")}
+                  {t('detail.competitorsCited')}
                 </p>
                 <div className="flex flex-wrap gap-1">
                   {sd.competitorsCited.map((comp) => (
@@ -326,19 +305,15 @@ export default function ContentDetailPage() {
             <CardHeader className="pb-3">
               <div className="flex items-center gap-2">
                 <FileText className="h-4 w-4 text-primary" />
-                <CardTitle className="text-sm font-medium">
-                  Content Brief
-                </CardTitle>
+                <CardTitle className="text-sm font-medium">Content Brief</CardTitle>
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <h3 className="text-base font-semibold">
-                  {brief.suggestedTitle}
-                </h3>
+                <h3 className="text-base font-semibold">{brief.suggestedTitle}</h3>
                 <div className="flex items-center gap-2 mt-1.5">
                   <Badge variant="outline" className="text-xs">
-                    {brief.contentType.replace(/-/g, " ")}
+                    {brief.contentType.replace(/-/g, ' ')}
                   </Badge>
                   <Badge variant="outline" className="text-xs tabular-nums">
                     ~{brief.targetWordCount.toLocaleString()} words
@@ -374,24 +349,18 @@ export default function ContentDetailPage() {
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-10 text-center">
               <Sparkles className="h-10 w-10 text-muted-foreground/40 mb-3" />
-              <h3 className="text-sm font-medium mb-1">
-                No Content Brief Yet
-              </h3>
+              <h3 className="text-sm font-medium mb-1">No Content Brief Yet</h3>
               <p className="text-xs text-muted-foreground mb-4 max-w-sm">
-                Generate an AI-powered content brief with a suggested title,
-                outline, target keywords, and competitor insights.
+                Generate an AI-powered content brief with a suggested title, outline, target
+                keywords, and competitor insights.
               </p>
-              <Button
-                onClick={handleGenerateBrief}
-                disabled={generatingBrief}
-                className="gap-2"
-              >
+              <Button onClick={handleGenerateBrief} disabled={generatingBrief} className="gap-2">
                 {generatingBrief ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
                   <Sparkles className="h-4 w-4" />
                 )}
-                {generatingBrief ? "Generating..." : "Generate Content Brief"}
+                {generatingBrief ? 'Generating...' : 'Generate Content Brief'}
               </Button>
             </CardContent>
           </Card>
@@ -404,27 +373,19 @@ export default function ContentDetailPage() {
           <CardHeader className="pb-3">
             <div className="flex items-center gap-2">
               <ListOrdered className="h-4 w-4 text-primary" />
-              <CardTitle className="text-sm font-medium">
-                Brief Outline
-              </CardTitle>
+              <CardTitle className="text-sm font-medium">Brief Outline</CardTitle>
             </div>
           </CardHeader>
           <CardContent className="space-y-5">
             <div className="space-y-3">
               {brief.outline.map((section, idx) => (
-                <div
-                  key={idx}
-                  className="rounded-lg border bg-muted/30 p-3"
-                >
+                <div key={idx} className="rounded-lg border bg-muted/30 p-3">
                   <p className="text-sm font-medium mb-1.5">
                     {idx + 1}. {section.heading}
                   </p>
                   <ul className="space-y-1 ml-4">
                     {section.keyPoints.map((point, pIdx) => (
-                      <li
-                        key={pIdx}
-                        className="text-xs text-muted-foreground list-disc"
-                      >
+                      <li key={pIdx} className="text-xs text-muted-foreground list-disc">
                         {point}
                       </li>
                     ))}

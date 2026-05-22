@@ -1,6 +1,6 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import type { Brand } from "@/types";
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import type { Brand } from '@/types';
 
 interface BrandStore {
   brands: Brand[];
@@ -22,8 +22,7 @@ export const useBrandStore = create<BrandStore>()(
       setBrands: (brands) =>
         set({
           brands,
-          activeBrandId:
-            brands.length > 0 ? (get().activeBrandId ?? brands[0].id) : null,
+          activeBrandId: brands.length > 0 ? (get().activeBrandId ?? brands[0].id) : null,
         }),
 
       addBrand: (brand) =>
@@ -34,9 +33,7 @@ export const useBrandStore = create<BrandStore>()(
 
       updateBrand: (id, updates) =>
         set((state) => ({
-          brands: state.brands.map((b) =>
-            b.id === id ? { ...b, ...updates } : b
-          ),
+          brands: state.brands.map((b) => (b.id === id ? { ...b, ...updates } : b)),
         })),
 
       removeBrand: (id) =>
@@ -45,9 +42,7 @@ export const useBrandStore = create<BrandStore>()(
           return {
             brands: remaining,
             activeBrandId:
-              state.activeBrandId === id
-                ? (remaining[0]?.id ?? null)
-                : state.activeBrandId,
+              state.activeBrandId === id ? (remaining[0]?.id ?? null) : state.activeBrandId,
           };
         }),
 
@@ -59,11 +54,11 @@ export const useBrandStore = create<BrandStore>()(
       },
     }),
     {
-      name: "brand-store",
+      name: 'brand-store',
       partialize: (state) => ({
         activeBrandId: state.activeBrandId,
         brands: state.brands,
       }),
-    }
-  )
+    },
+  ),
 );

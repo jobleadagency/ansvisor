@@ -7,7 +7,13 @@ import { BrandsClient } from './_brands-client';
 import { Button } from '@/components/ui/button';
 import { Crown, Plus } from 'lucide-react';
 
-function BrandsHeader({ canAddBrand, needsUpgrade }: { canAddBrand: boolean; needsUpgrade: boolean }) {
+function BrandsHeader({
+  canAddBrand,
+  needsUpgrade,
+}: {
+  canAddBrand: boolean;
+  needsUpgrade: boolean;
+}) {
   const t = useTranslations('brands');
   return (
     <div className="flex items-center justify-between">
@@ -37,10 +43,7 @@ function BrandsHeader({ canAddBrand, needsUpgrade }: { canAddBrand: boolean; nee
 export default async function BrandsPage() {
   const supabase = await createClient();
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('organization_id')
-    .single();
+  const { data: profile } = await supabase.from('profiles').select('organization_id').single();
 
   const orgId = profile?.organization_id;
 

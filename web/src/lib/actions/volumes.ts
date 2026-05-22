@@ -25,7 +25,9 @@ export async function analyzePromptVolume(
   force?: boolean,
 ): Promise<PromptVolume> {
   const supabase = await createClient();
-  const { data: { session } } = await supabase.auth.getSession();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
   if (!session) throw new Error('Not authenticated');
 
   const res = await fetch(`${AEO_SERVER_URL}/api/volumes/analyze`, {
@@ -57,7 +59,9 @@ export async function analyzePromptVolumesBatch(
   force?: boolean,
 ): Promise<{ results: (PromptVolume & { error?: string })[]; remaining?: number }> {
   const supabase = await createClient();
-  const { data: { session } } = await supabase.auth.getSession();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
   if (!session) throw new Error('Not authenticated');
 
   const res = await fetch(`${AEO_SERVER_URL}/api/volumes/analyze-batch`, {
@@ -87,7 +91,9 @@ export async function refreshVolumes(
   languageCode?: string,
 ): Promise<{ results: PromptVolume[]; refreshed: number; remaining?: number }> {
   const supabase = await createClient();
-  const { data: { session } } = await supabase.auth.getSession();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
   if (!session) throw new Error('Not authenticated');
 
   const res = await fetch(`${AEO_SERVER_URL}/api/volumes/refresh`, {
@@ -110,9 +116,13 @@ export async function refreshVolumes(
 /**
  * Get all prompt volumes for a brand via the aeo-server API.
  */
-export async function getPromptVolumes(brandId: string): Promise<{ volumes: PromptVolume[]; quota: VolumeQuota }> {
+export async function getPromptVolumes(
+  brandId: string,
+): Promise<{ volumes: PromptVolume[]; quota: VolumeQuota }> {
   const supabase = await createClient();
-  const { data: { session } } = await supabase.auth.getSession();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
   if (!session) throw new Error('Not authenticated');
 
   const res = await fetch(`${AEO_SERVER_URL}/api/volumes/brand/${brandId}`, {

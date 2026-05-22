@@ -4,7 +4,12 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { useRouter } from '@/i18n/navigation';
 import { useSearchParams } from 'next/navigation';
 import { createPortal } from 'react-dom';
-import { CompetitorChart, CompetitorLeaderboard, ShareOfVoicePlatformChart, ShareOfVoiceTrendChart } from './_charts';
+import {
+  CompetitorChart,
+  CompetitorLeaderboard,
+  ShareOfVoicePlatformChart,
+  ShareOfVoiceTrendChart,
+} from './_charts';
 import { MetricBreakdownSheet } from './_metric-breakdown-sheet';
 import { useBrandStore } from '@/stores/use-brand-store';
 import {
@@ -28,18 +33,8 @@ import type { Topic } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-} from '@/components/ui/table';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   BarChart3,
@@ -122,10 +117,7 @@ const INSIGHT_EXPORT_HEADERS = [
  *  "previous runs" history inside each platform group has meaningful depth. */
 const PROMPT_RESULTS_ROW_LIMIT = 1500;
 
-function getDateRange(
-  preset: DatePreset,
-  custom: { from: string; to: string },
-) {
+function getDateRange(preset: DatePreset, custom: { from: string; to: string }) {
   if (preset === 'all') return { dateFrom: undefined, dateTo: undefined };
   if (preset === 'custom') {
     return {
@@ -181,11 +173,7 @@ function InfoTip({ content }: { content: string }) {
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function SentimentBadge({
-  sentiment,
-}: {
-  sentiment: 'positive' | 'neutral' | 'negative';
-}) {
+function SentimentBadge({ sentiment }: { sentiment: 'positive' | 'neutral' | 'negative' }) {
   return (
     <Badge
       variant="outline"
@@ -212,11 +200,7 @@ function VisibilityBar({ score, max = 100 }: { score: number; max?: number }) {
         <div
           className={cn(
             'h-full rounded-full transition-all',
-            score >= 60
-              ? 'bg-green-500'
-              : score >= 40
-                ? 'bg-yellow-500'
-                : 'bg-red-500',
+            score >= 60 ? 'bg-green-500' : score >= 40 ? 'bg-yellow-500' : 'bg-red-500',
           )}
           style={{ width: `${pct}%` }}
         />
@@ -337,9 +321,7 @@ function groupResultsByPlatform(items: PromptResultWithText[]): PlatformGroup[] 
         latest,
         latestScore: latest.visibilityScore,
         avgScore:
-          Math.round(
-            (sorted.reduce((s, r) => s + r.visibilityScore, 0) / sorted.length) * 10,
-          ) / 10,
+          Math.round((sorted.reduce((s, r) => s + r.visibilityScore, 0) / sorted.length) * 10) / 10,
         totalMentions: sorted.reduce((s, r) => s + r.mentionCount, 0),
         totalCitations: sorted.reduce((s, r) => s + r.citationCount, 0),
       } satisfies PlatformGroup;
@@ -357,9 +339,7 @@ function computePromptGroup(promptId: string, items: PromptResultWithText[]): Pr
     promptCategory: sorted[0].promptCategory,
     results: sorted,
     platformGroups: groupResultsByPlatform(sorted),
-    avgScore: Math.round(
-      sorted.reduce((s, r) => s + r.visibilityScore, 0) / sorted.length,
-    ),
+    avgScore: Math.round(sorted.reduce((s, r) => s + r.visibilityScore, 0) / sorted.length),
     totalMentions: sorted.reduce((s, r) => s + r.mentionCount, 0),
     totalCitations: sorted.reduce((s, r) => s + r.citationCount, 0),
   };
@@ -372,9 +352,7 @@ function groupResultsByPrompt(results: PromptResultWithText[]): PromptGroup[] {
     arr.push(r);
     map.set(r.promptId, arr);
   }
-  return Array.from(map.entries()).map(([promptId, items]) =>
-    computePromptGroup(promptId, items),
-  );
+  return Array.from(map.entries()).map(([promptId, items]) => computePromptGroup(promptId, items));
 }
 
 interface TopicGroup {
@@ -411,9 +389,7 @@ function groupResultsByTopic(results: PromptResultWithText[]): TopicGroup[] {
         topicId: items[0].topicId ?? `__cat_${topicName}`,
         topicName: topicName === '__uncategorized__' ? 'Uncategorized' : topicName,
         prompts,
-        avgScore: Math.round(
-          items.reduce((s, r) => s + r.visibilityScore, 0) / items.length,
-        ),
+        avgScore: Math.round(items.reduce((s, r) => s + r.visibilityScore, 0) / items.length),
         totalMentions: items.reduce((s, r) => s + r.mentionCount, 0),
         totalCitations: items.reduce((s, r) => s + r.citationCount, 0),
         totalResults: items.length,
@@ -424,16 +400,9 @@ function groupResultsByTopic(results: PromptResultWithText[]): TopicGroup[] {
 
 // ─── Delta Badge ──────────────────────────────────────────────────────────────
 
-function DeltaBadge({
-  delta,
-  suffix = '%',
-}: {
-  delta: number | null;
-  suffix?: string;
-}) {
+function DeltaBadge({ delta, suffix = '%' }: { delta: number | null; suffix?: string }) {
   if (delta === null) return null;
-  if (delta === 0)
-    return <span className="text-xs text-muted-foreground">— 0{suffix}</span>;
+  if (delta === 0) return <span className="text-xs text-muted-foreground">— 0{suffix}</span>;
   const pos = delta > 0;
   return (
     <span
@@ -442,11 +411,7 @@ function DeltaBadge({
         pos ? 'text-green-600 dark:text-green-400' : 'text-red-500',
       )}
     >
-      {pos ? (
-        <TrendingUp className="h-3 w-3" />
-      ) : (
-        <TrendingDown className="h-3 w-3" />
-      )}
+      {pos ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
       {pos ? '+' : ''}
       {delta}
       {suffix}
@@ -540,7 +505,6 @@ function KpiCard({
   );
 }
 
-
 // ─── Run Single Prompt Dialog ─────────────────────────────────────────────────
 
 function RunSinglePromptDialog({
@@ -591,8 +555,7 @@ function RunSinglePromptDialog({
             Run Single Prompt
           </DialogTitle>
           <p className="text-sm text-muted-foreground">
-            Pick a prompt to test. Only that prompt will run across your enabled
-            platforms.
+            Pick a prompt to test. Only that prompt will run across your enabled platforms.
           </p>
         </DialogHeader>
 
@@ -662,34 +625,29 @@ function FilterBar({
   availableModels: string[];
   availableTopics: Topic[];
 }) {
-  const set = (patch: Partial<InsightsFilters>) =>
-    onChange({ ...filters, ...patch });
+  const set = (patch: Partial<InsightsFilters>) => onChange({ ...filters, ...patch });
 
   return (
     <div className="flex flex-wrap items-end gap-3">
       {/* Date presets */}
       <div>
-        <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
-          Date Range
-        </label>
+        <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Date Range</label>
         <div className="flex rounded-md border overflow-hidden">
-          {(['24h', '7d', '30d', '90d', 'all', 'custom'] as DatePreset[]).map(
-            (p) => (
-              <button
-                key={p}
-                type="button"
-                onClick={() => set({ datePreset: p })}
-                className={cn(
-                  'px-3 py-1.5 text-xs font-medium transition-colors',
-                  filters.datePreset === p
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-card hover:bg-muted text-foreground',
-                )}
-              >
-                {p === 'custom' ? 'Custom' : p === 'all' ? 'All' : p}
-              </button>
-            ),
-          )}
+          {(['24h', '7d', '30d', '90d', 'all', 'custom'] as DatePreset[]).map((p) => (
+            <button
+              key={p}
+              type="button"
+              onClick={() => set({ datePreset: p })}
+              className={cn(
+                'px-3 py-1.5 text-xs font-medium transition-colors',
+                filters.datePreset === p
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-card hover:bg-muted text-foreground',
+              )}
+            >
+              {p === 'custom' ? 'Custom' : p === 'all' ? 'All' : p}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -697,9 +655,7 @@ function FilterBar({
       {filters.datePreset === 'custom' && (
         <>
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
-              From
-            </label>
+            <label className="mb-1.5 block text-xs font-medium text-muted-foreground">From</label>
             <Input
               type="date"
               value={filters.dateFrom}
@@ -708,9 +664,7 @@ function FilterBar({
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
-              To
-            </label>
+            <label className="mb-1.5 block text-xs font-medium text-muted-foreground">To</label>
             <Input
               type="date"
               value={filters.dateTo}
@@ -724,9 +678,7 @@ function FilterBar({
       {/* Topic filter */}
       {availableTopics.length > 0 && (
         <div>
-          <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
-            Topic
-          </label>
+          <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Topic</label>
           <Select
             value={filters.topic || null}
             onValueChange={(v) => set({ topic: !v || v === '__all__' ? '' : v })}
@@ -735,7 +687,7 @@ function FilterBar({
               <SelectValue placeholder="All Topics">
                 {(value) =>
                   value && value !== '__all__'
-                    ? availableTopics.find((t) => t.id === value)?.name ?? 'All Topics'
+                    ? (availableTopics.find((t) => t.id === value)?.name ?? 'All Topics')
                     : 'All Topics'
                 }
               </SelectValue>
@@ -754,9 +706,7 @@ function FilterBar({
 
       {/* Region filter */}
       <div>
-        <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
-          Region
-        </label>
+        <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Region</label>
         <Select
           value={filters.region || null}
           onValueChange={(v) => set({ region: !v || v === '__all__' ? '' : v })}
@@ -777,9 +727,7 @@ function FilterBar({
 
       {/* Model filter */}
       <div>
-        <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
-          AI Model
-        </label>
+        <label className="mb-1.5 block text-xs font-medium text-muted-foreground">AI Model</label>
         <Select
           value={filters.model || null}
           onValueChange={(v) => set({ model: !v || v === '__all__' ? '' : v })}
@@ -836,16 +784,16 @@ function InsightsSkeleton() {
               <Skeleton className="h-4 w-24" />
               <Skeleton className="h-8 w-16" />
               <Skeleton className="h-3 w-32" />
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
         ))}
       </div>
-    <Card>
+      <Card>
         <CardContent className="pt-6">
           <Skeleton className="h-48 w-full" />
-      </CardContent>
-    </Card>
-  </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
 
@@ -865,20 +813,12 @@ function EmptyState({
       <BarChart3 className="h-12 w-12 text-muted-foreground/40 mb-4" />
       <h2 className="text-lg font-semibold">No tracking data yet</h2>
       <p className="text-muted-foreground text-sm mt-1 max-w-md">
-        Run your prompts through AI platforms to see how your brand appears in
-        AI-generated responses.
+        Run your prompts through AI platforms to see how your brand appears in AI-generated
+        responses.
       </p>
       {!isCloud && (
-        <Button
-          onClick={onRunPrompts}
-          disabled={isRunning}
-          className="mt-6 gap-2"
-        >
-          {isRunning ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <Play className="h-4 w-4" />
-          )}
+        <Button onClick={onRunPrompts} disabled={isRunning} className="mt-6 gap-2">
+          {isRunning ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
           Run Prompts Now
         </Button>
       )}
@@ -886,13 +826,7 @@ function EmptyState({
   );
 }
 
-function NoDataForPeriod({
-  datePreset,
-  onReset,
-}: {
-  datePreset: DatePreset;
-  onReset: () => void;
-}) {
+function NoDataForPeriod({ datePreset, onReset }: { datePreset: DatePreset; onReset: () => void }) {
   const labels: Record<DatePreset, string> = {
     '24h': 'last 24 hours',
     '7d': 'last 7 days',
@@ -904,12 +838,10 @@ function NoDataForPeriod({
   return (
     <div className="flex flex-col items-center justify-center py-16 text-center">
       <CalendarX2 className="h-10 w-10 text-muted-foreground/40 mb-3" />
-      <h3 className="text-base font-semibold">
-        No results for the {labels[datePreset]}
-      </h3>
+      <h3 className="text-base font-semibold">No results for the {labels[datePreset]}</h3>
       <p className="text-muted-foreground text-sm mt-1 max-w-sm">
-        There is tracking data available in other time periods. Try a wider
-        range or switch to &quot;All time&quot;.
+        There is tracking data available in other time periods. Try a wider range or switch to
+        &quot;All time&quot;.
       </p>
       <Button variant="outline" size="sm" className="mt-4" onClick={onReset}>
         Show all data
@@ -932,14 +864,11 @@ function TrackingProgressBanner({
 }) {
   if (!jobStatus) return null;
 
-  const isActive =
-    jobStatus.status === 'active' || jobStatus.status === 'waiting';
+  const isActive = jobStatus.status === 'active' || jobStatus.status === 'waiting';
   if (!isActive) return null;
 
   const progress = jobStatus.progress;
-  const pct = progress
-    ? Math.round((progress.current / progress.total) * 100)
-    : 0;
+  const pct = progress ? Math.round((progress.current / progress.total) * 100) : 0;
 
   return (
     <div className="rounded-lg border border-primary/20 bg-primary/5 px-4 py-3 space-y-2">
@@ -1023,9 +952,7 @@ function PlatformSubGroup({
   const hasMoreHistory = group.results.length > 1 + HISTORY_LIMIT;
   const latest = group.latest;
   const responsePreview =
-    (latest.response ?? '').trim().length > 0
-      ? latest.response
-      : 'No response text available.';
+    (latest.response ?? '').trim().length > 0 ? latest.response : 'No response text available.';
 
   return (
     <div className="rounded-md border bg-background/50">
@@ -1034,18 +961,25 @@ function PlatformSubGroup({
         tabIndex={0}
         onClick={onToggle}
         onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onToggle(); }
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onToggle();
+          }
         }}
         className="flex w-full items-center gap-3 px-3 py-2 hover:bg-muted/40 transition-colors cursor-pointer select-none"
       >
-        <ChevronDown className={cn('h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform', !expanded && '-rotate-90')} />
+        <ChevronDown
+          className={cn(
+            'h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform',
+            !expanded && '-rotate-90',
+          )}
+        />
         <div className="flex-1 min-w-0 flex items-center gap-2">
-          <ModelBadge
-            model={latest.modelUsed ?? latest.platform}
-            platform={latest.platform}
-          />
+          <ModelBadge model={latest.modelUsed ?? latest.platform} platform={latest.platform} />
           {latest.region && (
-            <Badge variant="outline" className="text-[10px]">{latest.region}</Badge>
+            <Badge variant="outline" className="text-[10px]">
+              {latest.region}
+            </Badge>
           )}
           <span className="text-[10px] text-muted-foreground tabular-nums ml-1">
             {group.results.length} run{group.results.length !== 1 ? 's' : ''}
@@ -1078,7 +1012,10 @@ function PlatformSubGroup({
                 variant="ghost"
                 size="sm"
                 className="h-6 gap-1.5 text-[11px]"
-                onClick={(e) => { e.stopPropagation(); onViewResult(latest); }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onViewResult(latest);
+                }}
               >
                 <Eye className="h-3 w-3" />
                 Full detail
@@ -1105,13 +1042,15 @@ function PlatformSubGroup({
                         <TableCell className="text-center py-1.5 text-xs tabular-nums w-[110px]">
                           <span className="font-semibold">{r.mentionCount}</span>
                           <span className="text-muted-foreground">
-                            {' '}mention{r.mentionCount !== 1 ? 's' : ''}
+                            {' '}
+                            mention{r.mentionCount !== 1 ? 's' : ''}
                           </span>
                         </TableCell>
                         <TableCell className="text-center py-1.5 text-xs tabular-nums w-[110px]">
                           <span className="font-semibold">{r.citationCount}</span>
                           <span className="text-muted-foreground">
-                            {' '}citation{r.citationCount !== 1 ? 's' : ''}
+                            {' '}
+                            citation{r.citationCount !== 1 ? 's' : ''}
                           </span>
                         </TableCell>
                         <TableCell className="text-center py-1.5 w-[100px]">
@@ -1126,7 +1065,10 @@ function PlatformSubGroup({
                             size="icon"
                             className="h-6 w-6"
                             title="View detail"
-                            onClick={(e) => { e.stopPropagation(); onViewResult(r); }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onViewResult(r);
+                            }}
                           >
                             <Eye className="h-3 w-3" />
                           </Button>
@@ -1175,11 +1117,19 @@ function PromptSubGroup({
         tabIndex={0}
         onClick={onToggle}
         onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onToggle(); }
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onToggle();
+          }
         }}
         className="flex w-full items-center gap-3 px-4 py-2.5 text-left hover:bg-muted/50 transition-colors cursor-pointer select-none"
       >
-        <ChevronDown className={cn('h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform', !expanded && '-rotate-90')} />
+        <ChevronDown
+          className={cn(
+            'h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform',
+            !expanded && '-rotate-90',
+          )}
+        />
         <div className="flex-1 min-w-0">
           <p className="text-sm line-clamp-1">{group.promptText}</p>
           <span className="text-[11px] text-muted-foreground">
@@ -1207,7 +1157,10 @@ function PromptSubGroup({
             className="h-6 w-6"
             title="Refresh results"
             disabled={refreshingId !== null}
-            onClick={(e) => { e.stopPropagation(); onRefresh(group.promptId); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onRefresh(group.promptId);
+            }}
           >
             {refreshingId === group.promptId ? (
               <Loader2 className="h-3 w-3 animate-spin" />
@@ -1260,27 +1213,34 @@ function PromptResultsGrouped({
   const toggleTopic = (id: string) =>
     setExpandedTopics((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id); else next.add(id);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
       return next;
     });
 
   const togglePrompt = (id: string) =>
     setExpandedPrompts((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id); else next.add(id);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
       return next;
     });
 
   const togglePlatform = (id: string) =>
     setExpandedPlatforms((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id); else next.add(id);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
       return next;
     });
 
   const handleRefresh = async (promptId: string) => {
     setRefreshingId(promptId);
-    try { await onRefreshPrompt(promptId); } finally { setRefreshingId(null); }
+    try {
+      await onRefreshPrompt(promptId);
+    } finally {
+      setRefreshingId(null);
+    }
   };
 
   const truncated = totalRowCount > loadedRowCount && loadedRowCount > 0;
@@ -1292,8 +1252,8 @@ function PromptResultsGrouped({
           <CardTitle className="text-sm font-medium">Prompt Results by Topic</CardTitle>
           {truncated && (
             <p className="text-xs text-muted-foreground font-normal">
-              Showing {loadedRowCount} of {totalRowCount} rows (newest first).
-              Narrow the date range or filters to focus the list.
+              Showing {loadedRowCount} of {totalRowCount} rows (newest first). Narrow the date range
+              or filters to focus the list.
             </p>
           )}
         </div>
@@ -1309,22 +1269,34 @@ function PromptResultsGrouped({
           {topicGroups.map((topic) => {
             const isTopicOpen = expandedTopics.has(topic.topicId);
             return (
-              <div key={topic.topicId + topic.topicName} className="rounded-lg border overflow-hidden">
+              <div
+                key={topic.topicId + topic.topicName}
+                className="rounded-lg border overflow-hidden"
+              >
                 <div
                   role="button"
                   tabIndex={0}
                   onClick={() => toggleTopic(topic.topicId)}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleTopic(topic.topicId); }
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      toggleTopic(topic.topicId);
+                    }
                   }}
                   className="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-muted/50 transition-colors cursor-pointer select-none"
                 >
-                  <ChevronDown className={cn('h-4 w-4 shrink-0 text-muted-foreground transition-transform', !isTopicOpen && '-rotate-90')} />
+                  <ChevronDown
+                    className={cn(
+                      'h-4 w-4 shrink-0 text-muted-foreground transition-transform',
+                      !isTopicOpen && '-rotate-90',
+                    )}
+                  />
                   <Tag className="h-4 w-4 shrink-0 text-muted-foreground" />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium">{topic.topicName}</p>
                     <span className="text-[11px] text-muted-foreground">
-                      {topic.prompts.length} prompt{topic.prompts.length !== 1 ? 's' : ''} · {topic.totalResults} result{topic.totalResults !== 1 ? 's' : ''}
+                      {topic.prompts.length} prompt{topic.prompts.length !== 1 ? 's' : ''} ·{' '}
+                      {topic.totalResults} result{topic.totalResults !== 1 ? 's' : ''}
                     </span>
                   </div>
                   <div className="flex items-center gap-4 shrink-0">
@@ -1388,8 +1360,7 @@ export default function InsightsPage() {
   const [availableRegions, setAvailableRegions] = useState<string[]>([]);
   const [availableModels, setAvailableModels] = useState<string[]>([]);
   const [availableTopics, setAvailableTopics] = useState<Topic[]>([]);
-  const [competitorData, setCompetitorData] =
-    useState<CompetitorComparisonData | null>(null);
+  const [competitorData, setCompetitorData] = useState<CompetitorComparisonData | null>(null);
   const [sovData, setSovData] = useState<ShareOfVoiceData | null>(null);
   const [breakdownMetric, setBreakdownMetric] = useState<BreakdownMetric | null>(null);
   const filtersRef = useRef(filters);
@@ -1434,7 +1405,8 @@ export default function InsightsPage() {
             : Promise.resolve(null),
         ];
 
-        const [summaryData, resultsData, compData, sovResult, unfilteredCheck] = await Promise.all(promises);
+        const [summaryData, resultsData, compData, sovResult, unfilteredCheck] =
+          await Promise.all(promises);
         setSummary(summaryData);
         setResults(resultsData.results);
         setTotalResults(resultsData.total);
@@ -1448,11 +1420,7 @@ export default function InsightsPage() {
         }
 
         const regions = [
-          ...new Set(
-            resultsData.results
-              .map((r) => r.region)
-              .filter(Boolean) as string[],
-          ),
+          ...new Set(resultsData.results.map((r) => r.region).filter(Boolean) as string[]),
         ].sort();
         // Group raw model slugs by their resolved display name so different
         // ChatGPT versions ("gpt-5-3-mini" + "gpt-5-5") collapse into one
@@ -1478,14 +1446,10 @@ export default function InsightsPage() {
           .map((slugs) => slugs.sort().join(','))
           .sort();
         setAvailableRegions((prev) =>
-          [...new Set([...prev, ...regions])].sort((a, b) =>
-            a.localeCompare(b),
-          ),
+          [...new Set([...prev, ...regions])].sort((a, b) => a.localeCompare(b)),
         );
         setAvailableModels((prev) =>
-          [...new Set([...prev, ...models])].sort((a, b) => 
-            a.localeCompare(b)
-          ),
+          [...new Set([...prev, ...models])].sort((a, b) => a.localeCompare(b)),
         );
       } catch (err) {
         const message = err instanceof Error ? err.message : '';
@@ -1520,7 +1484,9 @@ export default function InsightsPage() {
     const next = { ...filtersRef.current, region: '', model: '', topic: '' };
     filtersRef.current = next;
     setFilters(next);
-    getTopics(brand.id).then(setAvailableTopics).catch(() => {});
+    getTopics(brand.id)
+      .then(setAvailableTopics)
+      .catch(() => {});
   }, [brand?.id]);
 
   useEffect(() => {
@@ -1573,9 +1539,7 @@ export default function InsightsPage() {
             setActiveJobId(null);
             setIsRunning(false);
             setJobStatus(null);
-            toast.success(
-              `Analysis complete — ${status.result?.resultCount ?? 0} results saved.`,
-            );
+            toast.success(`Analysis complete — ${status.result?.resultCount ?? 0} results saved.`);
             loadData(undefined, { silent: true });
             break;
           }
@@ -1586,9 +1550,7 @@ export default function InsightsPage() {
             setIsRunning(false);
             setJobStatus(null);
             if (status.status === 'failed') {
-              toast.error(
-                `Job failed: ${status.failedReason ?? 'Unknown error'}`,
-              );
+              toast.error(`Job failed: ${status.failedReason ?? 'Unknown error'}`);
             }
             break;
           }
@@ -1625,9 +1587,7 @@ export default function InsightsPage() {
       });
     } catch (err) {
       setIsRunning(false);
-      toast.error(
-        err instanceof Error ? err.message : 'Failed to trigger tracking',
-      );
+      toast.error(err instanceof Error ? err.message : 'Failed to trigger tracking');
     }
   };
 
@@ -1695,9 +1655,7 @@ export default function InsightsPage() {
       sentiment: r.sentiment,
       citation_urls: r.citations.map((c) => c.url).join(', '),
       competitor_mentions:
-        r.competitorMentions
-          ?.map((c) => `${c.name}:${c.mention_count}`)
-          .join(', ') ?? '',
+        r.competitorMentions?.map((c) => `${c.name}:${c.mention_count}`).join(', ') ?? '',
     }));
 
     const csv = toCsv(rows, INSIGHT_EXPORT_HEADERS);
@@ -1723,23 +1681,14 @@ export default function InsightsPage() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">
-            Answer Engine Insights
-          </h1>
+          <h1 className="text-2xl font-bold tracking-tight">Answer Engine Insights</h1>
           <p className="text-muted-foreground text-sm">{brand.name}</p>
         </div>
-        <TrackingProgressBanner
-          jobStatus={jobStatus}
-          onStop={handleStopTracking}
-        />
+        <TrackingProgressBanner jobStatus={jobStatus} onStop={handleStopTracking} />
         <EmptyState onRunPrompts={handleRunPrompts} isRunning={isRunning} isCloud={isCloud} />
         {!isCloud && (
           <div className="flex justify-center">
-            <Button
-              variant="outline"
-              onClick={() => setShowSinglePrompt(true)}
-              className="gap-2"
-            >
+            <Button variant="outline" onClick={() => setShowSinglePrompt(true)} className="gap-2">
               <FlaskConical className="h-4 w-4" />
               Or test a single prompt
             </Button>
@@ -1770,9 +1719,7 @@ export default function InsightsPage() {
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">
-            Answer Engine Insights
-          </h1>
+          <h1 className="text-2xl font-bold tracking-tight">Answer Engine Insights</h1>
 
           <p className="text-muted-foreground text-sm">
             {brand.name} · Last run: {lastCheckedLabel} · {totalResults} results
@@ -1789,20 +1736,12 @@ export default function InsightsPage() {
           {/* Self-host only */}
           {!isCloud && (
             <>
-              <Button
-                variant="outline"
-                onClick={() => setShowSinglePrompt(true)}
-                className="gap-2"
-              >
+              <Button variant="outline" onClick={() => setShowSinglePrompt(true)} className="gap-2">
                 <FlaskConical className="h-4 w-4" />
                 Test Single Prompt
               </Button>
 
-              <Button
-                onClick={handleRunPrompts}
-                disabled={isRunning}
-                className="gap-2"
-              >
+              <Button onClick={handleRunPrompts} disabled={isRunning} className="gap-2">
                 {isRunning ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
@@ -1825,16 +1764,10 @@ export default function InsightsPage() {
       />
 
       {/* Tracking Progress */}
-      <TrackingProgressBanner
-        jobStatus={jobStatus}
-        onStop={handleStopTracking}
-      />
+      <TrackingProgressBanner jobStatus={jobStatus} onStop={handleStopTracking} />
 
       {noResults ? (
-        <NoDataForPeriod
-          datePreset={filters.datePreset}
-          onReset={handleResetFilters}
-        />
+        <NoDataForPeriod datePreset={filters.datePreset} onReset={handleResetFilters} />
       ) : (
         <>
           {/* KPI Cards */}
@@ -1931,8 +1864,8 @@ export default function InsightsPage() {
                     Share of Voice by Platform
                   </CardTitle>
                   {sovData.overallSovChange !== null && sovData.overallSovChange !== 0 && (
-                      <DeltaBadge delta={sovData.overallSovChange} suffix=" pts" />
-                    )}
+                    <DeltaBadge delta={sovData.overallSovChange} suffix=" pts" />
+                  )}
                 </CardHeader>
                 <CardContent>
                   <ShareOfVoicePlatformChart

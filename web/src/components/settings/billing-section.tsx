@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
-import { PlanSwitcher } from "@/components/settings/plan-switcher";
-import { InvoiceList } from "@/components/settings/invoice-list";
-import { usePlanContext } from "@/components/providers/plan-provider";
-import { createClient } from "@/lib/supabase/client";
-import { PLANS, type PlanId } from "@/config/plans";
+import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { Skeleton } from '@/components/ui/skeleton';
+import { PlanSwitcher } from '@/components/settings/plan-switcher';
+import { InvoiceList } from '@/components/settings/invoice-list';
+import { usePlanContext } from '@/components/providers/plan-provider';
+import { createClient } from '@/lib/supabase/client';
+import { PLANS, type PlanId } from '@/config/plans';
 
 interface SubscriptionData {
   planId: string;
@@ -23,36 +23,36 @@ interface SubscriptionData {
 
 function statusVariant(status: string) {
   switch (status) {
-    case "active":
-      return "default" as const;
-    case "trialing":
-      return "secondary" as const;
-    case "past_due":
-      return "destructive" as const;
-    case "canceled":
-      return "destructive" as const;
+    case 'active':
+      return 'default' as const;
+    case 'trialing':
+      return 'secondary' as const;
+    case 'past_due':
+      return 'destructive' as const;
+    case 'canceled':
+      return 'destructive' as const;
     default:
-      return "outline" as const;
+      return 'outline' as const;
   }
 }
 
 function statusLabel(status: string) {
   switch (status) {
-    case "active":
-      return "Active";
-    case "trialing":
-      return "Trial";
-    case "past_due":
-      return "Past Due";
-    case "canceled":
-      return "Canceled";
+    case 'active':
+      return 'Active';
+    case 'trialing':
+      return 'Trial';
+    case 'past_due':
+      return 'Past Due';
+    case 'canceled':
+      return 'Canceled';
     default:
       return status;
   }
 }
 
 export function BillingSection() {
-  const t = useTranslations("settings");
+  const t = useTranslations('settings');
   const { planId: contextPlanId } = usePlanContext();
   const [subscription, setSubscription] = useState<SubscriptionData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -62,38 +62,40 @@ export function BillingSection() {
       try {
         // First: load org data directly from Supabase (reliable, no API route auth issues)
         const supabase = createClient();
-        const { data: { user } } = await supabase.auth.getUser();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
         if (!user) return;
 
         const { data: profile } = await supabase
-          .from("profiles")
-          .select("organization_id")
-          .eq("id", user.id)
+          .from('profiles')
+          .select('organization_id')
+          .eq('id', user.id)
           .single();
 
         if (!profile?.organization_id) return;
 
         const { data: org } = await supabase
-          .from("organizations")
-          .select("plan, subscription_status, subscription_ends_at")
-          .eq("id", profile.organization_id)
+          .from('organizations')
+          .select('plan, subscription_status, subscription_ends_at')
+          .eq('id', profile.organization_id)
           .single();
 
         if (!org) return;
 
-        const plan = PLANS[(org.plan as PlanId) ?? "starter"] ?? PLANS.starter;
+        const plan = PLANS[(org.plan as PlanId) ?? 'starter'] ?? PLANS.starter;
 
         setSubscription({
-          planId: org.plan ?? "starter",
-          status: (org.subscription_status as string) ?? "active",
+          planId: org.plan ?? 'starter',
+          status: (org.subscription_status as string) ?? 'active',
           currentPeriodEnd: (org.subscription_ends_at as string) ?? null,
           cancelAtPeriodEnd: false,
           priceAmount: plan.pricing?.monthly ?? null,
-          interval: "month",
+          interval: 'month',
         });
 
         // Then: try to enrich with live Stripe data (cancel status etc.)
-        const res = await fetch("/api/stripe/subscription");
+        const res = await fetch('/api/stripe/subscription');
         if (res.ok) {
           const stripeData = await res.json();
           if (stripeData && !stripeData.error) {
@@ -105,11 +107,11 @@ export function BillingSection() {
         const plan = PLANS[contextPlanId] ?? PLANS.starter;
         setSubscription({
           planId: contextPlanId,
-          status: "active",
+          status: 'active',
           currentPeriodEnd: null,
           cancelAtPeriodEnd: false,
           priceAmount: plan.pricing?.monthly ?? null,
-          interval: "month",
+          interval: 'month',
         });
       } finally {
         setLoading(false);
@@ -140,11 +142,11 @@ export function BillingSection() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>{t("billing")}</CardTitle>
-          <CardDescription>{t("billingDescription")}</CardDescription>
+          <CardTitle>{t('billing')}</CardTitle>
+          <CardDescription>{t('billingDescription')}</CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">{t("noSubscription")}</p>
+          <p className="text-sm text-muted-foreground">{t('noSubscription')}</p>
         </CardContent>
       </Card>
     );
@@ -157,8 +159,8 @@ export function BillingSection() {
       {/* Current Plan */}
       <Card>
         <CardHeader>
-          <CardTitle>{t("currentPlan")}</CardTitle>
-          <CardDescription>{t("billingDescription")}</CardDescription>
+          <CardTitle>{t('currentPlan')}</CardTitle>
+          <CardDescription>{t('billingDescription')}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center gap-3">
@@ -170,17 +172,18 @@ export function BillingSection() {
 
           {subscription.priceAmount != null && (
             <p className="text-sm text-muted-foreground">
-              ${subscription.priceAmount}/{subscription.interval === "year" ? t("year") : t("month")}
+              ${subscription.priceAmount}/
+              {subscription.interval === 'year' ? t('year') : t('month')}
             </p>
           )}
 
           {subscription.currentPeriodEnd && !subscription.cancelAtPeriodEnd && (
             <p className="text-sm text-muted-foreground">
-              {t("renewsOn", {
-                date: new Date(subscription.currentPeriodEnd).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
+              {t('renewsOn', {
+                date: new Date(subscription.currentPeriodEnd).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
                 }),
               })}
             </p>
@@ -191,7 +194,7 @@ export function BillingSection() {
       {/* Plan Switcher */}
       <Card>
         <CardHeader>
-          <CardTitle>{t("changePlan")}</CardTitle>
+          <CardTitle>{t('changePlan')}</CardTitle>
         </CardHeader>
         <CardContent>
           <PlanSwitcher
@@ -206,7 +209,7 @@ export function BillingSection() {
       {/* Invoices */}
       <Card>
         <CardHeader>
-          <CardTitle>{t("invoices")}</CardTitle>
+          <CardTitle>{t('invoices')}</CardTitle>
         </CardHeader>
         <CardContent>
           <InvoiceList />

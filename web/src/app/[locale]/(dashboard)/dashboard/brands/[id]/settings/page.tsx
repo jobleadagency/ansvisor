@@ -1,57 +1,32 @@
-"use client";
+'use client';
 
-import { use, useState, useEffect, useCallback } from "react";
-import { useTranslations } from "next-intl";
-import { useRouter, Link } from "@/i18n/navigation";
-import { useBrandStore } from "@/stores/use-brand-store";
-import { updateBrand, deleteBrand } from "@/lib/actions/brand";
-import { syncDomains } from "@/lib/actions/brand-domain";
-import {
-  getCompetitors,
-  addCompetitor,
-  deleteCompetitor,
-} from "@/lib/actions/competitor";
-import { getFaviconUrl } from "@/lib/favicon";
-import type { Competitor } from "@/types";
-import {
-  INDUSTRIES,
-  type Brand,
-  type BrandDomain,
-} from "@/types";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { use, useState, useEffect, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
+import { useRouter, Link } from '@/i18n/navigation';
+import { useBrandStore } from '@/stores/use-brand-store';
+import { updateBrand, deleteBrand } from '@/lib/actions/brand';
+import { syncDomains } from '@/lib/actions/brand-domain';
+import { getCompetitors, addCompetitor, deleteCompetitor } from '@/lib/actions/competitor';
+import { getFaviconUrl } from '@/lib/favicon';
+import type { Competitor } from '@/types';
+import { INDUSTRIES, type Brand, type BrandDomain } from '@/types';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { toast } from "sonner";
-import {
-  Check,
-  Code,
-  Copy,
-  Globe,
-  Loader2,
-  Pencil,
-  Plus,
-  Save,
-  Trash2,
-  X,
-} from "lucide-react";
+} from '@/components/ui/select';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { toast } from 'sonner';
+import { Check, Code, Copy, Globe, Loader2, Pencil, Plus, Save, Trash2, X } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -61,7 +36,7 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogClose,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -69,7 +44,7 @@ interface PageProps {
 
 export default function BrandSettingsPage({ params }: PageProps) {
   const { id } = use(params);
-  const t = useTranslations("brands");
+  const t = useTranslations('brands');
   const router = useRouter();
   const { brands, updateBrand: updateBrandStore, removeBrand } = useBrandStore();
 
@@ -79,9 +54,7 @@ export default function BrandSettingsPage({ params }: PageProps) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <h2 className="text-lg font-semibold">Brand not found</h2>
-        <p className="text-muted-foreground text-sm mt-1">
-          This brand may have been deleted.
-        </p>
+        <p className="text-muted-foreground text-sm mt-1">This brand may have been deleted.</p>
         <Link href="/dashboard/brands" className="mt-4">
           <Button variant="outline">Back to Brands</Button>
         </Link>
@@ -93,27 +66,24 @@ export default function BrandSettingsPage({ params }: PageProps) {
     <div className="space-y-6">
       <Tabs defaultValue="general" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="general">{t("settings.generalTab")}</TabsTrigger>
-          <TabsTrigger value="domains">{t("settings.domainsTab")}</TabsTrigger>
+          <TabsTrigger value="general">{t('settings.generalTab')}</TabsTrigger>
+          <TabsTrigger value="domains">{t('settings.domainsTab')}</TabsTrigger>
           <TabsTrigger value="tracking">Tracking</TabsTrigger>
           <TabsTrigger value="competitors">Competitors</TabsTrigger>
-          <TabsTrigger value="danger" className="text-destructive data-[state=active]:text-destructive">
-            {t("settings.dangerTab")}
+          <TabsTrigger
+            value="danger"
+            className="text-destructive data-[state=active]:text-destructive"
+          >
+            {t('settings.dangerTab')}
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="general">
-          <GeneralTab
-            brand={brand}
-            onUpdate={(updated) => updateBrandStore(brand.id, updated)}
-          />
+          <GeneralTab brand={brand} onUpdate={(updated) => updateBrandStore(brand.id, updated)} />
         </TabsContent>
 
         <TabsContent value="domains">
-          <DomainsTab
-            brand={brand}
-            onUpdate={(updated) => updateBrandStore(brand.id, updated)}
-          />
+          <DomainsTab brand={brand} onUpdate={(updated) => updateBrandStore(brand.id, updated)} />
         </TabsContent>
 
         <TabsContent value="tracking">
@@ -129,8 +99,8 @@ export default function BrandSettingsPage({ params }: PageProps) {
             brand={brand}
             onDelete={async () => {
               removeBrand(brand.id);
-              toast.success("Brand deleted.");
-              router.push("/dashboard/brands");
+              toast.success('Brand deleted.');
+              router.push('/dashboard/brands');
             }}
           />
         </TabsContent>
@@ -148,10 +118,10 @@ function GeneralTab({
   brand: Brand;
   onUpdate: (updates: Partial<Brand>) => void;
 }) {
-  const t = useTranslations("brands");
+  const t = useTranslations('brands');
   const [name, setName] = useState(brand.name);
-  const [industry, setIndustry] = useState(brand.industry ?? "");
-  const [description, setDescription] = useState(brand.description ?? "");
+  const [industry, setIndustry] = useState(brand.industry ?? '');
+  const [description, setDescription] = useState(brand.description ?? '');
   const [isSaving, setIsSaving] = useState(false);
 
   const handleSave = async () => {
@@ -170,9 +140,9 @@ function GeneralTab({
         description: updated.description,
         updatedAt: updated.updatedAt,
       });
-      toast.success(t("settings.saved"));
+      toast.success(t('settings.saved'));
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to save changes.");
+      toast.error(err instanceof Error ? err.message : 'Failed to save changes.');
     } finally {
       setIsSaving(false);
     }
@@ -181,25 +151,25 @@ function GeneralTab({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{t("settings.generalTab")}</CardTitle>
+        <CardTitle>{t('settings.generalTab')}</CardTitle>
         <CardDescription>Update your brand&apos;s basic information.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="name">{t("brandName")} *</Label>
+          <Label htmlFor="name">{t('brandName')} *</Label>
           <Input
             id="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder={t("brandNamePlaceholder")}
+            placeholder={t('brandNamePlaceholder')}
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="industry">{t("industry")}</Label>
-          <Select value={industry} onValueChange={(v) => setIndustry(v ?? "")}>
+          <Label htmlFor="industry">{t('industry')}</Label>
+          <Select value={industry} onValueChange={(v) => setIndustry(v ?? '')}>
             <SelectTrigger id="industry">
-              <SelectValue placeholder={t("industryPlaceholder")} />
+              <SelectValue placeholder={t('industryPlaceholder')} />
             </SelectTrigger>
             <SelectContent>
               {INDUSTRIES.map((ind) => (
@@ -212,23 +182,19 @@ function GeneralTab({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="description">{t("description_field")}</Label>
+          <Label htmlFor="description">{t('description_field')}</Label>
           <Textarea
             id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder={t("descriptionPlaceholder")}
+            placeholder={t('descriptionPlaceholder')}
             rows={3}
           />
         </div>
 
         <Button onClick={handleSave} disabled={isSaving || !name.trim()} className="gap-2">
-          {isSaving ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <Save className="h-4 w-4" />
-          )}
-          {t("settings.saveChanges")}
+          {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+          {t('settings.saveChanges')}
         </Button>
       </CardContent>
     </Card>
@@ -244,11 +210,11 @@ function DomainsTab({
   brand: Brand;
   onUpdate: (updates: Partial<Brand>) => void;
 }) {
-  const t = useTranslations("brands");
+  const t = useTranslations('brands');
   const [domains, setDomains] = useState<BrandDomain[]>(brand.domains);
   const [isSaving, setIsSaving] = useState(false);
-  const [newDomain, setNewDomain] = useState("");
-  const [newCountry, setNewCountry] = useState("");
+  const [newDomain, setNewDomain] = useState('');
+  const [newCountry, setNewCountry] = useState('');
 
   const addDomain = () => {
     if (!newDomain.trim()) return;
@@ -260,8 +226,8 @@ function DomainsTab({
       isPrimary: domains.length === 0,
     };
     setDomains((prev) => [...prev, entry]);
-    setNewDomain("");
-    setNewCountry("");
+    setNewDomain('');
+    setNewCountry('');
   };
 
   const removeDomainLocal = (id: string) => {
@@ -287,7 +253,7 @@ function DomainsTab({
           domain: d.domain,
           country: d.country,
           isPrimary: d.isPrimary,
-        }))
+        })),
       );
       setDomains(savedDomains);
 
@@ -304,9 +270,9 @@ function DomainsTab({
         logoUrl: newLogoUrl ?? undefined,
         updatedAt: new Date().toISOString(),
       });
-      toast.success(t("settings.saved"));
+      toast.success(t('settings.saved'));
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to save domains.");
+      toast.error(err instanceof Error ? err.message : 'Failed to save domains.');
     } finally {
       setIsSaving(false);
     }
@@ -315,7 +281,7 @@ function DomainsTab({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{t("settings.domainsTab")}</CardTitle>
+        <CardTitle>{t('settings.domainsTab')}</CardTitle>
         <CardDescription>
           Manage the domains tracked for this brand. One domain must be set as primary.
         </CardDescription>
@@ -323,20 +289,15 @@ function DomainsTab({
       <CardContent className="space-y-4">
         <div className="space-y-2">
           {domains.map((d) => (
-            <div
-              key={d.id}
-              className="flex items-center gap-3 rounded-lg border px-3 py-2.5"
-            >
+            <div key={d.id} className="flex items-center gap-3 rounded-lg border px-3 py-2.5">
               <Globe className="h-4 w-4 shrink-0 text-muted-foreground" />
               <div className="flex-1 overflow-hidden">
                 <p className="truncate text-sm font-medium">{d.domain}</p>
-                {d.country && (
-                  <p className="text-xs text-muted-foreground">{d.country}</p>
-                )}
+                {d.country && <p className="text-xs text-muted-foreground">{d.country}</p>}
               </div>
               {d.isPrimary && (
                 <Badge variant="secondary" className="text-xs shrink-0">
-                  {t("primaryDomain")}
+                  {t('primaryDomain')}
                 </Badge>
               )}
               {!d.isPrimary && (
@@ -346,7 +307,7 @@ function DomainsTab({
                   className="h-7 text-xs shrink-0"
                   onClick={() => setPrimary(d.id)}
                 >
-                  {t("setPrimary")}
+                  {t('setPrimary')}
                 </Button>
               )}
               {domains.length > 1 && (
@@ -366,17 +327,17 @@ function DomainsTab({
         <Separator />
 
         <div className="space-y-2">
-          <Label className="text-sm font-medium">{t("addDomain")}</Label>
+          <Label className="text-sm font-medium">{t('addDomain')}</Label>
           <div className="flex gap-2">
             <Input
-              placeholder={t("domainPlaceholder")}
+              placeholder={t('domainPlaceholder')}
               value={newDomain}
               onChange={(e) => setNewDomain(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && addDomain()}
+              onKeyDown={(e) => e.key === 'Enter' && addDomain()}
               className="flex-1"
             />
             <Input
-              placeholder={t("countryPlaceholder")}
+              placeholder={t('countryPlaceholder')}
               value={newCountry}
               onChange={(e) => setNewCountry(e.target.value)}
               className="w-28"
@@ -393,17 +354,9 @@ function DomainsTab({
           </div>
         </div>
 
-        <Button
-          onClick={handleSave}
-          disabled={isSaving || domains.length === 0}
-          className="gap-2"
-        >
-          {isSaving ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <Save className="h-4 w-4" />
-          )}
-          {t("settings.saveChanges")}
+        <Button onClick={handleSave} disabled={isSaving || domains.length === 0} className="gap-2">
+          {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+          {t('settings.saveChanges')}
         </Button>
       </CardContent>
     </Card>
@@ -417,8 +370,8 @@ function CompetitorsTab({ brandId }: { brandId: string }) {
   const [isLoading, setIsLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [newName, setNewName] = useState("");
-  const [newDomain, setNewDomain] = useState("");
+  const [newName, setNewName] = useState('');
+  const [newDomain, setNewDomain] = useState('');
 
   const load = useCallback(async () => {
     setIsLoading(true);
@@ -426,7 +379,7 @@ function CompetitorsTab({ brandId }: { brandId: string }) {
       const data = await getCompetitors(brandId);
       setCompetitors(data);
     } catch {
-      toast.error("Failed to load competitors");
+      toast.error('Failed to load competitors');
     } finally {
       setIsLoading(false);
     }
@@ -445,11 +398,11 @@ function CompetitorsTab({ brandId }: { brandId: string }) {
         domain: newDomain.trim(),
       });
       setCompetitors((prev) => [...prev, added]);
-      setNewName("");
-      setNewDomain("");
+      setNewName('');
+      setNewDomain('');
       toast.success(`${added.name} added`);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to add competitor");
+      toast.error(err instanceof Error ? err.message : 'Failed to add competitor');
     } finally {
       setIsAdding(false);
     }
@@ -460,9 +413,9 @@ function CompetitorsTab({ brandId }: { brandId: string }) {
       await deleteCompetitor(id);
       setCompetitors((prev) => prev.filter((c) => c.id !== id));
       setDeletingId(null);
-      toast.success("Competitor removed");
+      toast.success('Competitor removed');
     } catch {
-      toast.error("Failed to remove competitor");
+      toast.error('Failed to remove competitor');
     }
   };
 
@@ -485,10 +438,7 @@ function CompetitorsTab({ brandId }: { brandId: string }) {
             {competitors.length > 0 && (
               <div className="space-y-2">
                 {competitors.map((c) => (
-                  <div
-                    key={c.id}
-                    className="flex items-center gap-3 rounded-lg border px-3 py-2.5"
-                  >
+                  <div key={c.id} className="flex items-center gap-3 rounded-lg border px-3 py-2.5">
                     {c.domain ? (
                       /* eslint-disable-next-line @next/next/no-img-element */
                       <img
@@ -503,11 +453,12 @@ function CompetitorsTab({ brandId }: { brandId: string }) {
                     )}
                     <div className="flex-1 overflow-hidden">
                       <p className="truncate text-sm font-medium">{c.name}</p>
-                      {c.domain && (
-                        <p className="text-xs text-muted-foreground">{c.domain}</p>
-                      )}
+                      {c.domain && <p className="text-xs text-muted-foreground">{c.domain}</p>}
                     </div>
-                    <Dialog open={deletingId === c.id} onOpenChange={(open) => !open && setDeletingId(null)}>
+                    <Dialog
+                      open={deletingId === c.id}
+                      onOpenChange={(open) => !open && setDeletingId(null)}
+                    >
                       <Button
                         variant="ghost"
                         size="icon"
@@ -520,7 +471,8 @@ function CompetitorsTab({ brandId }: { brandId: string }) {
                         <DialogHeader>
                           <DialogTitle>Remove {c.name}?</DialogTitle>
                           <DialogDescription>
-                            This will remove the competitor and its comparison data. This action cannot be undone.
+                            This will remove the competitor and its comparison data. This action
+                            cannot be undone.
                           </DialogDescription>
                         </DialogHeader>
                         <DialogFooter>
@@ -555,14 +507,14 @@ function CompetitorsTab({ brandId }: { brandId: string }) {
                   placeholder="Competitor name"
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && newName.trim() && handleAdd()}
+                  onKeyDown={(e) => e.key === 'Enter' && newName.trim() && handleAdd()}
                   className="flex-1"
                 />
                 <Input
                   placeholder="domain.com"
                   value={newDomain}
                   onChange={(e) => setNewDomain(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && newName.trim() && handleAdd()}
+                  onKeyDown={(e) => e.key === 'Enter' && newName.trim() && handleAdd()}
                   className="w-40"
                 />
                 <Button
@@ -590,14 +542,14 @@ function CompetitorsTab({ brandId }: { brandId: string }) {
 // ─── Tracking Tab ────────────────────────────────────────────────────────
 
 function TrackingTab({ brand }: { brand: Brand }) {
-  const [copied, setCopied] = useState<"code" | "snippet" | null>(null);
-  const isCloud = process.env.NEXT_PUBLIC_IS_CLOUD === "true";
-  const apiUrl = isCloud ? "https://api.ansops.ai" : process.env.NEXT_PUBLIC_API_URL;
+  const [copied, setCopied] = useState<'code' | 'snippet' | null>(null);
+  const isCloud = process.env.NEXT_PUBLIC_IS_CLOUD === 'true';
+  const apiUrl = isCloud ? 'https://api.ansops.ai' : process.env.NEXT_PUBLIC_API_URL;
   const snippet = apiUrl
-    ? `<script src="${apiUrl}/t.js" data-t="${brand.trackingCode || ""}" defer></script>`
-    : "";
+    ? `<script src="${apiUrl}/t.js" data-t="${brand.trackingCode || ''}" defer></script>`
+    : '';
 
-  const copyToClipboard = (text: string, key: "code" | "snippet") => {
+  const copyToClipboard = (text: string, key: 'code' | 'snippet') => {
     navigator.clipboard.writeText(text);
     setCopied(key);
     setTimeout(() => setCopied(null), 2000);
@@ -611,7 +563,8 @@ function TrackingTab({ brand }: { brand: Brand }) {
           AI Traffic Tracking
         </CardTitle>
         <CardDescription>
-          Track visits to your website that come from AI platforms like ChatGPT, Perplexity, Claude, and more.
+          Track visits to your website that come from AI platforms like ChatGPT, Perplexity, Claude,
+          and more.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -619,9 +572,20 @@ function TrackingTab({ brand }: { brand: Brand }) {
           <>
             {!apiUrl && (
               <div className="rounded-lg border border-yellow-500/30 bg-yellow-500/5 px-4 py-3 text-sm">
-                <p className="font-medium text-yellow-700 dark:text-yellow-400">Server URL not configured</p>
+                <p className="font-medium text-yellow-700 dark:text-yellow-400">
+                  Server URL not configured
+                </p>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  Set <code className="text-[11px] bg-muted px-1 py-0.5 rounded">NEXT_PUBLIC_API_URL</code> in your <code className="text-[11px] bg-muted px-1 py-0.5 rounded">.env</code> file to your aeo-server URL (e.g. <code className="text-[11px] bg-muted px-1 py-0.5 rounded">https://api.yourdomain.com</code>).
+                  Set{' '}
+                  <code className="text-[11px] bg-muted px-1 py-0.5 rounded">
+                    NEXT_PUBLIC_API_URL
+                  </code>{' '}
+                  in your <code className="text-[11px] bg-muted px-1 py-0.5 rounded">.env</code>{' '}
+                  file to your aeo-server URL (e.g.{' '}
+                  <code className="text-[11px] bg-muted px-1 py-0.5 rounded">
+                    https://api.yourdomain.com
+                  </code>
+                  ).
                 </p>
               </div>
             )}
@@ -635,9 +599,9 @@ function TrackingTab({ brand }: { brand: Brand }) {
                   variant="outline"
                   size="icon"
                   className="shrink-0"
-                  onClick={() => copyToClipboard(brand.trackingCode!, "code")}
+                  onClick={() => copyToClipboard(brand.trackingCode!, 'code')}
                 >
-                  {copied === "code" ? (
+                  {copied === 'code' ? (
                     <Check className="h-4 w-4 text-green-500" />
                   ) : (
                     <Copy className="h-4 w-4" />
@@ -651,7 +615,8 @@ function TrackingTab({ brand }: { brand: Brand }) {
               <div className="space-y-2">
                 <Label className="text-sm font-medium">Installation Snippet</Label>
                 <p className="text-xs text-muted-foreground">
-                  Add this script tag before the closing <code className="text-[11px]">&lt;/head&gt;</code> tag of your website.
+                  Add this script tag before the closing{' '}
+                  <code className="text-[11px]">&lt;/head&gt;</code> tag of your website.
                 </p>
                 <div className="relative">
                   <pre className="text-[12px] bg-muted rounded-md px-4 py-3 overflow-x-auto font-mono leading-relaxed">
@@ -661,9 +626,9 @@ function TrackingTab({ brand }: { brand: Brand }) {
                     variant="ghost"
                     size="icon"
                     className="absolute top-2 right-2 h-7 w-7"
-                    onClick={() => copyToClipboard(snippet, "snippet")}
+                    onClick={() => copyToClipboard(snippet, 'snippet')}
                   >
-                    {copied === "snippet" ? (
+                    {copied === 'snippet' ? (
                       <Check className="h-3.5 w-3.5 text-green-500" />
                     ) : (
                       <Copy className="h-3.5 w-3.5" />
@@ -677,7 +642,10 @@ function TrackingTab({ brand }: { brand: Brand }) {
             <div className="rounded-lg border p-4 space-y-2">
               <p className="text-sm font-medium">How it works</p>
               <ul className="text-xs text-muted-foreground space-y-1 list-disc pl-4">
-                <li>The script detects visitors coming from AI platforms (ChatGPT, Perplexity, Claude, Gemini, Copilot, etc.)</li>
+                <li>
+                  The script detects visitors coming from AI platforms (ChatGPT, Perplexity, Claude,
+                  Gemini, Copilot, etc.)
+                </li>
                 <li>Only AI-referred visits are tracked — regular traffic is ignored</li>
                 <li>Data appears in your AI Traffic Analytics dashboard</li>
                 <li>The script is lightweight (~1KB) and does not affect page performance</li>
@@ -702,15 +670,9 @@ function TrackingTab({ brand }: { brand: Brand }) {
 
 // ─── Danger Tab ───────────────────────────────────────────────────────────────
 
-function DangerTab({
-  brand,
-  onDelete,
-}: {
-  brand: Brand;
-  onDelete: () => Promise<void>;
-}) {
-  const t = useTranslations("brands");
-  const [confirmValue, setConfirmValue] = useState("");
+function DangerTab({ brand, onDelete }: { brand: Brand; onDelete: () => Promise<void> }) {
+  const t = useTranslations('brands');
+  const [confirmValue, setConfirmValue] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
 
   const canDelete = confirmValue === brand.name;
@@ -722,7 +684,7 @@ function DangerTab({
       await deleteBrand(brand.id);
       await onDelete();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to delete brand.");
+      toast.error(err instanceof Error ? err.message : 'Failed to delete brand.');
       setIsDeleting(false);
     }
   };
@@ -730,17 +692,16 @@ function DangerTab({
   return (
     <Card className="border-destructive/30">
       <CardHeader>
-        <CardTitle className="text-destructive">{t("settings.dangerTab")}</CardTitle>
-        <CardDescription>{t("settings.deleteWarning")}</CardDescription>
+        <CardTitle className="text-destructive">{t('settings.dangerTab')}</CardTitle>
+        <CardDescription>{t('settings.deleteWarning')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
           <Label className="text-sm">
-            {t("settings.confirmDelete")}{" "}
-            <span className="font-semibold">{brand.name}</span>
+            {t('settings.confirmDelete')} <span className="font-semibold">{brand.name}</span>
           </Label>
           <Input
-            placeholder={t("settings.deleteConfirmPlaceholder")}
+            placeholder={t('settings.deleteConfirmPlaceholder')}
             value={confirmValue}
             onChange={(e) => setConfirmValue(e.target.value)}
           />
@@ -756,7 +717,7 @@ function DangerTab({
           ) : (
             <Trash2 className="h-4 w-4" />
           )}
-          {t("settings.deleteButton")}
+          {t('settings.deleteButton')}
         </Button>
       </CardContent>
     </Card>

@@ -58,8 +58,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-const AEO_SERVER_URL =
-  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:80';
+const AEO_SERVER_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:80';
 
 // ── Step indicator ─────────────────────────────────────────────────────────────
 
@@ -90,16 +89,10 @@ function BrandHeader({ name, domain }: { name: string; domain: string }) {
     <div className="flex items-center gap-2.5 mb-8">
       {domain && (
         /* eslint-disable-next-line @next/next/no-img-element */
-        <img
-          src={getFaviconUrl(domain, 32)}
-          alt=""
-          className="h-6 w-6 rounded"
-        />
+        <img src={getFaviconUrl(domain, 32)} alt="" className="h-6 w-6 rounded" />
       )}
       <span className="text-sm font-medium">{name}</span>
-      {domain && (
-        <span className="text-sm text-muted-foreground">{domain}</span>
-      )}
+      {domain && <span className="text-sm text-muted-foreground">{domain}</span>}
     </div>
   );
 }
@@ -148,9 +141,7 @@ function TopicAccordion({
             <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
           )}
           <span className="font-medium">{data.topic}</span>
-          <span className="text-xs text-muted-foreground">
-            {data.prompts.length} prompts
-          </span>
+          <span className="text-xs text-muted-foreground">{data.prompts.length} prompts</span>
         </button>
         <DropdownMenu>
           <DropdownMenuTrigger className="p-1 rounded hover:bg-muted text-muted-foreground">
@@ -199,12 +190,7 @@ function TopicAccordion({
             >
               <Check className="h-4 w-4" />
             </Button>
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => setNewPrompt('')}
-              className="h-9 px-2"
-            >
+            <Button size="sm" variant="ghost" onClick={() => setNewPrompt('')} className="h-9 px-2">
               <X className="h-4 w-4" />
             </Button>
           </div>
@@ -272,8 +258,7 @@ export default function OnboardingPage() {
     topicMsgIdx.current = 0;
 
     const interval = setInterval(() => {
-      topicMsgIdx.current =
-        (topicMsgIdx.current + 1) % TOPIC_LOADING_MESSAGES.length;
+      topicMsgIdx.current = (topicMsgIdx.current + 1) % TOPIC_LOADING_MESSAGES.length;
       setTopicLoadingMsg(TOPIC_LOADING_MESSAGES[topicMsgIdx.current]);
     }, 2500);
 
@@ -290,9 +275,7 @@ export default function OnboardingPage() {
     domain: string;
     selected: boolean;
   }
-  const [suggestedCompetitors, setSuggestedCompetitors] = useState<
-    CompetitorItem[]
-  >([]);
+  const [suggestedCompetitors, setSuggestedCompetitors] = useState<CompetitorItem[]>([]);
   const [loadingCompetitors, setLoadingCompetitors] = useState(false);
   const [competitorName, setCompetitorName] = useState('');
   const [competitorDomain, setCompetitorDomain] = useState('');
@@ -329,9 +312,7 @@ export default function OnboardingPage() {
     const interval = setInterval(() => {
       competitorMsgIdx.current =
         (competitorMsgIdx.current + 1) % COMPETITOR_LOADING_MESSAGES.length;
-      setCompetitorLoadingMsg(
-        COMPETITOR_LOADING_MESSAGES[competitorMsgIdx.current],
-      );
+      setCompetitorLoadingMsg(COMPETITOR_LOADING_MESSAGES[competitorMsgIdx.current]);
     }, 2500);
 
     return () => clearInterval(interval);
@@ -409,15 +390,13 @@ export default function OnboardingPage() {
               description: b.description ?? undefined,
               region: b.region ?? undefined,
               language: b.language ?? undefined,
-              domains: (b.brand_domains || []).map(
-                (d: Record<string, unknown>) => ({
-                  id: d.id as string,
-                  brandId: d.brand_id as string,
-                  domain: d.domain as string,
-                  country: (d.country as string) ?? undefined,
-                  isPrimary: d.is_primary as boolean,
-                }),
-              ),
+              domains: (b.brand_domains || []).map((d: Record<string, unknown>) => ({
+                id: d.id as string,
+                brandId: d.brand_id as string,
+                domain: d.domain as string,
+                country: (d.country as string) ?? undefined,
+                isPrimary: d.is_primary as boolean,
+              })),
               createdAt: b.created_at,
               updatedAt: b.updated_at,
             };
@@ -528,8 +507,7 @@ export default function OnboardingPage() {
           .select()
           .single();
 
-        if (orgError || !org)
-          throw new Error(orgError?.message ?? 'Failed to create organization');
+        if (orgError || !org) throw new Error(orgError?.message ?? 'Failed to create organization');
 
         const { error: profileError } = await supabase
           .from('profiles')
@@ -579,9 +557,7 @@ export default function OnboardingPage() {
         fetchTopicSuggestions();
       }
     } catch (err) {
-      toast.error(
-        err instanceof Error ? err.message : 'Failed to create brand',
-      );
+      toast.error(err instanceof Error ? err.message : 'Failed to create brand');
     } finally {
       setIsLoading(false);
     }
@@ -688,12 +664,10 @@ export default function OnboardingPage() {
       const data = await res.json();
 
       setTopicPrompts(
-        (data.topicPrompts || []).map(
-          (tp: { topic: string; prompts: string[] }) => ({
-            topic: tp.topic,
-            prompts: tp.prompts,
-          }),
-        ),
+        (data.topicPrompts || []).map((tp: { topic: string; prompts: string[] }) => ({
+          topic: tp.topic,
+          prompts: tp.prompts,
+        })),
       );
       track('onboarding_step_completed', {
         step: 3,
@@ -747,9 +721,7 @@ export default function OnboardingPage() {
       setStep(5);
       fetchCompetitorSuggestions();
     } catch (err) {
-      toast.error(
-        err instanceof Error ? err.message : 'Failed to save prompts',
-      );
+      toast.error(err instanceof Error ? err.message : 'Failed to save prompts');
     } finally {
       setIsLoading(false);
     }
@@ -814,10 +786,7 @@ export default function OnboardingPage() {
       .replace(/^https?:\/\//, '')
       .replace(/\/+$/, '');
     if (!name) return;
-    setSuggestedCompetitors((prev) => [
-      ...prev,
-      { name, domain, selected: true },
-    ]);
+    setSuggestedCompetitors((prev) => [...prev, { name, domain, selected: true }]);
     setCompetitorName('');
     setCompetitorDomain('');
   };
@@ -832,9 +801,7 @@ export default function OnboardingPage() {
       const selected = suggestedCompetitors.filter((c) => c.selected);
       if (selected.length > 0) {
         await Promise.all(
-          selected.map((c) =>
-            addCompetitor(createdBrand.id, { name: c.name, domain: c.domain }),
-          ),
+          selected.map((c) => addCompetitor(createdBrand.id, { name: c.name, domain: c.domain })),
         );
       }
 
@@ -844,10 +811,7 @@ export default function OnboardingPage() {
         data: { user },
       } = await supabase.auth.getUser();
       if (user) {
-        await supabase
-          .from('profiles')
-          .update({ onboarding_completed: true })
-          .eq('id', user.id);
+        await supabase.from('profiles').update({ onboarding_completed: true }).eq('id', user.id);
       }
 
       const competitorCount = selected.length;
@@ -891,9 +855,7 @@ export default function OnboardingPage() {
       // the server-side layout reads the fresh onboarding_completed flag.
       window.location.href = '/dashboard/insights';
     } catch (err) {
-      toast.error(
-        err instanceof Error ? err.message : 'Failed to save competitors',
-      );
+      toast.error(err instanceof Error ? err.message : 'Failed to save competitors');
       setSavingCompetitors(false);
     }
   };
@@ -937,9 +899,7 @@ export default function OnboardingPage() {
 
   const addPromptToTopic = (topicIndex: number, prompt: string) => {
     setTopicPrompts((prev) =>
-      prev.map((tp, i) =>
-        i === topicIndex ? { ...tp, prompts: [...tp.prompts, prompt] } : tp,
-      ),
+      prev.map((tp, i) => (i === topicIndex ? { ...tp, prompts: [...tp.prompts, prompt] } : tp)),
     );
   };
 
@@ -953,10 +913,7 @@ export default function OnboardingPage() {
     );
   };
 
-  const totalPrompts = topicPrompts.reduce(
-    (sum, tp) => sum + tp.prompts.length,
-    0,
-  );
+  const totalPrompts = topicPrompts.reduce((sum, tp) => sum + tp.prompts.length, 0);
 
   // ── Loading state ──
 
@@ -978,12 +935,9 @@ export default function OnboardingPage() {
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground">
               <Globe className="h-6 w-6" />
             </div>
-            <h1 className="text-2xl font-bold tracking-tight">
-              Set up your brand
-            </h1>
+            <h1 className="text-2xl font-bold tracking-tight">Set up your brand</h1>
             <p className="text-sm text-muted-foreground">
-              See how AI platforms talk about you. Add your first brand to get
-              started.
+              See how AI platforms talk about you. Add your first brand to get started.
             </p>
           </div>
 
@@ -1017,8 +971,7 @@ export default function OnboardingPage() {
 
             <div className="space-y-2">
               <Label htmlFor="description">
-                Describe your brand{' '}
-                <span className="text-muted-foreground">(optional)</span>
+                Describe your brand <span className="text-muted-foreground">(optional)</span>
               </Label>
               <Textarea
                 id="description"
@@ -1069,12 +1022,10 @@ export default function OnboardingPage() {
           <BrandHeader name={brandName} domain={domain} />
 
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">
-              Select your target market
-            </h1>
+            <h1 className="text-2xl font-bold tracking-tight">Select your target market</h1>
             <p className="text-sm text-muted-foreground mt-1">
-              Pick the region and language your audience uses. This helps us
-              deliver more accurate AI visibility data.
+              Pick the region and language your audience uses. This helps us deliver more accurate
+              AI visibility data.
             </p>
           </div>
 
@@ -1097,10 +1048,7 @@ export default function OnboardingPage() {
 
             <div className="space-y-2">
               <Label>Language</Label>
-              <Select
-                value={language}
-                onValueChange={(v) => v && setLanguage(v)}
-              >
+              <Select value={language} onValueChange={(v) => v && setLanguage(v)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -1114,11 +1062,7 @@ export default function OnboardingPage() {
               </Select>
             </div>
 
-            <Button
-              className="w-full"
-              onClick={handleCreateOrgAndBrand}
-              disabled={isLoading}
-            >
+            <Button className="w-full" onClick={handleCreateOrgAndBrand} disabled={isLoading}>
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -1157,13 +1101,9 @@ export default function OnboardingPage() {
           <div className="grid grid-cols-1 gap-10 lg:grid-cols-5">
             <div className="lg:col-span-3 space-y-6">
               <div>
-                <h1 className="text-2xl font-bold tracking-tight">
-                  Choose topics to monitor
-                </h1>
+                <h1 className="text-2xl font-bold tracking-tight">Choose topics to monitor</h1>
                 <div className="flex items-center gap-2 mt-3">
-                  <span className="text-sm text-muted-foreground">
-                    Select up to 10 topics
-                  </span>
+                  <span className="text-sm text-muted-foreground">Select up to 10 topics</span>
                   <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
                     <div
                       className="h-full bg-primary rounded-full transition-all"
@@ -1178,10 +1118,7 @@ export default function OnboardingPage() {
               {loadingTopics ? (
                 <div className="flex flex-col items-center gap-3 py-12 text-muted-foreground">
                   <Sparkles className="h-5 w-5 animate-pulse" />
-                  <span
-                    key={topicLoadingMsg}
-                    className="text-sm animate-in fade-in duration-500"
-                  >
+                  <span key={topicLoadingMsg} className="text-sm animate-in fade-in duration-500">
                     {topicLoadingMsg}
                   </span>
                 </div>
@@ -1237,9 +1174,7 @@ export default function OnboardingPage() {
 
               <Button
                 className="w-full"
-                disabled={
-                  selectedTopics.size === 0 || loadingPrompts || loadingTopics
-                }
+                disabled={selectedTopics.size === 0 || loadingPrompts || loadingTopics}
                 onClick={handleGeneratePrompts}
               >
                 {loadingPrompts ? (
@@ -1255,31 +1190,25 @@ export default function OnboardingPage() {
 
             <div className="lg:col-span-2">
               <div className="rounded-xl border bg-card p-5 sticky top-10">
-                <h3 className="text-sm font-semibold mb-4">
-                  Topic Selection Tips
-                </h3>
+                <h3 className="text-sm font-semibold mb-4">Topic Selection Tips</h3>
                 <div className="space-y-4">
                   <div className="flex gap-3">
                     <Check className="h-4 w-4 text-foreground shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-sm font-medium">
-                        5 prompts are created per topic
-                      </p>
+                      <p className="text-sm font-medium">5 prompts are created per topic</p>
                       <p className="text-xs text-muted-foreground mt-0.5">
-                        You can select up to 10 topics for a total of 50
-                        prompts. More can be added anytime from the dashboard.
+                        You can select up to 10 topics for a total of 50 prompts. More can be added
+                        anytime from the dashboard.
                       </p>
                     </div>
                   </div>
                   <div className="flex gap-3">
                     <Check className="h-4 w-4 text-foreground shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-sm font-medium">
-                        Think like your customers
-                      </p>
+                      <p className="text-sm font-medium">Think like your customers</p>
                       <p className="text-xs text-muted-foreground mt-0.5">
-                        Use terms your audience would search for when looking
-                        for products or services like yours.
+                        Use terms your audience would search for when looking for products or
+                        services like yours.
                       </p>
                     </div>
                   </div>
@@ -1288,8 +1217,8 @@ export default function OnboardingPage() {
                     <div>
                       <p className="text-sm font-medium">Keep it short</p>
                       <p className="text-xs text-muted-foreground mt-0.5">
-                        Topics should be concise — we&apos;ll turn them into
-                        detailed prompts in the next step.
+                        Topics should be concise — we&apos;ll turn them into detailed prompts in the
+                        next step.
                       </p>
                     </div>
                   </div>
@@ -1324,12 +1253,10 @@ export default function OnboardingPage() {
 
           <div className="flex items-start justify-between mb-6">
             <div>
-              <h1 className="text-2xl font-bold tracking-tight">
-                Review your prompts
-              </h1>
+              <h1 className="text-2xl font-bold tracking-tight">Review your prompts</h1>
               <p className="text-sm text-muted-foreground mt-1">
-                These prompts will be sent to AI platforms daily. Feel free to
-                edit, add, or remove any before starting.
+                These prompts will be sent to AI platforms daily. Feel free to edit, add, or remove
+                any before starting.
               </p>
             </div>
             <Button
@@ -1349,9 +1276,7 @@ export default function OnboardingPage() {
 
           <div className="mb-4">
             <p className="text-sm font-medium">Your Prompt List</p>
-            <p className="text-xs text-muted-foreground">
-              {totalPrompts} prompts total
-            </p>
+            <p className="text-xs text-muted-foreground">{totalPrompts} prompts total</p>
           </div>
 
           <div className="rounded-lg border">
@@ -1394,158 +1319,144 @@ export default function OnboardingPage() {
   // ── Step 5: Competitors ──
 
   if (step === 5) {
-  const selectedCompetitorCount = suggestedCompetitors.filter(
-    (c) => c.selected,
-  ).length;
+    const selectedCompetitorCount = suggestedCompetitors.filter((c) => c.selected).length;
 
-  return (
-    <div className="flex min-h-svh flex-col p-6 md:p-10">
-      <div className="mx-auto w-full max-w-lg flex-1">
-        <BrandHeader name={brandName} domain={domain} />
+    return (
+      <div className="flex min-h-svh flex-col p-6 md:p-10">
+        <div className="mx-auto w-full max-w-lg flex-1">
+          <BrandHeader name={brandName} domain={domain} />
 
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold tracking-tight">
-            Add your competitors
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            We&apos;ll track how often competitors appear alongside your brand
-            in AI responses.
-          </p>
-        </div>
-
-        {loadingCompetitors ? (
-          <div className="flex flex-col items-center gap-3 py-16 text-muted-foreground">
-            <Sparkles className="h-5 w-5 animate-pulse" />
-            <span
-              key={competitorLoadingMsg}
-              className="text-sm animate-in fade-in duration-500"
-            >
-              {competitorLoadingMsg}
-            </span>
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold tracking-tight">Add your competitors</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              We&apos;ll track how often competitors appear alongside your brand in AI responses.
+            </p>
           </div>
-        ) : (
-          <div className="space-y-4">
-            {suggestedCompetitors.length > 0 && (
+
+          {loadingCompetitors ? (
+            <div className="flex flex-col items-center gap-3 py-16 text-muted-foreground">
+              <Sparkles className="h-5 w-5 animate-pulse" />
+              <span key={competitorLoadingMsg} className="text-sm animate-in fade-in duration-500">
+                {competitorLoadingMsg}
+              </span>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {suggestedCompetitors.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    Suggested competitors
+                  </p>
+                  {suggestedCompetitors.map((c, idx) => (
+                    <div
+                      key={`${c.domain}-${idx}`}
+                      className={cn(
+                        'flex items-center gap-3 rounded-lg border px-4 py-3 cursor-pointer transition-colors',
+                        c.selected
+                          ? 'border-primary/50 bg-primary/5'
+                          : 'border-border hover:bg-muted/50',
+                      )}
+                      onClick={() => toggleCompetitor(idx)}
+                    >
+                      <div
+                        className={cn(
+                          'flex h-5 w-5 shrink-0 items-center justify-center rounded border transition-colors',
+                          c.selected
+                            ? 'bg-primary border-primary text-primary-foreground'
+                            : 'border-muted-foreground/30',
+                        )}
+                      >
+                        {c.selected && <Check className="h-3 w-3" />}
+                      </div>
+                      {c.domain && (
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img
+                          src={getFaviconUrl(c.domain)}
+                          alt=""
+                          className="h-5 w-5 rounded-sm"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).style.display = 'none';
+                          }}
+                        />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{c.name}</p>
+                        {c.domain && (
+                          <p className="text-xs text-muted-foreground truncate">{c.domain}</p>
+                        )}
+                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeCompetitor(idx);
+                        }}
+                        className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-destructive"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
               <div className="space-y-2">
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  Suggested competitors
+                  Add manually
                 </p>
-                {suggestedCompetitors.map((c, idx) => (
-                  <div
-                    key={`${c.domain}-${idx}`}
-                    className={cn(
-                      'flex items-center gap-3 rounded-lg border px-4 py-3 cursor-pointer transition-colors',
-                      c.selected
-                        ? 'border-primary/50 bg-primary/5'
-                        : 'border-border hover:bg-muted/50',
-                    )}
-                    onClick={() => toggleCompetitor(idx)}
+                <div className="flex items-center gap-2">
+                  <Input
+                    placeholder="Company name"
+                    value={competitorName}
+                    onChange={(e) => setCompetitorName(e.target.value)}
+                    className="text-sm"
+                  />
+                  <Input
+                    placeholder="domain.com"
+                    value={competitorDomain}
+                    onChange={(e) => setCompetitorDomain(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && addManualCompetitor()}
+                    className="text-sm"
+                  />
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={addManualCompetitor}
+                    disabled={!competitorName.trim()}
                   >
-                    <div
-                      className={cn(
-                        'flex h-5 w-5 shrink-0 items-center justify-center rounded border transition-colors',
-                        c.selected
-                          ? 'bg-primary border-primary text-primary-foreground'
-                          : 'border-muted-foreground/30',
-                      )}
-                    >
-                      {c.selected && <Check className="h-3 w-3" />}
-                    </div>
-                    {c.domain && (
-                      /* eslint-disable-next-line @next/next/no-img-element */
-                      <img
-                        src={getFaviconUrl(c.domain)}
-                        alt=""
-                        className="h-5 w-5 rounded-sm"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = 'none';
-                        }}
-                      />
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{c.name}</p>
-                      {c.domain && (
-                        <p className="text-xs text-muted-foreground truncate">
-                          {c.domain}
-                        </p>
-                      )}
-                    </div>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        removeCompetitor(idx);
-                      }}
-                      className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-destructive"
-                    >
-                      <X className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
-                ))}
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
-            )}
 
-            <div className="space-y-2">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                Add manually
-              </p>
-              <div className="flex items-center gap-2">
-                <Input
-                  placeholder="Company name"
-                  value={competitorName}
-                  onChange={(e) => setCompetitorName(e.target.value)}
-                  className="text-sm"
-                />
-                <Input
-                  placeholder="domain.com"
-                  value={competitorDomain}
-                  onChange={(e) => setCompetitorDomain(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && addManualCompetitor()}
-                  className="text-sm"
-                />
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={addManualCompetitor}
-                  disabled={!competitorName.trim()}
-                >
-                  <Plus className="h-4 w-4" />
-                </Button>
-              </div>
+              <Button className="w-full" onClick={handleFinish} disabled={savingCompetitors}>
+                {savingCompetitors ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Finishing setup...
+                  </>
+                ) : selectedCompetitorCount > 0 ? (
+                  `Start tracking with ${selectedCompetitorCount} competitor${selectedCompetitorCount !== 1 ? 's' : ''}`
+                ) : (
+                  'Skip & start tracking'
+                )}
+              </Button>
             </div>
+          )}
+        </div>
 
-            <Button
-              className="w-full"
-              onClick={handleFinish}
-              disabled={savingCompetitors}
-            >
-              {savingCompetitors ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Finishing setup...
-                </>
-              ) : selectedCompetitorCount > 0 ? (
-                `Start tracking with ${selectedCompetitorCount} competitor${selectedCompetitorCount !== 1 ? 's' : ''}`
-              ) : (
-                'Skip & start tracking'
-              )}
-            </Button>
-          </div>
-        )}
+        <div className="flex mx-auto w-full max-w-lg items-center justify-between mt-8">
+          <button
+            onClick={() => setStep(4)}
+            className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            Back
+          </button>
+          <StepDots current={5} total={totalSteps} />
+          <div className="w-12" />
+        </div>
       </div>
-
-      <div className="flex mx-auto w-full max-w-lg items-center justify-between mt-8">
-        <button
-          onClick={() => setStep(4)}
-          className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" />
-          Back
-        </button>
-        <StepDots current={5} total={totalSteps} />
-        <div className="w-12" />
-      </div>
-    </div>
-  );
+    );
   }
 
   // ── Step 6: Choose Plan (cloud only) ──
@@ -1556,9 +1467,7 @@ export default function OnboardingPage() {
     <div className="flex min-h-svh flex-col p-6 md:p-10">
       <div className="mx-auto w-full max-w-2xl flex-1">
         <div className="mb-8 text-center">
-          <h1 className="text-2xl font-bold tracking-tight">
-            Choose your plan
-          </h1>
+          <h1 className="text-2xl font-bold tracking-tight">Choose your plan</h1>
           <p className="text-sm text-muted-foreground mt-1">
             Start with a 7-day free trial. Cancel anytime.
           </p>
@@ -1578,30 +1487,21 @@ export default function OnboardingPage() {
                 key={planId}
                 className={cn(
                   'relative flex flex-col rounded-2xl border bg-card p-6 shadow-sm transition-shadow hover:shadow-md',
-                  plan.highlighted &&
-                    'border-primary shadow-md ring-1 ring-primary/20',
+                  plan.highlighted && 'border-primary shadow-md ring-1 ring-primary/20',
                 )}
               >
                 {plan.highlighted && (
-                  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    Most Popular
-                  </Badge>
+                  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2">Most Popular</Badge>
                 )}
 
                 <div className="mb-4">
                   <h3 className="text-lg font-semibold">{plan.name}</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    {plan.tagline}
-                  </p>
+                  <p className="mt-1 text-sm text-muted-foreground">{plan.tagline}</p>
                 </div>
 
                 <div className="flex items-end gap-1 mb-4">
-                  <span className="text-4xl font-bold tracking-tight">
-                    ${price.monthly}
-                  </span>
-                  <span className="mb-1 text-sm text-muted-foreground">
-                    /month
-                  </span>
+                  <span className="text-4xl font-bold tracking-tight">${price.monthly}</span>
+                  <span className="mb-1 text-sm text-muted-foreground">/month</span>
                 </div>
 
                 <Button
@@ -1625,17 +1525,13 @@ export default function OnboardingPage() {
                 <div className="flex-1 space-y-2.5 text-sm">
                   <PlanFeatureItem>
                     <strong>
-                      {plan.limits.maxBrands === -1
-                        ? 'Unlimited'
-                        : plan.limits.maxBrands}
+                      {plan.limits.maxBrands === -1 ? 'Unlimited' : plan.limits.maxBrands}
                     </strong>{' '}
                     {plan.limits.maxBrands === 1 ? 'brand' : 'brands'}
                   </PlanFeatureItem>
                   <PlanFeatureItem>
                     <strong>
-                      {plan.limits.maxPrompts === -1
-                        ? 'Unlimited'
-                        : plan.limits.maxPrompts}
+                      {plan.limits.maxPrompts === -1 ? 'Unlimited' : plan.limits.maxPrompts}
                     </strong>{' '}
                     prompts tracked
                   </PlanFeatureItem>
@@ -1643,10 +1539,15 @@ export default function OnboardingPage() {
                     <strong>{plan.limits.maxPlatforms}</strong> answer engines
                     {plan.limits.allowedScrapers && plan.limits.allowedScrapers.length > 0 && (
                       <span className="text-muted-foreground font-normal">
-                        {' '}({plan.limits.allowedScrapers.map((id) => {
-                          const s = ALL_SCRAPERS.find((s) => s.id === id);
-                          return s ? s.label.replace(/\s*\(Web\)/i, '') : id;
-                        }).join(' & ')})
+                        {' '}
+                        (
+                        {plan.limits.allowedScrapers
+                          .map((id) => {
+                            const s = ALL_SCRAPERS.find((s) => s.id === id);
+                            return s ? s.label.replace(/\s*\(Web\)/i, '') : id;
+                          })
+                          .join(' & ')}
+                        )
                       </span>
                     )}
                   </PlanFeatureItem>
@@ -1678,10 +1579,7 @@ export default function OnboardingPage() {
 
         <p className="mt-6 text-center text-xs text-muted-foreground">
           Need more?{' '}
-          <a
-            href="mailto:sales@ansvisor.com"
-            className="underline hover:text-foreground"
-          >
+          <a href="mailto:sales@ansvisor.com" className="underline hover:text-foreground">
             Contact sales
           </a>{' '}
           for Enterprise pricing.

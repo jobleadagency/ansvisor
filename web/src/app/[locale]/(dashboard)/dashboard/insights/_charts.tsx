@@ -143,9 +143,7 @@ function AreaTooltip({
             className="inline-block h-2 w-2 rounded-full shrink-0"
             style={{ backgroundColor: entry.color }}
           />
-          <span className="text-muted-foreground capitalize">
-            {entry.name}:
-          </span>
+          <span className="text-muted-foreground capitalize">{entry.name}:</span>
           <span className="font-medium text-foreground">{entry.value}</span>
         </div>
       ))}
@@ -183,19 +181,13 @@ function PieTooltip({
 
 // ─── Bar List ─────────────────────────────────────────────────────────────────
 
-function BarList({
-  data,
-}: {
-  data: { name: string; value: number; color: string }[];
-}) {
+function BarList({ data }: { data: { name: string; value: number; color: string }[] }) {
   const max = 100;
   return (
     <div className="w-full space-y-2">
       {data.map((item) => (
         <div key={item.name} className="flex items-center gap-2 text-xs">
-          <span className="w-20 shrink-0 text-muted-foreground truncate">
-            {item.name}
-          </span>
+          <span className="w-20 shrink-0 text-muted-foreground truncate">{item.name}</span>
           <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
             <div
               className="h-full rounded-full transition-all"
@@ -246,11 +238,7 @@ export function TrendChart({ data }: { data: VisibilityTrendPoint[] }) {
               <stop offset="95%" stopColor="#94a3b8" stopOpacity={0} />
             </linearGradient>
           </defs>
-          <CartesianGrid
-            strokeDasharray="3 3"
-            className="stroke-border"
-            vertical={false}
-          />
+          <CartesianGrid strokeDasharray="3 3" className="stroke-border" vertical={false} />
           <XAxis
             dataKey="date"
             tick={{ fontSize: 11 }}
@@ -266,11 +254,7 @@ export function TrendChart({ data }: { data: VisibilityTrendPoint[] }) {
             domain={[0, 100]}
           />
           <Tooltip content={<AreaTooltip />} />
-          <Legend
-            iconType="circle"
-            iconSize={8}
-            wrapperStyle={{ fontSize: 11, paddingTop: 8 }}
-          />
+          <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 11, paddingTop: 8 }} />
           <Area
             type="monotone"
             dataKey="score"
@@ -345,8 +329,7 @@ export function PlatformChart({
                 paddingAngle={2}
                 dataKey="value"
                 onMouseEnter={(_, index) => {
-                  if (!chartData[index].isRemainder)
-                    setHovered(chartData[index].name);
+                  if (!chartData[index].isRemainder) setHovered(chartData[index].name);
                 }}
                 onMouseLeave={() => setHovered(null)}
               >
@@ -355,11 +338,7 @@ export function PlatformChart({
                     key={entry.name}
                     fill={entry.isRemainder ? 'hsl(var(--muted))' : entry.color}
                     opacity={
-                      entry.isRemainder
-                        ? 0.4
-                        : hovered === null || hovered === entry.name
-                          ? 1
-                          : 0.4
+                      entry.isRemainder ? 0.4 : hovered === null || hovered === entry.name ? 1 : 0.4
                     }
                     stroke="none"
                   />
@@ -432,9 +411,7 @@ export function CompetitorChart({
   // pick a sensible upper bound. See niceVisibilityYMax for the rules.
   const yMax = niceVisibilityYMax(
     providerRows.flatMap((row) =>
-      brandNames
-        .map((name) => row[name])
-        .filter((v): v is number => typeof v === 'number'),
+      brandNames.map((name) => row[name]).filter((v): v is number => typeof v === 'number'),
     ),
   );
 
@@ -449,11 +426,7 @@ export function CompetitorChart({
           barGap={2}
           barCategoryGap="20%"
         >
-          <CartesianGrid
-            strokeDasharray="3 3"
-            className="stroke-border"
-            vertical={false}
-          />
+          <CartesianGrid strokeDasharray="3 3" className="stroke-border" vertical={false} />
           <XAxis
             dataKey="provider"
             tick={{ fontSize: 11 }}
@@ -469,15 +442,8 @@ export function CompetitorChart({
             domain={[0, yMax]}
             tickFormatter={(v: number) => `${v}%`}
           />
-          <Tooltip
-            content={<CompetitorTooltip />}
-            cursor={{ fill: 'hsl(var(--muted) / 0.3)' }}
-          />
-          <Legend
-            iconType="circle"
-            iconSize={8}
-            wrapperStyle={{ fontSize: 11, paddingTop: 8 }}
-          />
+          <Tooltip content={<CompetitorTooltip />} cursor={{ fill: 'hsl(var(--muted) / 0.3)' }} />
+          <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 11, paddingTop: 8 }} />
           {brandNames.map((name, i) => (
             <Bar
               key={`${name}-${i}`}
@@ -494,13 +460,7 @@ export function CompetitorChart({
 
 const MAX_VISIBLE = 5;
 
-function LeaderboardEntry({
-  entry,
-  rank,
-}: {
-  entry: CompetitorComparisonEntry;
-  rank: number;
-}) {
+function LeaderboardEntry({ entry, rank }: { entry: CompetitorComparisonEntry; rank: number }) {
   return (
     <div
       className={`flex items-center gap-3 rounded-lg border px-3 py-2.5 ${
@@ -513,9 +473,7 @@ function LeaderboardEntry({
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
           <span className="text-sm font-medium truncate">{entry.name}</span>
-          {entry.isOwnBrand && (
-            <span className="text-[10px] font-medium text-primary">YOU</span>
-          )}
+          {entry.isOwnBrand && <span className="text-[10px] font-medium text-primary">YOU</span>}
         </div>
         <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
           <span>{entry.totalMentions} mentions</span>
@@ -523,9 +481,7 @@ function LeaderboardEntry({
         </div>
       </div>
       <div className="flex flex-col items-end gap-0.5 shrink-0">
-        <span className="text-sm font-semibold tabular-nums">
-          {entry.avgVisibilityScore}%
-        </span>
+        <span className="text-sm font-semibold tabular-nums">{entry.avgVisibilityScore}%</span>
         {entry.change !== null && entry.change !== 0 && (
           <span
             className={`text-[10px] font-medium tabular-nums ${
@@ -536,46 +492,35 @@ function LeaderboardEntry({
           </span>
         )}
         {entry.change === 0 && (
-          <span className="text-[10px] font-medium tabular-nums text-muted-foreground">
-            — 0%
-          </span>
+          <span className="text-[10px] font-medium tabular-nums text-muted-foreground">— 0%</span>
         )}
       </div>
     </div>
   );
 }
 
-export function CompetitorLeaderboard({
-  data,
-}: {
-  data: CompetitorComparisonEntry[];
-}) {
+export function CompetitorLeaderboard({ data }: { data: CompetitorComparisonEntry[] }) {
   const [expanded, setExpanded] = useState(false);
 
   const needsTruncation = data.length > MAX_VISIBLE;
 
-  const visibleEntries: { entry: CompetitorComparisonEntry; rank: number }[] =
-    (() => {
-      if (!needsTruncation || expanded) {
-        return data.map((entry, i) => ({ entry, rank: i + 1 }));
-      }
+  const visibleEntries: { entry: CompetitorComparisonEntry; rank: number }[] = (() => {
+    if (!needsTruncation || expanded) {
+      return data.map((entry, i) => ({ entry, rank: i + 1 }));
+    }
 
-      const ownBrandIdx = data.findIndex((e) => e.isOwnBrand);
-      const ownBrandInTop = ownBrandIdx >= 0 && ownBrandIdx < MAX_VISIBLE - 1;
+    const ownBrandIdx = data.findIndex((e) => e.isOwnBrand);
+    const ownBrandInTop = ownBrandIdx >= 0 && ownBrandIdx < MAX_VISIBLE - 1;
 
-      if (ownBrandInTop || ownBrandIdx < 0) {
-        return data
-          .slice(0, MAX_VISIBLE)
-          .map((entry, i) => ({ entry, rank: i + 1 }));
-      }
+    if (ownBrandInTop || ownBrandIdx < 0) {
+      return data.slice(0, MAX_VISIBLE).map((entry, i) => ({ entry, rank: i + 1 }));
+    }
 
-      // Show top 4 + own brand at its actual rank
-      const top = data
-        .slice(0, MAX_VISIBLE - 1)
-        .map((entry, i) => ({ entry, rank: i + 1 }));
-      top.push({ entry: data[ownBrandIdx], rank: ownBrandIdx + 1 });
-      return top;
-    })();
+    // Show top 4 + own brand at its actual rank
+    const top = data.slice(0, MAX_VISIBLE - 1).map((entry, i) => ({ entry, rank: i + 1 }));
+    top.push({ entry: data[ownBrandIdx], rank: ownBrandIdx + 1 });
+    return top;
+  })();
 
   return (
     <div className="space-y-2">
@@ -639,18 +584,13 @@ export function ShareOfVoicePlatformChart({
     fill: palette[index % palette.length],
     voiceMentions: d.brandMentions + d.competitorMentions,
   }));
-  const totalVoiceMentions = chartData.reduce(
-    (sum, d) => sum + d.voiceMentions,
-    0,
-  );
+  const totalVoiceMentions = chartData.reduce((sum, d) => sum + d.voiceMentions, 0);
 
   return (
     <div className="flex flex-col gap-4">
       <div className="text-center">
         <div className="text-4xl font-bold tabular-nums">{overallSov}%</div>
-        <div className="text-xs text-muted-foreground mt-0.5">
-          Overall Share of Voice
-        </div>
+        <div className="text-xs text-muted-foreground mt-0.5">Overall Share of Voice</div>
       </div>
 
       <ChartContainer height={200}>
@@ -681,15 +621,12 @@ export function ShareOfVoicePlatformChart({
                     voiceMentions: number;
                   };
                   const platformShare =
-                    totalVoiceMentions > 0
-                      ? (p.voiceMentions / totalVoiceMentions) * 100
-                      : 0;
+                    totalVoiceMentions > 0 ? (p.voiceMentions / totalVoiceMentions) * 100 : 0;
                   return (
                     <div className="rounded-md border bg-popover px-2.5 py-1.5 text-xs shadow-sm">
                       <div className="font-medium">{p.provider}</div>
                       <div className="text-muted-foreground">
-                        {p.sov.toFixed(1)}% SoV · {platformShare.toFixed(1)}% of
-                        voice
+                        {p.sov.toFixed(1)}% SoV · {platformShare.toFixed(1)}% of voice
                       </div>
                     </div>
                   );
@@ -709,9 +646,7 @@ export function ShareOfVoicePlatformChart({
               aria-hidden
             />
             <span className="truncate text-foreground">{d.provider}</span>
-            <span className="ml-auto tabular-nums text-muted-foreground">
-              {d.sov.toFixed(1)}%
-            </span>
+            <span className="ml-auto tabular-nums text-muted-foreground">{d.sov.toFixed(1)}%</span>
           </li>
         ))}
       </ul>
@@ -776,11 +711,7 @@ export function ShareOfVoiceTrendChart({ data }: { data: SoVTrendPoint[] }) {
               <stop offset="95%" stopColor="#94a3b8" stopOpacity={0} />
             </linearGradient>
           </defs>
-          <CartesianGrid
-            strokeDasharray="3 3"
-            className="stroke-border"
-            vertical={false}
-          />
+          <CartesianGrid strokeDasharray="3 3" className="stroke-border" vertical={false} />
           <XAxis
             dataKey="date"
             tick={{ fontSize: 11 }}
@@ -797,11 +728,7 @@ export function ShareOfVoiceTrendChart({ data }: { data: SoVTrendPoint[] }) {
             tickFormatter={(v: number) => `${v}%`}
           />
           <Tooltip content={<SoVTrendTooltip />} />
-          <Legend
-            iconType="circle"
-            iconSize={8}
-            wrapperStyle={{ fontSize: 11, paddingTop: 8 }}
-          />
+          <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 11, paddingTop: 8 }} />
           <Area
             type="monotone"
             dataKey="brandSov"

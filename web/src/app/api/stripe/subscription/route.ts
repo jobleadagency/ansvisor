@@ -33,11 +33,7 @@ function getCurrentPeriodEndIso(sub: SubscriptionRaw): string | null {
   const itemEnd = sub.items?.data?.[0]?.current_period_end;
   const subEnd = sub.current_period_end;
   const epochSeconds =
-    typeof itemEnd === 'number'
-      ? itemEnd
-      : typeof subEnd === 'number'
-        ? subEnd
-        : null;
+    typeof itemEnd === 'number' ? itemEnd : typeof subEnd === 'number' ? subEnd : null;
   if (epochSeconds == null) return null;
   return new Date(epochSeconds * 1000).toISOString();
 }
@@ -60,7 +56,9 @@ async function getOrgStripeIds() {
 
   const { data: org } = await supabase
     .from('organizations')
-    .select('id, plan, subscription_status, stripe_customer_id, stripe_subscription_id, subscription_ends_at')
+    .select(
+      'id, plan, subscription_status, stripe_customer_id, stripe_subscription_id, subscription_ends_at',
+    )
     .eq('id', profile.organization_id)
     .single();
 
@@ -86,9 +84,9 @@ export async function GET() {
       });
     }
 
-    const sub = await stripe.subscriptions.retrieve(
+    const sub = (await stripe.subscriptions.retrieve(
       org.stripe_subscription_id as string,
-    ) as unknown as SubscriptionRaw;
+    )) as unknown as SubscriptionRaw;
 
     const item = sub.items.data[0];
     const price = item?.price;
@@ -132,9 +130,9 @@ export async function PATCH(req: NextRequest) {
 
     // Reactivate a canceled-at-period-end subscription
     if (reactivate) {
-      const updated = await stripe.subscriptions.update(subscriptionId, {
+      const updated = (await stripe.subscriptions.update(subscriptionId, {
         cancel_at_period_end: false,
-      }) as unknown as SubscriptionRaw;
+      })) as unknown as SubscriptionRaw;
       return NextResponse.json({
         status: updated.status,
         cancelAtPeriodEnd: false,
@@ -156,25 +154,24 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: 'Price not configured' }, { status: 400 });
     }
 
-    const currentSub = await stripe.subscriptions.retrieve(subscriptionId) as unknown as SubscriptionRaw;
+    const currentSub = (await stripe.subscriptions.retrieve(
+      subscriptionId,
+    )) as unknown as SubscriptionRaw;
     const itemId = currentSub.items.data[0]?.id;
 
     if (!itemId) {
       return NextResponse.json({ error: 'Subscription item not found' }, { status: 400 });
     }
 
-    const updated = await stripe.subscriptions.update(subscriptionId, {
+    const updated = (await stripe.subscriptions.update(subscriptionId, {
       items: [{ id: itemId, price: priceId }],
       metadata: { plan_id: newPlanId, organization_id: org.id },
       proration_behavior: 'create_prorations',
-    }) as unknown as SubscriptionRaw;
+    })) as unknown as SubscriptionRaw;
 
     // Optimistic DB update
     const supabase = await createClient();
-    await supabase
-      .from('organizations')
-      .update({ plan: newPlanId })
-      .eq('id', org.id);
+    await supabase.from('organizations').update({ plan: newPlanId }).eq('id', org.id);
 
     const newPrice = updated.items.data[0]?.price;
 
@@ -207,10 +204,9 @@ export async function DELETE() {
       return NextResponse.json({ error: 'No active subscription' }, { status: 400 });
     }
 
-    const updated = await stripe.subscriptions.update(
-      org.stripe_subscription_id as string,
-      { cancel_at_period_end: true },
-    ) as unknown as SubscriptionRaw;
+    const updated = (await stripe.subscriptions.update(org.stripe_subscription_id as string, {
+      cancel_at_period_end: true,
+    })) as unknown as SubscriptionRaw;
 
     return NextResponse.json({
       cancelAtPeriodEnd: true,

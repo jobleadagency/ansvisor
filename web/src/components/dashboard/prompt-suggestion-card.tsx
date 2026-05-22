@@ -23,12 +23,7 @@ import {
 } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import { Check, Pencil, Trash2, X } from 'lucide-react';
-import {
-  MODEL_GROUPS,
-  ALL_MODELS,
-  SCRAPER_GROUPS,
-  ALL_SCRAPERS,
-} from '@/config/prompt-options';
+import { MODEL_GROUPS, ALL_MODELS, SCRAPER_GROUPS, ALL_SCRAPERS } from '@/config/prompt-options';
 
 interface TopicOption {
   id: string;
@@ -128,9 +123,7 @@ export const PromptSuggestionCard = memo(function PromptSuggestionCard({
     <div
       className={cn(
         'group flex items-start gap-3 rounded-lg border p-3 transition-colors',
-        isActive
-          ? 'border-border bg-card'
-          : 'border-border/50 bg-muted/30 opacity-60',
+        isActive ? 'border-border bg-card' : 'border-border/50 bg-muted/30 opacity-60',
       )}
     >
       {/* Toggle checkbox */}
@@ -214,10 +207,7 @@ export const PromptSuggestionCard = memo(function PromptSuggestionCard({
                       value="__placeholder__"
                       onValueChange={(v) => {
                         if (!v || v === '__placeholder__') return;
-                        if (
-                          visibleModels.some((m) => m.id === v) &&
-                          !editModels.includes(v)
-                        ) {
+                        if (visibleModels.some((m) => m.id === v) && !editModels.includes(v)) {
                           setEditModels((prev) => [...prev, v]);
                         } else if (
                           visibleScrapers.some((s) => s.id === v) &&
@@ -296,19 +286,11 @@ export const PromptSuggestionCard = memo(function PromptSuggestionCard({
                         {editPlatforms.map((id) => {
                           const s = ALL_SCRAPERS.find((as_) => as_.id === id);
                           return (
-                            <Badge
-                              key={id}
-                              variant="outline"
-                              className="gap-1 text-xs"
-                            >
+                            <Badge key={id} variant="outline" className="gap-1 text-xs">
                               {s?.label ?? id}
                               <button
                                 type="button"
-                                onClick={() =>
-                                  setEditPlatforms((p) =>
-                                    p.filter((i) => i !== id),
-                                  )
-                                }
+                                onClick={() => setEditPlatforms((p) => p.filter((i) => i !== id))}
                               >
                                 <X className="h-3 w-3" />
                               </button>
@@ -318,19 +300,11 @@ export const PromptSuggestionCard = memo(function PromptSuggestionCard({
                         {editModels.map((id) => {
                           const m = ALL_MODELS.find((am) => am.id === id);
                           return (
-                            <Badge
-                              key={id}
-                              variant="secondary"
-                              className="gap-1 text-xs"
-                            >
+                            <Badge key={id} variant="secondary" className="gap-1 text-xs">
                               {m?.label ?? id}
                               <button
                                 type="button"
-                                onClick={() =>
-                                  setEditModels((p) =>
-                                    p.filter((i) => i !== id),
-                                  )
-                                }
+                                onClick={() => setEditModels((p) => p.filter((i) => i !== id))}
                               >
                                 <X className="h-3 w-3" />
                               </button>
@@ -341,7 +315,6 @@ export const PromptSuggestionCard = memo(function PromptSuggestionCard({
                     )}
                   </div>
                 )}
-
               </div>
             )}
           </div>
@@ -374,22 +347,15 @@ export const PromptSuggestionCard = memo(function PromptSuggestionCard({
                     <DialogHeader>
                       <DialogTitle>Delete Prompt</DialogTitle>
                       <DialogDescription>
-                        Are you sure you want to delete this prompt? This action
-                        cannot be undone.
+                        Are you sure you want to delete this prompt? This action cannot be undone.
                       </DialogDescription>
                     </DialogHeader>
                     <p className="rounded-md bg-muted p-3 text-sm text-muted-foreground line-clamp-2">
                       {text}
                     </p>
                     <DialogFooter>
-                      <DialogClose render={<Button variant="outline" />}>
-                        Cancel
-                      </DialogClose>
-                      <DialogClose
-                        render={
-                          <Button variant="destructive" onClick={onDelete} />
-                        }
-                      >
+                      <DialogClose render={<Button variant="outline" />}>Cancel</DialogClose>
+                      <DialogClose render={<Button variant="destructive" onClick={onDelete} />}>
                         Delete
                       </DialogClose>
                     </DialogFooter>

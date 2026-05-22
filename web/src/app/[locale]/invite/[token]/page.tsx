@@ -1,8 +1,8 @@
-import { redirect } from "@/i18n/navigation";
-import { getInvitationByToken } from "@/lib/actions/team";
-import { createClient } from "@/lib/supabase/server";
-import { AcceptInvitationCard } from "@/components/team/accept-invitation-card";
-import { AlertTriangle } from "lucide-react";
+import { redirect } from '@/i18n/navigation';
+import { getInvitationByToken } from '@/lib/actions/team';
+import { createClient } from '@/lib/supabase/server';
+import { AcceptInvitationCard } from '@/components/team/accept-invitation-card';
+import { AlertTriangle } from 'lucide-react';
 
 export default async function InviteAcceptPage({
   params,
@@ -17,7 +17,7 @@ export default async function InviteAcceptPage({
     return <InvalidInvitation reason="not_found" />;
   }
 
-  if (invitation.status !== "pending") {
+  if (invitation.status !== 'pending') {
     return <InvalidInvitation reason={invitation.status} />;
   }
 
@@ -38,18 +38,17 @@ export default async function InviteAcceptPage({
     });
   }
 
-  const emailMatches =
-    user!.email?.toLowerCase() === invitation.email.toLowerCase();
+  const emailMatches = user!.email?.toLowerCase() === invitation.email.toLowerCase();
 
   return (
     <div className="flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
       <div className="flex w-full max-w-md flex-col gap-6">
         <AcceptInvitationCard
           token={token}
-          organizationName={invitation.organizationName ?? "this team"}
+          organizationName={invitation.organizationName ?? 'this team'}
           email={invitation.email}
           role={invitation.role}
-          currentUserEmail={user!.email ?? ""}
+          currentUserEmail={user!.email ?? ''}
           emailMatches={emailMatches}
         />
       </div>
@@ -60,28 +59,28 @@ export default async function InviteAcceptPage({
 function InvalidInvitation({
   reason,
 }: {
-  reason: "not_found" | "expired" | "accepted" | "revoked" | "pending";
+  reason: 'not_found' | 'expired' | 'accepted' | 'revoked' | 'pending';
 }) {
   const messages: Record<string, { title: string; description: string }> = {
     not_found: {
-      title: "Invitation not found",
-      description: "The link you followed is invalid.",
+      title: 'Invitation not found',
+      description: 'The link you followed is invalid.',
     },
     expired: {
-      title: "Invitation expired",
-      description: "Ask your team admin to send a new invitation.",
+      title: 'Invitation expired',
+      description: 'Ask your team admin to send a new invitation.',
     },
     accepted: {
-      title: "Invitation already used",
-      description: "This invitation has already been accepted.",
+      title: 'Invitation already used',
+      description: 'This invitation has already been accepted.',
     },
     revoked: {
-      title: "Invitation revoked",
-      description: "This invitation was revoked by the team admin.",
+      title: 'Invitation revoked',
+      description: 'This invitation was revoked by the team admin.',
     },
     pending: {
-      title: "Invitation unavailable",
-      description: "Please try again or contact your team admin.",
+      title: 'Invitation unavailable',
+      description: 'Please try again or contact your team admin.',
     },
   };
   const msg = messages[reason] ?? messages.pending;

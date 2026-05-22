@@ -13,10 +13,7 @@ function mapTopicRow(row: Record<string, unknown>): Topic {
   };
 }
 
-export async function createTopics(
-  brandId: string,
-  names: string[],
-): Promise<Topic[]> {
+export async function createTopics(brandId: string, names: string[]): Promise<Topic[]> {
   const supabase = await createClient();
 
   // Remove existing topics for this brand to avoid duplicates
@@ -28,10 +25,7 @@ export async function createTopics(
     name: name.trim(),
   }));
 
-  const { data, error } = await supabase
-    .from('topics')
-    .insert(rows)
-    .select();
+  const { data, error } = await supabase.from('topics').insert(rows).select();
 
   if (error) throw new Error(error.message);
   return (data ?? []).map((r) => mapTopicRow(r as Record<string, unknown>));
@@ -51,10 +45,7 @@ export async function getTopics(brandId: string): Promise<Topic[]> {
   return (data ?? []).map((r) => mapTopicRow(r as Record<string, unknown>));
 }
 
-export async function createTopic(
-  brandId: string,
-  name: string,
-): Promise<Topic> {
+export async function createTopic(brandId: string, name: string): Promise<Topic> {
   const supabase = await createClient();
 
   const { data, error } = await supabase
@@ -67,10 +58,7 @@ export async function createTopic(
   return mapTopicRow(data as Record<string, unknown>);
 }
 
-export async function updateTopic(
-  topicId: string,
-  name: string,
-): Promise<Topic> {
+export async function updateTopic(topicId: string, name: string): Promise<Topic> {
   const supabase = await createClient();
 
   const { data, error } = await supabase
@@ -84,16 +72,10 @@ export async function updateTopic(
   return mapTopicRow(data as Record<string, unknown>);
 }
 
-export async function getPromptCountByTopic(
-  brandId: string,
-  topicName: string,
-): Promise<number> {
+export async function getPromptCountByTopic(brandId: string, topicName: string): Promise<number> {
   const supabase = await createClient();
 
-  const { data: sets } = await supabase
-    .from('prompt_sets')
-    .select('id')
-    .eq('brand_id', brandId);
+  const { data: sets } = await supabase.from('prompt_sets').select('id').eq('brand_id', brandId);
 
   if (!sets || sets.length === 0) return 0;
 
@@ -136,9 +118,7 @@ export interface TopicOverviewSummary {
  * Change is computed as (current 7d avg) - (previous 7d avg) to mirror
  * the logic used by Insights KPI cards.
  */
-export async function getTopicsOverview(
-  brandId: string,
-): Promise<TopicOverviewSummary> {
+export async function getTopicsOverview(brandId: string): Promise<TopicOverviewSummary> {
   const supabase = await createClient();
 
   const now = Date.now();
@@ -153,10 +133,7 @@ export async function getTopicsOverview(
       .eq('brand_id', brandId)
       .eq('is_active', true)
       .order('created_at', { ascending: true }),
-    supabase
-      .from('prompts')
-      .select('id, topic_id, prompt_set_id')
-      .eq('is_active', true),
+    supabase.from('prompts').select('id, topic_id, prompt_set_id').eq('is_active', true),
     supabase
       .from('prompt_results')
       .select(
@@ -187,9 +164,7 @@ export async function getTopicsOverview(
     .from('prompt_sets')
     .select('id')
     .eq('brand_id', brandId);
-  const brandSetIds = new Set(
-    ((brandSets ?? []) as { id: string }[]).map((s) => s.id),
-  );
+  const brandSetIds = new Set(((brandSets ?? []) as { id: string }[]).map((s) => s.id));
   const prompts = allPrompts.filter((p) => brandSetIds.has(p.prompt_set_id));
 
   const promptTopicMap = new Map<string, string | null>();
@@ -239,10 +214,7 @@ export async function getTopicsOverview(
   const promptCountByTopic = new Map<string, number>();
   for (const p of prompts) {
     if (!p.topic_id) continue;
-    promptCountByTopic.set(
-      p.topic_id,
-      (promptCountByTopic.get(p.topic_id) ?? 0) + 1,
-    );
+    promptCountByTopic.set(p.topic_id, (promptCountByTopic.get(p.topic_id) ?? 0) + 1);
   }
 
   for (const row of results) {
@@ -305,18 +277,12 @@ export async function getTopicsOverview(
     const avg = agg.allCount > 0 ? Math.round(agg.allScoreSum / agg.allCount) : 0;
     const change =
       agg.curCount > 0 && agg.prevCount > 0
-        ? Math.round(
-            (agg.curScoreSum / agg.curCount -
-              agg.prevScoreSum / agg.prevCount) *
-              10,
-          ) / 10
+        ? Math.round((agg.curScoreSum / agg.curCount - agg.prevScoreSum / agg.prevCount) * 10) / 10
         : null;
 
     const totalForSov = agg.brandMentions + agg.compMentions;
     const shareOfVoice =
-      totalForSov > 0
-        ? Math.round((agg.brandMentions / totalForSov) * 1000) / 10
-        : 0;
+      totalForSov > 0 ? Math.round((agg.brandMentions / totalForSov) * 1000) / 10 : 0;
 
     let topCompetitor: TopicOverviewRow['topCompetitor'] = null;
     if (totalForSov > 0 && agg.competitors.size > 0) {
@@ -334,9 +300,7 @@ export async function getTopicsOverview(
       const d = new Date(todayMs - i * 24 * 60 * 60 * 1000);
       const key = d.toISOString().slice(0, 10);
       const bucket = agg.daily.get(key);
-      sparklineDays.push(
-        bucket && bucket.count > 0 ? Math.round(bucket.sum / bucket.count) : 0,
-      );
+      sparklineDays.push(bucket && bucket.count > 0 ? Math.round(bucket.sum / bucket.count) : 0);
     }
 
     return {

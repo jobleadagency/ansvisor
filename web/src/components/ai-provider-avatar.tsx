@@ -74,12 +74,7 @@ const AI_PROVIDER_META: Record<
 export function resolveAIProvider(model: string, platform?: string): AIProviderKey {
   const key = platform || model;
 
-  if (
-    key === 'ChatGPT' ||
-    key === 'chatgpt' ||
-    key === 'chatgpt-web' ||
-    key.startsWith('gpt-')
-  ) {
+  if (key === 'ChatGPT' || key === 'chatgpt' || key === 'chatgpt-web' || key.startsWith('gpt-')) {
     return 'openai';
   }
   if (key === 'Claude' || key === 'claude' || key.startsWith('claude-')) {
@@ -104,11 +99,7 @@ export function resolveAIProvider(model: string, platform?: string): AIProviderK
   if (key === 'Grok' || key === 'grok' || key === 'grok-web' || key.startsWith('grok-')) {
     return 'xai';
   }
-  if (
-    key === 'Google AI Overview' ||
-    key === 'google-aio' ||
-    key === 'google-ai-overviews'
-  ) {
+  if (key === 'Google AI Overview' || key === 'google-aio' || key === 'google-ai-overviews') {
     return 'googleAio';
   }
   if (
@@ -173,12 +164,7 @@ export function AIProviderAvatar({
         className,
       )}
     >
-      <img
-        src={meta.icon}
-        alt=""
-        className="h-full w-full object-cover"
-        aria-hidden="true"
-      />
+      <img src={meta.icon} alt="" className="h-full w-full object-cover" aria-hidden="true" />
     </span>
   );
 }

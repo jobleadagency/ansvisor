@@ -19,9 +19,7 @@ function mapRow(row: Record<string, unknown>): BrandPlatform {
   };
 }
 
-export async function getBrandPlatforms(
-  brandId: string,
-): Promise<BrandPlatform[]> {
+export async function getBrandPlatforms(brandId: string): Promise<BrandPlatform[]> {
   const supabase = await createClient();
 
   const { data, error } = await supabase
@@ -100,10 +98,8 @@ export async function updateBrandPlatform(
 
   const payload: Record<string, unknown> = {};
   if (updates.isEnabled !== undefined) payload.is_enabled = updates.isEnabled;
-  if (updates.checkFrequency !== undefined)
-    payload.check_frequency = updates.checkFrequency;
-  if (updates.apiModel !== undefined)
-    payload.api_model = updates.apiModel || null;
+  if (updates.checkFrequency !== undefined) payload.check_frequency = updates.checkFrequency;
+  if (updates.apiModel !== undefined) payload.api_model = updates.apiModel || null;
 
   const { data, error } = await supabase
     .from('brand_platforms')
@@ -112,8 +108,7 @@ export async function updateBrandPlatform(
     .select()
     .single();
 
-  if (error || !data)
-    throw new Error(error?.message ?? 'Failed to update platform');
+  if (error || !data) throw new Error(error?.message ?? 'Failed to update platform');
 
   revalidatePath('/dashboard/brands');
   return mapRow(data as Record<string, unknown>);

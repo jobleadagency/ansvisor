@@ -77,24 +77,24 @@ export interface Topic {
 }
 
 export type AIPlatform =
-  | "chatgpt"
-  | "gemini"
-  | "claude"
-  | "perplexity"
-  | "grok"
-  | "meta-ai"
-  | "copilot"
-  | "google-ai-overviews"
-  | "google-ai-mode"
-  | "chatgpt-web"
-  | "google-aio"
-  | "google-aimode"
-  | "copilot-web"
-  | "grok-web"
-  | "perplexity-web"
-  | "gemini-web";
+  | 'chatgpt'
+  | 'gemini'
+  | 'claude'
+  | 'perplexity'
+  | 'grok'
+  | 'meta-ai'
+  | 'copilot'
+  | 'google-ai-overviews'
+  | 'google-ai-mode'
+  | 'chatgpt-web'
+  | 'google-aio'
+  | 'google-aimode'
+  | 'copilot-web'
+  | 'grok-web'
+  | 'perplexity-web'
+  | 'gemini-web';
 
-export type CheckFrequency = "daily" | "weekly" | "monthly";
+export type CheckFrequency = 'daily' | 'weekly' | 'monthly';
 
 export interface BrandPlatform {
   id: string;
@@ -108,7 +108,7 @@ export interface BrandPlatform {
   updatedAt: string;
 }
 
-export type Sentiment = "positive" | "neutral" | "negative";
+export type Sentiment = 'positive' | 'neutral' | 'negative';
 
 export interface Citation {
   url: string;
@@ -166,16 +166,11 @@ export interface PromptVolume {
   fetchedAt: string;
 }
 
-export type ContentOpportunityStatus =
-  | "new"
-  | "sent"
-  | "in_progress"
-  | "done"
-  | "dismissed";
+export type ContentOpportunityStatus = 'new' | 'sent' | 'in_progress' | 'done' | 'dismissed';
 
-export type ContentOpportunityImpact = "high" | "medium" | "low";
+export type ContentOpportunityImpact = 'high' | 'medium' | 'low';
 
-export type ContentOpportunityType = "owned" | "earned";
+export type ContentOpportunityType = 'owned' | 'earned';
 
 export interface ContentOpportunitySourceData {
   promptText?: string;
@@ -227,7 +222,7 @@ export interface WebhookConfig {
   updatedAt: string;
 }
 
-export type UserRole = "admin" | "manager" | "analyst" | "agency_partner";
+export type UserRole = 'admin' | 'manager' | 'analyst' | 'agency_partner';
 
 export interface UserProfile {
   id: string;
@@ -239,21 +234,21 @@ export interface UserProfile {
 }
 
 export const INDUSTRIES = [
-  "Technology",
-  "E-commerce & Retail",
-  "Finance & Banking",
-  "Healthcare",
-  "Travel & Hospitality",
-  "Media & Entertainment",
-  "Education",
-  "Food & Beverage",
-  "Automotive",
-  "Fashion & Apparel",
-  "Real Estate",
-  "Consumer Goods",
-  "B2B Software (SaaS)",
-  "Telecommunications",
-  "Other",
+  'Technology',
+  'E-commerce & Retail',
+  'Finance & Banking',
+  'Healthcare',
+  'Travel & Hospitality',
+  'Media & Entertainment',
+  'Education',
+  'Food & Beverage',
+  'Automotive',
+  'Fashion & Apparel',
+  'Real Estate',
+  'Consumer Goods',
+  'B2B Software (SaaS)',
+  'Telecommunications',
+  'Other',
 ] as const;
 
 export type Industry = (typeof INDUSTRIES)[number];

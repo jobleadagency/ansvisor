@@ -17,12 +17,7 @@ import {
 } from '@/lib/actions/tracking';
 import { getTopics } from '@/lib/actions/topic';
 import type { Topic } from '@/types';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -38,14 +33,7 @@ import {
 } from 'lucide-react';
 import { ShareOfVoicePlatformChart } from '../../insights/_charts';
 import { cn } from '@/lib/utils';
-import {
-  AreaChart,
-  Area,
-  CartesianGrid,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
+import { AreaChart, Area, CartesianGrid, Tooltip, XAxis, YAxis } from 'recharts';
 
 function ChartContainer({
   height,
@@ -100,9 +88,7 @@ function KpiCard({
           <div className="text-2xl font-semibold tabular-nums">
             {value}
             {suffix && (
-              <span className="text-sm font-normal text-muted-foreground ml-0.5">
-                {suffix}
-              </span>
+              <span className="text-sm font-normal text-muted-foreground ml-0.5">{suffix}</span>
             )}
           </div>
           {change !== null && change !== undefined && (
@@ -214,11 +200,7 @@ function VisibilityTrendChart({ data }: { data: VisibilityTrendPoint[] }) {
 
 // ─── Page ────────────────────────────────────────────────────────────────
 
-export default function TopicDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default function TopicDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id: topicId } = use(params);
   const router = useRouter();
   const activeBrandId = useBrandStore((s) => s.activeBrandId);
@@ -276,17 +258,13 @@ export default function TopicDetailPage({
   }
 
   // Top/weak prompts — aggregate by prompt_id
-  const promptRollup = new Map<
-    string,
-    { promptText: string; totalScore: number; count: number }
-  >();
+  const promptRollup = new Map<string, { promptText: string; totalScore: number; count: number }>();
   for (const r of results) {
-    const ex =
-      promptRollup.get(r.promptId) ?? {
-        promptText: r.promptText,
-        totalScore: 0,
-        count: 0,
-      };
+    const ex = promptRollup.get(r.promptId) ?? {
+      promptText: r.promptText,
+      totalScore: 0,
+      count: 0,
+    };
     ex.totalScore += r.visibilityScore;
     ex.count += 1;
     promptRollup.set(r.promptId, ex);
@@ -366,38 +344,25 @@ export default function TopicDetailPage({
       <div className="grid gap-4 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">
-              Visibility trend
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Visibility trend</CardTitle>
             <p className="text-xs text-muted-foreground">
               Daily average visibility for this topic vs. competitor average
             </p>
           </CardHeader>
           <CardContent>
-            {loading ? (
-              <Skeleton className="h-[260px]" />
-            ) : (
-              <VisibilityTrendChart data={trend} />
-            )}
+            {loading ? <Skeleton className="h-[260px]" /> : <VisibilityTrendChart data={trend} />}
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">
-              Share of voice by platform
-            </CardTitle>
-            <p className="text-xs text-muted-foreground">
-              Brand vs. competitors on answer engines
-            </p>
+            <CardTitle className="text-sm font-medium">Share of voice by platform</CardTitle>
+            <p className="text-xs text-muted-foreground">Brand vs. competitors on answer engines</p>
           </CardHeader>
           <CardContent>
             {loading ? (
               <Skeleton className="h-[260px]" />
             ) : sov && sov.byPlatform.length > 0 ? (
-              <ShareOfVoicePlatformChart
-                data={sov.byPlatform}
-                overallSov={sov.overallSov}
-              />
+              <ShareOfVoicePlatformChart data={sov.byPlatform} overallSov={sov.overallSov} />
             ) : (
               <div className="flex h-[260px] items-center justify-center text-sm text-muted-foreground">
                 No platform data yet.
@@ -439,9 +404,7 @@ export default function TopicDetailPage({
                     <span className="flex-1 text-sm font-medium truncate">
                       {c.name}
                       {c.isOwnBrand && (
-                        <span className="ml-1.5 text-[10px] font-medium text-primary">
-                          YOU
-                        </span>
+                        <span className="ml-1.5 text-[10px] font-medium text-primary">YOU</span>
                       )}
                     </span>
                     <span className="text-sm tabular-nums w-10 text-right">
@@ -476,9 +439,7 @@ export default function TopicDetailPage({
         {/* Top / Weak prompts */}
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">
-              Prompt performance
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Prompt performance</CardTitle>
             <p className="text-xs text-muted-foreground">
               Best & worst performing prompts in this topic (last 50 runs)
             </p>
@@ -502,17 +463,12 @@ export default function TopicDetailPage({
                   </div>
                   <ul className="space-y-1.5">
                     {topPrompts.map((p) => (
-                      <li
-                        key={p.id}
-                        className="flex items-center gap-2 text-sm"
-                      >
+                      <li key={p.id} className="flex items-center gap-2 text-sm">
                         <Badge variant="outline" className="text-[10px] shrink-0">
                           {p.avg}%
                         </Badge>
                         <span className="flex-1 truncate">{p.text}</span>
-                        <span className="text-xs text-muted-foreground">
-                          {p.runs} runs
-                        </span>
+                        <span className="text-xs text-muted-foreground">{p.runs} runs</span>
                       </li>
                     ))}
                   </ul>
@@ -524,17 +480,12 @@ export default function TopicDetailPage({
                   </div>
                   <ul className="space-y-1.5">
                     {weakPrompts.map((p) => (
-                      <li
-                        key={p.id}
-                        className="flex items-center gap-2 text-sm"
-                      >
+                      <li key={p.id} className="flex items-center gap-2 text-sm">
                         <Badge variant="outline" className="text-[10px] shrink-0">
                           {p.avg}%
                         </Badge>
                         <span className="flex-1 truncate">{p.text}</span>
-                        <span className="text-xs text-muted-foreground">
-                          {p.runs} runs
-                        </span>
+                        <span className="text-xs text-muted-foreground">{p.runs} runs</span>
                       </li>
                     ))}
                   </ul>

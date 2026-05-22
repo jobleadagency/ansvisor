@@ -10,11 +10,7 @@ import { BrandGuard } from '@/components/providers/brand-guard';
 import { getBrands } from '@/lib/actions/brand';
 import { isCloud, type PlanId } from '@/config/plans';
 
-export default async function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
   const {
     data: { user },

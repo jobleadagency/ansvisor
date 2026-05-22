@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
-import type { User } from "@supabase/supabase-js";
-import { useAuthStore } from "@/stores/use-auth-store";
-import { createClient } from "@/lib/supabase/client";
-import { identify, reset as resetAnalytics } from "@/lib/analytics";
+import { useEffect } from 'react';
+import type { User } from '@supabase/supabase-js';
+import { useAuthStore } from '@/stores/use-auth-store';
+import { createClient } from '@/lib/supabase/client';
+import { identify, reset as resetAnalytics } from '@/lib/analytics';
 
 interface AuthProviderProps {
   user: User | null;
@@ -29,14 +29,11 @@ export function AuthProvider({ user }: AuthProviderProps) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
-      if (
-        (event === "INITIAL_SESSION" || event === "SIGNED_IN") &&
-        session?.user
-      ) {
+      if ((event === 'INITIAL_SESSION' || event === 'SIGNED_IN') && session?.user) {
         identify(session.user.id, {
           email: session.user.email,
         });
-      } else if (event === "SIGNED_OUT") {
+      } else if (event === 'SIGNED_OUT') {
         resetAnalytics();
       }
     });

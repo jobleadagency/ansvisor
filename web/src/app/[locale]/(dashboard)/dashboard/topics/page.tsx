@@ -3,16 +3,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from '@/i18n/navigation';
 import { useBrandStore } from '@/stores/use-brand-store';
-import {
-  getTopicsOverview,
-  type TopicOverviewRow,
-} from '@/lib/actions/topic';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { getTopicsOverview, type TopicOverviewRow } from '@/lib/actions/topic';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Table,
   TableBody,
@@ -112,11 +104,7 @@ function Sparkline({ points }: { points: number[] }) {
         d={path}
         fill="none"
         strokeWidth={1.5}
-        className={
-          trendUp
-            ? 'stroke-emerald-500'
-            : 'stroke-rose-500'
-        }
+        className={trendUp ? 'stroke-emerald-500' : 'stroke-rose-500'}
       />
     </svg>
   );
@@ -150,12 +138,8 @@ function KpiCard({
           <Icon className="h-3.5 w-3.5" />
           {label}
         </div>
-        <div className={cn('text-2xl font-semibold tabular-nums', toneClasses[tone])}>
-          {value}
-        </div>
-        {sub && (
-          <p className="text-xs text-muted-foreground mt-1 truncate">{sub}</p>
-        )}
+        <div className={cn('text-2xl font-semibold tabular-nums', toneClasses[tone])}>{value}</div>
+        {sub && <p className="text-xs text-muted-foreground mt-1 truncate">{sub}</p>}
       </CardContent>
     </Card>
   );
@@ -195,8 +179,7 @@ export default function TopicsPage() {
   }, [loadData]);
 
   const sortedByVisibility = useMemo(
-    () =>
-      [...topics].sort((a, b) => b.avgVisibilityScore - a.avgVisibilityScore),
+    () => [...topics].sort((a, b) => b.avgVisibilityScore - a.avgVisibilityScore),
     [topics],
   );
 
@@ -211,17 +194,11 @@ export default function TopicsPage() {
         gainer: null as TopicOverviewRow | null,
       };
     }
-    const best = [...withData].sort(
-      (a, b) => b.avgVisibilityScore - a.avgVisibilityScore,
-    )[0];
-    const weakest = [...withData].sort(
-      (a, b) => a.avgVisibilityScore - b.avgVisibilityScore,
-    )[0];
+    const best = [...withData].sort((a, b) => b.avgVisibilityScore - a.avgVisibilityScore)[0];
+    const weakest = [...withData].sort((a, b) => a.avgVisibilityScore - b.avgVisibilityScore)[0];
     const withChange = topics.filter((t) => t.visibilityChange !== null);
     const gainer = withChange.length
-      ? [...withChange].sort(
-          (a, b) => (b.visibilityChange ?? 0) - (a.visibilityChange ?? 0),
-        )[0]
+      ? [...withChange].sort((a, b) => (b.visibilityChange ?? 0) - (a.visibilityChange ?? 0))[0]
       : null;
 
     return {
@@ -368,9 +345,7 @@ export default function TopicsPage() {
       {/* Leaderboard */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-medium">
-            Topic leaderboard
-          </CardTitle>
+          <CardTitle className="text-sm font-medium">Topic leaderboard</CardTitle>
           <p className="text-xs text-muted-foreground">
             Click a topic to drill into detailed analytics
           </p>
@@ -410,10 +385,7 @@ export default function TopicsPage() {
                 {sortedByVisibility.map((t) => (
                   <TableRow key={t.id} className="group hover:bg-muted/50">
                     <TableCell className="pl-6 font-medium text-sm">
-                      <Link
-                        href={`/dashboard/topics/${t.id}`}
-                        className="hover:underline"
-                      >
+                      <Link href={`/dashboard/topics/${t.id}`} className="hover:underline">
                         {t.name}
                       </Link>
                     </TableCell>
@@ -457,28 +429,26 @@ export default function TopicsPage() {
                       {t.totalCitations.toLocaleString()}
                     </TableCell>
                     <TableCell>
-                      {t.trendSparkline.length > 0 &&
-                      t.trendSparkline.some((v) => v > 0) ? (
+                      {t.trendSparkline.length > 0 && t.trendSparkline.some((v) => v > 0) ? (
                         <div className="flex items-center gap-2">
                           <Sparkline points={t.trendSparkline} />
-                          {t.visibilityChange !== null &&
-                            t.visibilityChange !== 0 && (
-                              <span
-                                className={cn(
-                                  'text-xs font-medium tabular-nums',
-                                  t.visibilityChange > 0
-                                    ? 'text-emerald-600 dark:text-emerald-400'
-                                    : 'text-rose-600 dark:text-rose-400',
-                                )}
-                              >
-                                {t.visibilityChange > 0 ? (
-                                  <TrendingUp className="h-3 w-3 inline mr-0.5" />
-                                ) : (
-                                  <TrendingDown className="h-3 w-3 inline mr-0.5" />
-                                )}
-                                {Math.abs(t.visibilityChange).toFixed(1)}%
-                              </span>
-                            )}
+                          {t.visibilityChange !== null && t.visibilityChange !== 0 && (
+                            <span
+                              className={cn(
+                                'text-xs font-medium tabular-nums',
+                                t.visibilityChange > 0
+                                  ? 'text-emerald-600 dark:text-emerald-400'
+                                  : 'text-rose-600 dark:text-rose-400',
+                              )}
+                            >
+                              {t.visibilityChange > 0 ? (
+                                <TrendingUp className="h-3 w-3 inline mr-0.5" />
+                              ) : (
+                                <TrendingDown className="h-3 w-3 inline mr-0.5" />
+                              )}
+                              {Math.abs(t.visibilityChange).toFixed(1)}%
+                            </span>
+                          )}
                           {t.visibilityChange === 0 && (
                             <Minus className="h-3 w-3 text-muted-foreground" />
                           )}

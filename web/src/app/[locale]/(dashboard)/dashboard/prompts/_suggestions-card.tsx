@@ -1,24 +1,10 @@
 'use client';
 
 import { useEffect, useState, useCallback, useTransition } from 'react';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  Sparkles,
-  Plus,
-  X,
-  RefreshCw,
-  Loader2,
-  TrendingUp,
-  Tag,
-  Info,
-} from 'lucide-react';
+import { Sparkles, Plus, X, RefreshCw, Loader2, TrendingUp, Tag, Info } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   getPromptSuggestions,
@@ -111,16 +97,14 @@ export function SuggestionsCard({ brandId }: Props) {
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <div className="flex items-center gap-2">
             <Sparkles className="h-4 w-4 text-primary" />
-            <CardTitle className="text-sm font-medium">
-              Prompt Suggestions
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">Prompt Suggestions</CardTitle>
             <Info
               className="h-3.5 w-3.5 text-muted-foreground cursor-help"
               aria-label="AI-generated prompt ideas based on your brand, existing tracked prompts, and competitors cited in AI answers."
             >
               <title>
-                AI-generated prompt ideas based on your brand, existing tracked
-                prompts, and competitors cited in AI answers.
+                AI-generated prompt ideas based on your brand, existing tracked prompts, and
+                competitors cited in AI answers.
               </title>
             </Info>
           </div>
@@ -150,15 +134,10 @@ export function SuggestionsCard({ brandId }: Props) {
             <Sparkles className="h-8 w-8 text-muted-foreground/40 mb-2" />
             <p className="text-sm font-medium mb-1">No suggestions right now</p>
             <p className="text-xs text-muted-foreground mb-3 max-w-sm">
-              Click refresh to generate new prompt ideas tailored to your brand
-              and competitor activity.
+              Click refresh to generate new prompt ideas tailored to your brand and competitor
+              activity.
             </p>
-            <Button
-              onClick={handleRefresh}
-              disabled={refreshing}
-              size="sm"
-              className="gap-2"
-            >
+            <Button onClick={handleRefresh} disabled={refreshing} size="sm" className="gap-2">
               {refreshing ? (
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />
               ) : (
@@ -177,9 +156,7 @@ export function SuggestionsCard({ brandId }: Props) {
                   className="group flex items-start gap-3 rounded-lg border bg-muted/20 p-3 transition-colors hover:bg-muted/40"
                 >
                   <div className="flex-1 min-w-0 space-y-1.5">
-                    <p className="text-sm font-medium leading-snug">
-                      {s.suggestedText}
-                    </p>
+                    <p className="text-sm font-medium leading-snug">{s.suggestedText}</p>
                     <div className="flex flex-wrap items-center gap-1.5">
                       {s.topicName && (
                         <Badge variant="outline" className="gap-1 text-xs">
@@ -188,19 +165,13 @@ export function SuggestionsCard({ brandId }: Props) {
                         </Badge>
                       )}
                       {s.estVolume != null && s.estVolume > 0 && (
-                        <Badge
-                          variant="outline"
-                          className="gap-1 text-xs tabular-nums"
-                        >
-                          <TrendingUp className="h-3 w-3" />
-                          ~{s.estVolume.toLocaleString()}/mo
+                        <Badge variant="outline" className="gap-1 text-xs tabular-nums">
+                          <TrendingUp className="h-3 w-3" />~{s.estVolume.toLocaleString()}/mo
                         </Badge>
                       )}
                     </div>
                     {s.reason && (
-                      <p className="text-xs text-muted-foreground leading-relaxed">
-                        {s.reason}
-                      </p>
+                      <p className="text-xs text-muted-foreground leading-relaxed">{s.reason}</p>
                     )}
                   </div>
                   <div className="flex items-center gap-1 shrink-0">

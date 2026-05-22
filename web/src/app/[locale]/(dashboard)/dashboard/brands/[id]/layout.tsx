@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import { use } from "react";
-import { usePathname, Link } from "@/i18n/navigation";
-import { useBrandStore } from "@/stores/use-brand-store";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { cn } from "@/lib/utils";
-import { ArrowLeft, MessageSquareText, Settings, Tag } from "lucide-react";
+import { use } from 'react';
+import { usePathname, Link } from '@/i18n/navigation';
+import { useBrandStore } from '@/stores/use-brand-store';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { cn } from '@/lib/utils';
+import { ArrowLeft, MessageSquareText, Settings, Tag } from 'lucide-react';
 
 const SUB_NAV = [
-  { href: "topics", label: "Topics", icon: Tag },
-  { href: "prompts", label: "Prompts", icon: MessageSquareText },
-  { href: "settings", label: "Settings", icon: Settings },
+  { href: 'topics', label: 'Topics', icon: Tag },
+  { href: 'prompts', label: 'Prompts', icon: MessageSquareText },
+  { href: 'settings', label: 'Settings', icon: Settings },
 ] as const;
 
 export default function BrandDetailLayout({
@@ -29,12 +29,12 @@ export default function BrandDetailLayout({
 
   const initials = brand
     ? brand.name
-        .split(" ")
+        .split(' ')
         .map((w) => w[0])
-        .join("")
+        .join('')
         .toUpperCase()
         .slice(0, 2)
-    : "?";
+    : '?';
 
   return (
     <div className="space-y-6">
@@ -48,11 +48,7 @@ export default function BrandDetailLayout({
         {brand && (
           <div className="flex items-center gap-3">
             <Avatar className="h-9 w-9 rounded-lg bg-zinc-50 dark:bg-zinc-100">
-              <AvatarImage
-                src={brand.logoUrl}
-                alt={brand.name}
-                className="object-contain p-1"
-              />
+              <AvatarImage src={brand.logoUrl} alt={brand.name} className="object-contain p-1" />
               <AvatarFallback className="rounded-lg bg-primary/10 text-primary text-sm font-semibold">
                 {initials}
               </AvatarFallback>
@@ -60,7 +56,7 @@ export default function BrandDetailLayout({
             <div>
               <h1 className="text-xl font-bold tracking-tight">{brand.name}</h1>
               <p className="text-xs text-muted-foreground">
-                {brand.domains.find((d) => d.isPrimary)?.domain ?? ""}
+                {brand.domains.find((d) => d.isPrimary)?.domain ?? ''}
               </p>
             </div>
           </div>
@@ -77,10 +73,10 @@ export default function BrandDetailLayout({
             <Link key={item.href} href={fullHref}>
               <span
                 className={cn(
-                  "inline-flex items-center gap-2 border-b-2 px-4 py-2 text-sm font-medium transition-colors",
+                  'inline-flex items-center gap-2 border-b-2 px-4 py-2 text-sm font-medium transition-colors',
                   isActive
-                    ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
+                    ? 'border-primary text-primary'
+                    : 'border-transparent text-muted-foreground hover:text-foreground',
                 )}
               >
                 <item.icon className="h-4 w-4" />

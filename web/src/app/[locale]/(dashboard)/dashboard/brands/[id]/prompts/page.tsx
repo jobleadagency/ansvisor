@@ -1,25 +1,37 @@
-"use client";
+'use client';
 
-import { useEffect, useState, useCallback, useMemo } from "react";
-import { useParams } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
-import { getPromptSets, savePromptSet, addPromptToSet, updatePrompt, deletePrompt } from "@/lib/actions/prompt";
-import { getBrandById } from "@/lib/actions/brand";
-import { getTopics } from "@/lib/actions/topic";
-import { PromptSuggestionCard } from "@/components/dashboard/prompt-suggestion-card";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { toast } from "sonner";
-import { Badge } from "@/components/ui/badge";
-import { Loader2, Plus, Sparkles, Save, X, Play, Search } from "lucide-react";
-import { MODEL_GROUPS, ALL_MODELS, SCRAPER_GROUPS, ALL_SCRAPERS } from "@/config/prompt-options";
-import { usePlanContext } from "@/components/providers/plan-provider";
-import { PLANS } from "@/config/plans";
-import { saveTrackingJob } from "@/lib/tracking-job-store";
-import { useRouter } from "@/i18n/navigation";
+import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useParams } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
+import {
+  getPromptSets,
+  savePromptSet,
+  addPromptToSet,
+  updatePrompt,
+  deletePrompt,
+} from '@/lib/actions/prompt';
+import { getBrandById } from '@/lib/actions/brand';
+import { getTopics } from '@/lib/actions/topic';
+import { PromptSuggestionCard } from '@/components/dashboard/prompt-suggestion-card';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { toast } from 'sonner';
+import { Badge } from '@/components/ui/badge';
+import { Loader2, Plus, Sparkles, Save, X, Play, Search } from 'lucide-react';
+import { MODEL_GROUPS, ALL_MODELS, SCRAPER_GROUPS, ALL_SCRAPERS } from '@/config/prompt-options';
+import { usePlanContext } from '@/components/providers/plan-provider';
+import { PLANS } from '@/config/plans';
+import { saveTrackingJob } from '@/lib/tracking-job-store';
+import { useRouter } from '@/i18n/navigation';
 import {
   Dialog,
   DialogContent,
@@ -27,9 +39,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Checkbox } from "@/components/ui/checkbox";
-import type { Brand, Prompt, PromptSet, Topic } from "@/types";
+} from '@/components/ui/dialog';
+import { Checkbox } from '@/components/ui/checkbox';
+import type { Brand, Prompt, PromptSet, Topic } from '@/types';
 
 interface UnanalyzedPrompt {
   id: string;
@@ -37,7 +49,7 @@ interface UnanalyzedPrompt {
   category: string;
 }
 
-const AEO_SERVER_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:80";
+const AEO_SERVER_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:80';
 
 interface SuggestedPrompt {
   text: string;
@@ -57,8 +69,8 @@ export default function PromptsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [manualText, setManualText] = useState("");
-  const [manualCategory, setManualCategory] = useState("");
+  const [manualText, setManualText] = useState('');
+  const [manualCategory, setManualCategory] = useState('');
   const [generateTopics, setGenerateTopics] = useState<string[] | null>(null);
   const { planId } = usePlanContext();
   const allowedScraperIds = useMemo(() => {
@@ -96,12 +108,14 @@ export default function PromptsPage() {
   const fetchUnanalyzed = useCallback(async () => {
     try {
       const supabase = createClient();
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session) return;
       const resp = await fetch(`${AEO_SERVER_URL}/api/tracking/unanalyzed/${brandId}`, {
         headers: {
           Authorization: `Bearer ${session.access_token}`,
-          "ngrok-skip-browser-warning": "1",
+          'ngrok-skip-browser-warning': '1',
         },
       });
       if (resp.ok) {
@@ -123,12 +137,10 @@ export default function PromptsPage() {
       if (topicsData.length > 0 && !manualCategory) {
         setManualCategory(topicsData[0].name);
       }
-      setGenerateTopics((prev) =>
-        prev === null ? topicsData.map((t) => t.name) : prev,
-      );
+      setGenerateTopics((prev) => (prev === null ? topicsData.map((t) => t.name) : prev));
       setPromptSets(sets);
     } catch {
-      toast.error("Failed to load data");
+      toast.error('Failed to load data');
     } finally {
       setIsLoading(false);
     }
@@ -142,7 +154,7 @@ export default function PromptsPage() {
   const handleGenerate = async () => {
     if (!brand) return;
     if (!generateTopics || generateTopics.length === 0) {
-      toast.error("Select at least one topic to generate prompts");
+      toast.error('Select at least one topic to generate prompts');
       return;
     }
 
@@ -151,13 +163,15 @@ export default function PromptsPage() {
 
     try {
       const supabase = createClient();
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error("Not authenticated");
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) throw new Error('Not authenticated');
 
       const response = await fetch(`${AEO_SERVER_URL}/api/prompts/from-topics`, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
           Authorization: `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
@@ -165,7 +179,7 @@ export default function PromptsPage() {
           industry: brand.industry || undefined,
           description: brand.description || undefined,
           topics: generateTopics,
-          language: brand.language || "en",
+          language: brand.language || 'en',
         }),
       });
 
@@ -184,7 +198,7 @@ export default function PromptsPage() {
       setSuggestions(allPrompts);
       toast.success(`${allPrompts.length} prompt suggestions generated!`);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to generate suggestions");
+      toast.error(err instanceof Error ? err.message : 'Failed to generate suggestions');
     } finally {
       setIsGenerating(false);
     }
@@ -193,7 +207,7 @@ export default function PromptsPage() {
   const handleSaveSuggestions = async () => {
     const activePrompts = suggestions.filter((s) => s.isActive);
     if (activePrompts.length === 0) {
-      toast.error("Select at least one prompt to save");
+      toast.error('Select at least one prompt to save');
       return;
     }
 
@@ -207,7 +221,7 @@ export default function PromptsPage() {
       if (!targetSetId) {
         const newSet = await savePromptSet({
           brandId,
-          name: "Prompts",
+          name: 'Prompts',
           prompts: activePrompts.map((p) => ({
             text: p.text,
             category: p.category,
@@ -225,8 +239,8 @@ export default function PromptsPage() {
               category: p.category,
               platforms: defaultPlatforms,
               models: defaultModels,
-            })
-          )
+            }),
+          ),
         );
       }
 
@@ -234,7 +248,7 @@ export default function PromptsPage() {
       toast.success(`Saved ${activePrompts.length} prompts`);
       await loadData();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to save prompts");
+      toast.error(err instanceof Error ? err.message : 'Failed to save prompts');
     } finally {
       setIsSaving(false);
     }
@@ -267,13 +281,13 @@ export default function PromptsPage() {
         });
       }
 
-      setManualText("");
+      setManualText('');
       setManualModels(allowedModelIds);
       setManualScrapers(allowedScraperIds);
-      toast.success("Prompt added");
+      toast.success('Prompt added');
       await loadData();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to add prompt");
+      toast.error(err instanceof Error ? err.message : 'Failed to add prompt');
     } finally {
       setIsAddingManual(false);
     }
@@ -283,9 +297,7 @@ export default function PromptsPage() {
     setPromptSets((prev) =>
       prev.map((set) => ({
         ...set,
-        prompts: set.prompts.map((p) =>
-          p.id === promptId ? { ...p, ...patch } : p,
-        ),
+        prompts: set.prompts.map((p) => (p.id === promptId ? { ...p, ...patch } : p)),
       })),
     );
   }, []);
@@ -299,77 +311,97 @@ export default function PromptsPage() {
     );
   }, []);
 
-  const handleTogglePrompt = useCallback(async (prompt: Prompt) => {
-    updatePromptLocal(prompt.id, { isActive: !prompt.isActive });
-    try {
-      await updatePrompt(prompt.id, { isActive: !prompt.isActive });
-    } catch {
-      updatePromptLocal(prompt.id, { isActive: prompt.isActive });
-      toast.error("Failed to update prompt");
-    }
-  }, [updatePromptLocal]);
+  const handleTogglePrompt = useCallback(
+    async (prompt: Prompt) => {
+      updatePromptLocal(prompt.id, { isActive: !prompt.isActive });
+      try {
+        await updatePrompt(prompt.id, { isActive: !prompt.isActive });
+      } catch {
+        updatePromptLocal(prompt.id, { isActive: prompt.isActive });
+        toast.error('Failed to update prompt');
+      }
+    },
+    [updatePromptLocal],
+  );
 
-  const handleEditPrompt = useCallback(async (promptId: string, text: string) => {
-    updatePromptLocal(promptId, { text });
-    try {
-      await updatePrompt(promptId, { text });
-    } catch {
-      toast.error("Failed to update prompt");
-      await loadData();
-    }
-  }, [updatePromptLocal, loadData]);
+  const handleEditPrompt = useCallback(
+    async (promptId: string, text: string) => {
+      updatePromptLocal(promptId, { text });
+      try {
+        await updatePrompt(promptId, { text });
+      } catch {
+        toast.error('Failed to update prompt');
+        await loadData();
+      }
+    },
+    [updatePromptLocal, loadData],
+  );
 
-  const handleCategoryChange = useCallback(async (promptId: string, category: string) => {
-    updatePromptLocal(promptId, { category });
-    try {
-      await updatePrompt(promptId, { category });
-    } catch {
-      toast.error("Failed to update topic");
-      await loadData();
-    }
-  }, [updatePromptLocal, loadData]);
+  const handleCategoryChange = useCallback(
+    async (promptId: string, category: string) => {
+      updatePromptLocal(promptId, { category });
+      try {
+        await updatePrompt(promptId, { category });
+      } catch {
+        toast.error('Failed to update topic');
+        await loadData();
+      }
+    },
+    [updatePromptLocal, loadData],
+  );
 
-  const handleModelsChange = useCallback(async (promptId: string, models: string[]) => {
-    updatePromptLocal(promptId, { models });
-    try {
-      await updatePrompt(promptId, { models });
-    } catch {
-      toast.error("Failed to update models");
-      await loadData();
-    }
-  }, [updatePromptLocal, loadData]);
+  const handleModelsChange = useCallback(
+    async (promptId: string, models: string[]) => {
+      updatePromptLocal(promptId, { models });
+      try {
+        await updatePrompt(promptId, { models });
+      } catch {
+        toast.error('Failed to update models');
+        await loadData();
+      }
+    },
+    [updatePromptLocal, loadData],
+  );
 
-  const handlePlatformsChange = useCallback(async (promptId: string, platforms: string[]) => {
-    updatePromptLocal(promptId, { platforms: platforms as Prompt["platforms"] });
-    try {
-      await updatePrompt(promptId, { platforms });
-    } catch {
-      toast.error("Failed to update platforms");
-      await loadData();
-    }
-  }, [updatePromptLocal, loadData]);
+  const handlePlatformsChange = useCallback(
+    async (promptId: string, platforms: string[]) => {
+      updatePromptLocal(promptId, { platforms: platforms as Prompt['platforms'] });
+      try {
+        await updatePrompt(promptId, { platforms });
+      } catch {
+        toast.error('Failed to update platforms');
+        await loadData();
+      }
+    },
+    [updatePromptLocal, loadData],
+  );
 
-  const handleDeletePrompt = useCallback(async (promptId: string) => {
-    removePromptLocal(promptId);
-    try {
-      await deletePrompt(promptId);
-    } catch {
-      toast.error("Failed to delete prompt");
-      await loadData();
-    }
-  }, [removePromptLocal, loadData]);
+  const handleDeletePrompt = useCallback(
+    async (promptId: string) => {
+      removePromptLocal(promptId);
+      try {
+        await deletePrompt(promptId);
+      } catch {
+        toast.error('Failed to delete prompt');
+        await loadData();
+      }
+    },
+    [removePromptLocal, loadData],
+  );
 
   const openAnalyzeDialog = useCallback(async () => {
     setAnalyzeDialogOpen(true);
     setIsLoadingUnanalyzed(true);
     try {
       const supabase = createClient();
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session) return;
       const resp = await fetch(`${AEO_SERVER_URL}/api/tracking/unanalyzed/${brandId}`, {
         headers: {
           Authorization: `Bearer ${session.access_token}`,
-          "ngrok-skip-browser-warning": "1",
+          'ngrok-skip-browser-warning': '1',
         },
       });
       if (resp.ok) {
@@ -379,7 +411,7 @@ export default function PromptsPage() {
         setSelectedAnalyzeIds(new Set(prompts.map((p) => p.id)));
       }
     } catch {
-      toast.error("Failed to load unanalyzed prompts");
+      toast.error('Failed to load unanalyzed prompts');
     } finally {
       setIsLoadingUnanalyzed(false);
     }
@@ -390,15 +422,17 @@ export default function PromptsPage() {
     setIsAnalyzing(true);
     try {
       const supabase = createClient();
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error("Not authenticated");
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) throw new Error('Not authenticated');
 
       const resp = await fetch(`${AEO_SERVER_URL}/api/tracking/analyze-new`, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
           Authorization: `Bearer ${session.access_token}`,
-          "ngrok-skip-browser-warning": "1",
+          'ngrok-skip-browser-warning': '1',
         },
         body: JSON.stringify({ brandId, promptIds: Array.from(selectedAnalyzeIds) }),
       });
@@ -406,21 +440,21 @@ export default function PromptsPage() {
       const data = await resp.json();
 
       if (!resp.ok) {
-        toast.error(data.message || "Failed to start analysis");
+        toast.error(data.message || 'Failed to start analysis');
         return;
       }
 
       if (data.newCount === 0) {
-        toast.info(data.message || "All prompts already analyzed");
+        toast.info(data.message || 'All prompts already analyzed');
       } else {
         toast.success(data.message || `Analyzing ${data.newCount} new prompts`);
         setUnanalyzedPrompts([]);
         setAnalyzeDialogOpen(false);
         saveTrackingJob({ jobId: data.jobId, brandId, startedAt: Date.now() });
-        router.push("/dashboard/insights");
+        router.push('/dashboard/insights');
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to start analysis");
+      toast.error(err instanceof Error ? err.message : 'Failed to start analysis');
     } finally {
       setIsAnalyzing(false);
     }
@@ -462,14 +496,16 @@ export default function PromptsPage() {
                 value={manualText}
                 onChange={(e) => setManualText(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter" && manualText.trim()) handleAddManualPrompt();
+                  if (e.key === 'Enter' && manualText.trim()) handleAddManualPrompt();
                 }}
               />
 
               <div className="space-y-3">
                 {/* Topic */}
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Topic</label>
+                  <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
+                    Topic
+                  </label>
                   {topics.length > 0 ? (
                     <Select value={manualCategory} onValueChange={(v) => v && setManualCategory(v)}>
                       <SelectTrigger className="w-full">
@@ -477,7 +513,9 @@ export default function PromptsPage() {
                       </SelectTrigger>
                       <SelectContent>
                         {topics.map((topic) => (
-                          <SelectItem key={topic.id} value={topic.name}>{topic.name}</SelectItem>
+                          <SelectItem key={topic.id} value={topic.name}>
+                            {topic.name}
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -490,14 +528,19 @@ export default function PromptsPage() {
 
                 {/* Platform & Models — combined select */}
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Platform & Models</label>
+                  <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
+                    Platform & Models
+                  </label>
                   <Select
                     value="__placeholder__"
                     onValueChange={(v) => {
-                      if (!v || v === "__placeholder__") return;
+                      if (!v || v === '__placeholder__') return;
                       if (visibleModels.some((m) => m.id === v) && !manualModels.includes(v)) {
                         setManualModels((prev) => [...prev, v]);
-                      } else if (visibleScrapers.some((s) => s.id === v) && !manualScrapers.includes(v)) {
+                      } else if (
+                        visibleScrapers.some((s) => s.id === v) &&
+                        !manualScrapers.includes(v)
+                      ) {
                         setManualScrapers((prev) => [...prev, v]);
                       }
                     }}
@@ -506,7 +549,7 @@ export default function PromptsPage() {
                       <span className="truncate text-muted-foreground">
                         {manualModels.length + manualScrapers.length > 0
                           ? `${manualModels.length + manualScrapers.length} selected`
-                          : "Select platform & models"}
+                          : 'Select platform & models'}
                       </span>
                     </SelectTrigger>
                     <SelectContent>
@@ -517,12 +560,20 @@ export default function PromptsPage() {
                         if (scrapers.length === 0) return null;
                         return (
                           <div key={group.provider}>
-                            <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">{group.provider} (Scraper)</div>
+                            <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">
+                              {group.provider} (Scraper)
+                            </div>
                             {scrapers.map((s) => (
-                              <SelectItem key={s.id} value={s.id} disabled={manualScrapers.includes(s.id)}>
+                              <SelectItem
+                                key={s.id}
+                                value={s.id}
+                                disabled={manualScrapers.includes(s.id)}
+                              >
                                 <div>
                                   <div>{s.label}</div>
-                                  <div className="text-[10px] text-muted-foreground font-mono">{s.id}</div>
+                                  <div className="text-[10px] text-muted-foreground font-mono">
+                                    {s.id}
+                                  </div>
                                 </div>
                               </SelectItem>
                             ))}
@@ -536,12 +587,20 @@ export default function PromptsPage() {
                         if (groupModels.length === 0) return null;
                         return (
                           <div key={group.provider}>
-                            <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">{group.provider} (API)</div>
+                            <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">
+                              {group.provider} (API)
+                            </div>
                             {groupModels.map((m) => (
-                              <SelectItem key={m.id} value={m.id} disabled={manualModels.includes(m.id)}>
+                              <SelectItem
+                                key={m.id}
+                                value={m.id}
+                                disabled={manualModels.includes(m.id)}
+                              >
                                 <div>
                                   <div>{m.label}</div>
-                                  <div className="text-[10px] text-muted-foreground font-mono">{m.id}</div>
+                                  <div className="text-[10px] text-muted-foreground font-mono">
+                                    {m.id}
+                                  </div>
                                 </div>
                               </SelectItem>
                             ))}
@@ -557,7 +616,10 @@ export default function PromptsPage() {
                         return (
                           <Badge key={id} variant="outline" className="gap-1 text-xs">
                             {s?.label ?? id}
-                            <button type="button" onClick={() => setManualScrapers((p) => p.filter((i) => i !== id))}>
+                            <button
+                              type="button"
+                              onClick={() => setManualScrapers((p) => p.filter((i) => i !== id))}
+                            >
                               <X className="h-3 w-3" />
                             </button>
                           </Badge>
@@ -568,7 +630,10 @@ export default function PromptsPage() {
                         return (
                           <Badge key={id} variant="secondary" className="gap-1 text-xs">
                             {m?.label ?? id}
-                            <button type="button" onClick={() => setManualModels((p) => p.filter((i) => i !== id))}>
+                            <button
+                              type="button"
+                              onClick={() => setManualModels((p) => p.filter((i) => i !== id))}
+                            >
                               <X className="h-3 w-3" />
                             </button>
                           </Badge>
@@ -614,20 +679,22 @@ export default function PromptsPage() {
               </p>
               {topics.length > 0 ? (
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Topics</label>
+                  <label className="mb-1.5 block text-xs font-medium text-muted-foreground">
+                    Topics
+                  </label>
                   <div className="flex flex-wrap gap-1.5">
                     {topics.map((topic) => {
                       const selected = generateTopics?.includes(topic.name) ?? false;
                       return (
                         <Badge
                           key={topic.id}
-                          variant={selected ? "default" : "outline"}
+                          variant={selected ? 'default' : 'outline'}
                           className="cursor-pointer select-none"
                           onClick={() =>
                             setGenerateTopics((prev) =>
                               selected
                                 ? (prev ?? []).filter((t) => t !== topic.name)
-                                : [...(prev ?? []), topic.name]
+                                : [...(prev ?? []), topic.name],
                             )
                           }
                         >
@@ -638,7 +705,8 @@ export default function PromptsPage() {
                   </div>
                   {generateTopics && generateTopics.length > 0 && (
                     <p className="mt-1.5 text-xs text-muted-foreground">
-                      {generateTopics.length} topic{generateTopics.length !== 1 ? "s" : ""} selected — {generateTopics.length * 5} prompts will be generated
+                      {generateTopics.length} topic{generateTopics.length !== 1 ? 's' : ''} selected
+                      — {generateTopics.length * 5} prompts will be generated
                     </p>
                   )}
                 </div>
@@ -688,17 +756,11 @@ export default function PromptsPage() {
                   isActive={s.isActive}
                   onToggle={() =>
                     setSuggestions((prev) =>
-                      prev.map((p, idx) =>
-                        idx === i ? { ...p, isActive: !p.isActive } : p
-                      )
+                      prev.map((p, idx) => (idx === i ? { ...p, isActive: !p.isActive } : p)),
                     )
                   }
                   onTextChange={(text) =>
-                    setSuggestions((prev) =>
-                      prev.map((p, idx) =>
-                        idx === i ? { ...p, text } : p
-                      )
-                    )
+                    setSuggestions((prev) => prev.map((p, idx) => (idx === i ? { ...p, text } : p)))
                   }
                   mode="review"
                 />
@@ -714,11 +776,7 @@ export default function PromptsPage() {
                 )}
                 Save Selected ({suggestions.filter((s) => s.isActive).length})
               </Button>
-              <Button
-                variant="outline"
-                onClick={handleGenerate}
-                disabled={isGenerating}
-              >
+              <Button variant="outline" onClick={handleGenerate} disabled={isGenerating}>
                 {isGenerating ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
@@ -738,12 +796,10 @@ export default function PromptsPage() {
       {allPrompts.length > 0 && (
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold">
-              All Prompts ({allPrompts.length})
-            </h2>
+            <h2 className="text-lg font-semibold">All Prompts ({allPrompts.length})</h2>
             <Button
               size="sm"
-              variant={unanalyzedPrompts.length > 0 ? "default" : "outline"}
+              variant={unanalyzedPrompts.length > 0 ? 'default' : 'outline'}
               onClick={openAnalyzeDialog}
             >
               <Search className="mr-2 h-3.5 w-3.5" />
@@ -760,7 +816,7 @@ export default function PromptsPage() {
               <PromptSuggestionCard
                 key={prompt.id}
                 text={prompt.text}
-                category={prompt.category ?? ""}
+                category={prompt.category ?? ''}
                 isActive={prompt.isActive}
                 regions={prompt.regions}
                 models={prompt.models}
@@ -799,8 +855,8 @@ export default function PromptsPage() {
             <DialogTitle>Analyze Prompts</DialogTitle>
             <DialogDescription>
               {unanalyzedPrompts.length > 0
-                ? "Select which prompts to analyze with AI platforms."
-                : "All prompts have already been analyzed."}
+                ? 'Select which prompts to analyze with AI platforms.'
+                : 'All prompts have already been analyzed.'}
             </DialogDescription>
           </DialogHeader>
 
@@ -825,7 +881,9 @@ export default function PromptsPage() {
                     }
                   }}
                 >
-                  {selectedAnalyzeIds.size === unanalyzedPrompts.length ? "Deselect All" : "Select All"}
+                  {selectedAnalyzeIds.size === unanalyzedPrompts.length
+                    ? 'Deselect All'
+                    : 'Select All'}
                 </Button>
               </div>
               <div className="max-h-64 space-y-1.5 overflow-y-auto rounded-md border p-2">
@@ -869,10 +927,7 @@ export default function PromptsPage() {
           )}
 
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setAnalyzeDialogOpen(false)}
-            >
+            <Button variant="outline" onClick={() => setAnalyzeDialogOpen(false)}>
               Cancel
             </Button>
             {unanalyzedPrompts.length > 0 && (
