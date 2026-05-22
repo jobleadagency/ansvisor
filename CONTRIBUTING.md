@@ -188,6 +188,7 @@ fix(web): correct chart rendering on mobile
 - TypeScript with strict mode enabled
 - ESLint with `eslint-config-next` (core-web-vitals + typescript)
 - Run `yarn lint` before submitting
+- **Prettier owns formatting.** Run `yarn format` before submitting (or enable format-on-save with the repo's Prettier config). CI runs `yarn format:check`, so unformatted code will fail the check — don't hand-format or reformat unrelated lines.
 
 ### Server (`server/`)
 
