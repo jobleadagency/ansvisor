@@ -11,7 +11,7 @@
 
 # Ansvisor
 
-**Open-source Answer Engine Optimization platform**
+**Open-source AI Visibility & AI Search Optimization Platform**
 
 </div>
 
