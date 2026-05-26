@@ -1,6 +1,6 @@
 {
   "name": "@aeohub/ansvisor-server",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Ansvisor - AI Engine Optimization Server",
   "main": "src/server.js",
   "type": "module",
