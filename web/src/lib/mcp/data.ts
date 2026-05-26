@@ -428,6 +428,80 @@ export interface ContentOpportunityDetail {
   updated_at: string;
 }
 
+export interface GeneratedBrief {
+  id: string;
+  brief: Record<string, unknown>;
+  generated_at: string;
+  regenerated: boolean;
+}
+
+/**
+ * Generate (or re-generate) the AI content brief for an opportunity.
+ *
+ * Org-ownership is verified *first* via supabaseAdmin — a wrong-org or
+ * missing id returns `null` (→ 404 upstream) and never reaches the
+ * aeo-server, so the LLM is never invoked for a tenant that doesn't own
+ * the opportunity. Only after ownership passes do we call the internal
+ * brief endpoint at `${NEXT_PUBLIC_API_URL}/api/internal/content/:id/brief`
+ * with `Authorization: Bearer ${CRON_SECRET}` — same pattern as the
+ * `/api/cron/daily-tracking` route. The `ans_` API key never leaves the
+ * web layer.
+ *
+ * Always passes `force: true` because MCP callers explicitly want a fresh
+ * brief; cached reads belong on `getContentOpportunityFor`.
+ */
+export async function generateBriefFor(
+  auth: McpAuthContext,
+  opportunityId: string,
+): Promise<GeneratedBrief | null> {
+  if (!auth.organizationId) return null;
+
+  // Ownership check first — wrong-org or missing id returns null with no
+  // outbound call, so no LLM cost or data leak for an attacker probing ids.
+  const { data: ownership } = await supabaseAdmin
+    .from('content_opportunities')
+    .select('id, brands!inner(organization_id)')
+    .eq('id', opportunityId)
+    .eq('brands.organization_id', auth.organizationId)
+    .maybeSingle();
+  if (!ownership) return null;
+
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:80';
+  const cronSecret = process.env.CRON_SECRET;
+  if (!cronSecret) {
+    throw new Error('CRON_SECRET must be configured for MCP brief generation');
+  }
+
+  const res = await fetch(`${apiUrl}/api/internal/content/${opportunityId}/brief`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${cronSecret}`,
+    },
+    body: JSON.stringify({ force: true }),
+  });
+
+  if (res.status === 404) return null;
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(`Internal brief endpoint returned ${res.status}: ${text.slice(0, 200)}`);
+  }
+
+  const body = (await res.json()) as {
+    brief: Record<string, unknown>;
+    generated_at: string;
+    regenerated?: boolean;
+  };
+
+  return {
+    id: opportunityId,
+    brief: body.brief,
+    generated_at: body.generated_at,
+    regenerated: Boolean(body.regenerated),
+  };
+}
+
 export async function getContentOpportunityFor(
   auth: McpAuthContext,
   opportunityId: string,

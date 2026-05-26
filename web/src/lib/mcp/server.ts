@@ -3,6 +3,7 @@ import { z } from 'zod';
 
 import type { McpAuthContext } from '@/lib/mcp-auth';
 import {
+  generateBriefFor,
   getContentOpportunityFor,
   getVisibilitySummaryFor,
   listBrandsFor,
@@ -219,6 +220,32 @@ export function createMcpServer(auth: McpAuthContext): McpServer {
       }
       return {
         content: [{ type: 'text', text: JSON.stringify(opportunity, null, 2) }],
+      };
+    },
+  );
+
+  server.registerTool(
+    'generate_content_brief',
+    {
+      description:
+        'Generate a fresh AI-powered content brief for a specific content opportunity. WARNING: this triggers an LLM call (cost + latency) and ALWAYS re-generates, overwriting any existing brief on the opportunity. Use only after list_content_opportunities + get_content_opportunity and only when the user has explicitly asked to generate or refresh a brief for a specific opportunity — never as part of exploratory queries. To read an existing brief without an LLM call, use get_content_opportunity instead.',
+      inputSchema: {
+        opportunity_id: z
+          .string()
+          .uuid()
+          .describe('Content opportunity UUID, from list_content_opportunities.'),
+      },
+    },
+    async (args) => {
+      const result = await generateBriefFor(auth, args.opportunity_id);
+      if (!result) {
+        return {
+          content: [{ type: 'text', text: 'Content opportunity not found' }],
+          isError: true,
+        };
+      }
+      return {
+        content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
       };
     },
   );

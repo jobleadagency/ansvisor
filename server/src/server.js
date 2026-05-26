@@ -15,6 +15,7 @@ import { createJob, cleanupStaleJobs, cleanupOldJobs } from './lib/job-manager.j
 import { runTrackingJob } from './lib/job-runner.js';
 import { parseScraperResponse } from './lib/cloro-scraper.js';
 import { handleScraperResult } from './lib/cloro-result-handler.js';
+import { generateBriefForOpportunity } from './routes/content.js';
 import supabaseAdmin from './config/supabase.js';
 import {
   getPlan,
@@ -162,6 +163,41 @@ app.post('/api/internal/daily-tracking', async (req, res) => {
     return res.json({ success: true, ...result });
   } catch (err) {
     console.error('[cron] Daily tracking error:', err.message);
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// --- Internal content-brief endpoint (CRON_SECRET auth, called by web MCP layer) ---
+// The web layer's MCP route does the org-ownership check *before* hitting
+// this endpoint — it can't reach here unless the authenticated `ans_` API
+// key belongs to the same org as the opportunity. So this endpoint just
+// trusts the secret and runs the LLM. Always passes force=true to bypass
+// the cached-brief early-return (MCP callers want a fresh brief; for
+// cached reads they should use get_content_opportunity instead).
+app.post('/api/internal/content/:id/brief', async (req, res) => {
+  const secret = req.headers.authorization?.replace('Bearer ', '');
+  if (!process.env.CRON_SECRET || secret !== process.env.CRON_SECRET) {
+    return res.status(401).json({ success: false, message: 'Unauthorized' });
+  }
+
+  try {
+    const { id } = req.params;
+    const { force, model } = req.body || {};
+    const result = await generateBriefForOpportunity(id, {
+      force: Boolean(force),
+      model,
+    });
+    return res.json({
+      success: true,
+      brief: result.brief,
+      generated_at: result.generated_at,
+      regenerated: result.regenerated,
+    });
+  } catch (err) {
+    if (err.status === 404) {
+      return res.status(404).json({ success: false, message: err.message });
+    }
+    console.error('[internal] content brief error:', err.message);
     return res.status(500).json({ success: false, message: err.message });
   }
 });

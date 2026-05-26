@@ -562,69 +562,82 @@ Rules:
 - Target word count should be appropriate for the content type (e.g. blog post: 1500-3000, guide: 3000-5000).`;
 
 /**
- * POST /api/content/:id/brief
- * Generate an AI-powered content brief for an opportunity.
+ * Generate (or fetch) an AI brief for a content opportunity.
+ *
+ * Shared core for both the user-facing dashboard route below and the
+ * `/api/internal/content/:id/brief` MCP route in server.js. Keeping one
+ * implementation here means MCP and dashboard can't drift in cost or
+ * output shape.
+ *
+ * Behavior:
+ *   - opportunity not found → throws Error with `.status = 404`
+ *   - opportunity has a brief AND `force` is false → returns the cached
+ *     brief with `regenerated: false` (no LLM call)
+ *   - otherwise runs the LLM, writes the result back, returns
+ *     `{ brief, generated_at, regenerated: true }`
  */
-router.post('/:id/brief', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { model } = req.body;
+export async function generateBriefForOpportunity(opportunityId, { force = false, model } = {}) {
+  const { data: opportunity, error: oppErr } = await supabaseAdmin
+    .from('content_opportunities')
+    .select('*')
+    .eq('id', opportunityId)
+    .single();
 
-    const { data: opportunity, error: oppErr } = await supabaseAdmin
-      .from('content_opportunities')
-      .select('*')
-      .eq('id', id)
+  if (oppErr || !opportunity) {
+    const err = new Error('Opportunity not found');
+    err.status = 404;
+    throw err;
+  }
+
+  if (opportunity.brief && !force) {
+    return {
+      brief: opportunity.brief,
+      generated_at: opportunity.updated_at,
+      regenerated: false,
+    };
+  }
+
+  const { data: brand } = await supabaseAdmin
+    .from('brands')
+    .select('name, industry, description')
+    .eq('id', opportunity.brand_id)
+    .single();
+
+  const { data: domains } = await supabaseAdmin
+    .from('brand_domains')
+    .select('domain')
+    .eq('brand_id', opportunity.brand_id);
+
+  let promptText = opportunity.source_data?.promptText || '';
+  let latestResults = [];
+
+  if (opportunity.prompt_id) {
+    const { data: prompt } = await supabaseAdmin
+      .from('prompts')
+      .select('text, category')
+      .eq('id', opportunity.prompt_id)
       .single();
 
-    if (oppErr || !opportunity) {
-      return res.status(404).json({ error: 'Opportunity not found' });
-    }
+    if (prompt) promptText = prompt.text;
 
-    if (opportunity.brief) {
-      return res.json({ brief: opportunity.brief });
-    }
+    const { data: results } = await supabaseAdmin
+      .from('prompt_results')
+      .select('platform, visibility_score, mention_count, citation_count, sentiment, response, competitor_mentions')
+      .eq('prompt_id', opportunity.prompt_id)
+      .order('created_at', { ascending: false })
+      .limit(10);
 
-    const { data: brand } = await supabaseAdmin
-      .from('brands')
-      .select('name, industry, description')
-      .eq('id', opportunity.brand_id)
-      .single();
+    latestResults = results || [];
+  }
 
-    const { data: domains } = await supabaseAdmin
-      .from('brand_domains')
-      .select('domain')
-      .eq('brand_id', opportunity.brand_id);
+  const { data: competitors } = await supabaseAdmin
+    .from('competitors')
+    .select('name, domain')
+    .eq('brand_id', opportunity.brand_id);
 
-    let promptText = opportunity.source_data?.promptText || '';
-    let latestResults = [];
+  const sourceData = opportunity.source_data || {};
 
-    if (opportunity.prompt_id) {
-      const { data: prompt } = await supabaseAdmin
-        .from('prompts')
-        .select('text, category')
-        .eq('id', opportunity.prompt_id)
-        .single();
-
-      if (prompt) promptText = prompt.text;
-
-      const { data: results } = await supabaseAdmin
-        .from('prompt_results')
-        .select('platform, visibility_score, mention_count, citation_count, sentiment, response, competitor_mentions')
-        .eq('prompt_id', opportunity.prompt_id)
-        .order('created_at', { ascending: false })
-        .limit(10);
-
-      latestResults = results || [];
-    }
-
-    const { data: competitors } = await supabaseAdmin
-      .from('competitors')
-      .select('name, domain')
-      .eq('brand_id', opportunity.brand_id);
-
-    const sourceData = opportunity.source_data || {};
-
-    const userPrompt = `Brand: ${brand?.name || 'Unknown'}
+  const userPrompt = `Brand: ${brand?.name || 'Unknown'}
 Industry: ${brand?.industry || 'Not specified'}
 Description: ${brand?.description || 'N/A'}
 Domain: ${(domains || []).map((d) => d.domain).join(', ') || 'N/A'}
@@ -650,22 +663,43 @@ ${latestResults.map((r) => `- ${r.platform}: visibility ${r.visibility_score}%, 
 
 Generate a detailed content brief for this opportunity.`;
 
-    const aiModel = resolveModel(model);
+  const aiModel = resolveModel(model);
 
-    const { object: brief } = await generateObject({
-      model: aiModel,
-      schema: briefSchema,
-      system: BRIEF_SYSTEM_PROMPT,
-      prompt: userPrompt,
-    });
+  const { object: brief } = await generateObject({
+    model: aiModel,
+    schema: briefSchema,
+    system: BRIEF_SYSTEM_PROMPT,
+    prompt: userPrompt,
+  });
 
-    await supabaseAdmin
-      .from('content_opportunities')
-      .update({ brief, updated_at: new Date().toISOString() })
-      .eq('id', id);
+  const generatedAt = new Date().toISOString();
 
-    return res.json({ brief });
+  await supabaseAdmin
+    .from('content_opportunities')
+    .update({ brief, updated_at: generatedAt })
+    .eq('id', opportunityId);
+
+  return { brief, generated_at: generatedAt, regenerated: true };
+}
+
+/**
+ * POST /api/content/:id/brief
+ * Generate an AI-powered content brief for an opportunity.
+ *
+ * Dashboard-facing route. Preserves the existing cache-on-existing-brief
+ * behavior — to force a re-generate, the MCP route in server.js calls
+ * `generateBriefForOpportunity` with `{ force: true }` directly.
+ */
+router.post('/:id/brief', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { model } = req.body;
+    const result = await generateBriefForOpportunity(id, { model });
+    return res.json({ brief: result.brief });
   } catch (error) {
+    if (error.status === 404) {
+      return res.status(404).json({ error: error.message });
+    }
     console.error('[content] Brief generation error:', error);
     return res.status(500).json({
       error: 'Failed to generate brief',
