@@ -202,11 +202,14 @@ export async function inviteMember(email: string, role: TeamRole) {
 
   const token = randomBytes(32).toString('hex');
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-  // Plain destination URL. The actual auth verification happens inside
-  // /auth/confirm (called from the email link by the customized Invite
-  // User template) — once verifyOtp succeeds and the session cookie is
-  // written, the template's `redirect_to` value drops the user here.
-  const inviteLink = `${appUrl}/invite/${token}`;
+  // What we hand to Supabase as `redirectTo`. It becomes `{{ .RedirectTo }}`
+  // in the Invite User template, which we use as the *base* for the
+  // /auth/confirm URL — token_hash + type get appended in the template.
+  // The benefit: the prefix is whatever appUrl is for *this* environment
+  // (localhost when running `pnpm dev`, app.ansvisor.com in production),
+  // independent of Supabase's project-level Site URL. So a single template
+  // works for both dev and prod.
+  const inviteLink = `${appUrl}/auth/confirm?next=${encodeURIComponent(`/invite/${token}`)}`;
 
   const { data: invitation, error: insertError } = await supabaseAdmin
     .from('invitations')
