@@ -13,13 +13,7 @@ const PlanContext = createContext<PlanContextValue>({
   isCloud: false,
 });
 
-export function PlanProvider({
-  planId,
-  children,
-}: {
-  planId: PlanId;
-  children: React.ReactNode;
-}) {
+export function PlanProvider({ planId, children }: { planId: PlanId; children: React.ReactNode }) {
   const isCloud = process.env.NEXT_PUBLIC_IS_CLOUD === 'true';
   const effectivePlan: PlanId = isCloud ? planId : 'self_hosted';
 
