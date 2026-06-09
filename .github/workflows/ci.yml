@@ -26,3 +26,5 @@ jobs:
         run: yarn lint
       - name: TypeScript typecheck
         run: yarn typecheck
+      - name: Vitest tests
+        run: yarn test
