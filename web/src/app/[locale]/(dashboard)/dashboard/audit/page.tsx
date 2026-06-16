@@ -205,7 +205,7 @@ export default function SiteAuditPage() {
                 )}
               </div>
               {chartData.length >= 2 ? (
-                <ScoreTrendChart data={chartData} />
+                <ScoreTrendChart data={chartData} score={latestPoint?.totalScore ?? null} />
               ) : (
                 <div className="flex h-[200px] items-center justify-center text-center text-sm text-muted-foreground">
                   {t('trendNeedsMore')}

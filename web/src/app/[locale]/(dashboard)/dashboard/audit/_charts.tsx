@@ -5,6 +5,15 @@ import { AreaChart, Area, CartesianGrid, XAxis, YAxis, Tooltip } from 'recharts'
 
 export type TrendDatum = { date: string; score: number };
 
+// Chart color follows the same score bands as the rest of Site Audit
+// (green ≥70 / amber 40–69 / red <40). Driven by the overall (latest) score.
+function scoreHex(score: number | null): string {
+  if (score === null) return '#6366f1';
+  if (score >= 0.7) return '#16a34a'; // green-600
+  if (score >= 0.4) return '#f59e0b'; // amber-500
+  return '#dc2626'; // red-600
+}
+
 // Width-tracking wrapper — ResponsiveContainer has React 19 quirks, so we
 // measure with a ResizeObserver (same approach as insights/_charts.tsx).
 function ChartContainer({
@@ -52,7 +61,8 @@ function ScoreTooltip({
   );
 }
 
-export function ScoreTrendChart({ data }: { data: TrendDatum[] }) {
+export function ScoreTrendChart({ data, score }: { data: TrendDatum[]; score: number | null }) {
+  const color = scoreHex(score);
   return (
     <ChartContainer height={200}>
       {(width) => (
@@ -64,8 +74,8 @@ export function ScoreTrendChart({ data }: { data: TrendDatum[] }) {
         >
           <defs>
             <linearGradient id="auditScoreGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#6366f1" stopOpacity={0.25} />
-              <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+              <stop offset="5%" stopColor={color} stopOpacity={0.25} />
+              <stop offset="95%" stopColor={color} stopOpacity={0} />
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" className="stroke-border" vertical={false} />
@@ -75,10 +85,10 @@ export function ScoreTrendChart({ data }: { data: TrendDatum[] }) {
           <Area
             type="monotone"
             dataKey="score"
-            stroke="#6366f1"
+            stroke={color}
             strokeWidth={2}
             fill="url(#auditScoreGrad)"
-            dot={{ r: 3 }}
+            dot={{ r: 3, fill: color }}
             activeDot={{ r: 4 }}
           />
         </AreaChart>
