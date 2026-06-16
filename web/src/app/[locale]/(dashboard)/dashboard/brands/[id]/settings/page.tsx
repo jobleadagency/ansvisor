@@ -468,20 +468,29 @@ function CompetitorsTab({ brandId }: { brandId: string }) {
   const [newName, setNewName] = useState('');
   const [newDomain, setNewDomain] = useState('');
 
-  const load = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const data = await getCompetitors(brandId);
-      setCompetitors(data);
-    } catch {
-      toast.error('Failed to load competitors');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [brandId]);
+  const load = useCallback(
+    async (isCancelled?: () => boolean) => {
+      setIsLoading(true);
+      try {
+        const data = await getCompetitors(brandId);
+        if (isCancelled?.()) return;
+        setCompetitors(data);
+      } catch {
+        if (isCancelled?.()) return;
+        toast.error('Failed to load competitors');
+      } finally {
+        if (!isCancelled?.()) setIsLoading(false);
+      }
+    },
+    [brandId],
+  );
 
   useEffect(() => {
-    load();
+    let cancelled = false;
+    load(() => cancelled);
+    return () => {
+      cancelled = true;
+    };
   }, [load]);
 
   const handleAdd = async () => {
