@@ -1068,7 +1068,10 @@ export default function CitationsPage() {
   const [gaps, setGaps] = useState<CitationGaps | null>(null);
   const [gapsLoading, setGapsLoading] = useState(false);
 
-  const apiFilters = useMemo<CitationsFilters>(() => {
+  // Shared scoping filters (date / platform / region / topic / prompt). The
+  // domain-list flags below don't apply to Competitor Gaps, so keeping them out
+  // of this memo means toggling them doesn't refetch the Gaps tab.
+  const gapFilters = useMemo<CitationsFilters>(() => {
     const { dateFrom, dateTo } = getDateRange(filters.datePreset, {
       from: filters.dateFrom,
       to: filters.dateTo,
@@ -1081,9 +1084,6 @@ export default function CitationsPage() {
       regions: filters.region ? [filters.region] : undefined,
       topicIds: filters.topic ? [filters.topic] : undefined,
       promptIds: filters.prompt ? [filters.prompt] : undefined,
-      excludeOwnDomain: filters.excludeOwnDomain,
-      competitorOnly: filters.competitorOnly,
-      ownOnly: filters.ownOnly,
     };
   }, [
     filters.datePreset,
@@ -1093,10 +1093,17 @@ export default function CitationsPage() {
     filters.region,
     filters.topic,
     filters.prompt,
-    filters.excludeOwnDomain,
-    filters.competitorOnly,
-    filters.ownOnly,
   ]);
+
+  const apiFilters = useMemo<CitationsFilters>(
+    () => ({
+      ...gapFilters,
+      excludeOwnDomain: filters.excludeOwnDomain,
+      competitorOnly: filters.competitorOnly,
+      ownOnly: filters.ownOnly,
+    }),
+    [gapFilters, filters.excludeOwnDomain, filters.competitorOnly, filters.ownOnly],
+  );
 
   useEffect(() => {
     if (!activeBrandId) return;
@@ -1145,12 +1152,13 @@ export default function CitationsPage() {
   }, [loadData]);
 
   // Lazy-load Competitor Gaps only when its tab is active; re-fetch when the
-  // shared filters change while it's open.
+  // shared scoping filters change while it's open. Uses `gapFilters` (not
+  // `apiFilters`) so the domain-list flags don't trigger a no-op refetch.
   useEffect(() => {
     if (sourceTab !== 'gaps' || !activeBrandId) return;
     let cancelled = false;
     setGapsLoading(true);
-    getCitationGaps(activeBrandId, apiFilters)
+    getCitationGaps(activeBrandId, gapFilters)
       .then((res) => {
         if (!cancelled) setGaps(res);
       })
@@ -1163,7 +1171,7 @@ export default function CitationsPage() {
     return () => {
       cancelled = true;
     };
-  }, [sourceTab, activeBrandId, apiFilters]);
+  }, [sourceTab, activeBrandId, gapFilters]);
 
   const totals = data?.totals;
   const kpis = useMemo(

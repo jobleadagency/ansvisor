@@ -458,7 +458,7 @@ export async function getCitationGaps(
 
   let query = supabase
     .from('prompt_results')
-    .select('id, model_used, region, created_at, citations, competitor_mentions, mention_count')
+    .select('id, citations, competitor_mentions, mention_count')
     .eq('brand_id', brandId);
 
   const { from, to } = resolveDateRange(filters);
