@@ -202,14 +202,25 @@ export async function inviteMember(email: string, role: TeamRole) {
 
   const token = randomBytes(32).toString('hex');
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-  // What we hand to Supabase as `redirectTo`. It becomes `{{ .RedirectTo }}`
-  // in the Invite User template, which we use as the *base* for the
-  // /auth/confirm URL — token_hash + type get appended in the template.
-  // The benefit: the prefix is whatever appUrl is for *this* environment
-  // (localhost when running `pnpm dev`, app.ansvisor.com in production),
-  // independent of Supabase's project-level Site URL. So a single template
-  // works for both dev and prod.
-  const inviteLink = `${appUrl}/auth/confirm?next=${encodeURIComponent(`/invite/${token}`)}`;
+
+  // The link we surface to the admin (dashboard "share this link directly" +
+  // clipboard) is the direct, self-contained accept page. It looks the
+  // invitation up by token and routes to sign-up/accept on its own, so it
+  // NEVER depends on Supabase's email OTP params.
+  //
+  // Previously this returned the /auth/confirm base below, which only works
+  // once the invite EMAIL template appends token_hash + type. Opened directly
+  // (which is exactly what the "share this link" affordance does) it has
+  // neither, so /auth/confirm bounced to /sign-in?error=auth_confirm_missing_params.
+  // resendInvitation already returned this direct form; inviteMember now matches.
+  const shareLink = `${appUrl}/invite/${token}`;
+
+  // What we hand to Supabase as `redirectTo` for the invite EMAIL only. It
+  // becomes `{{ .RedirectTo }}` in the Invite User template, which appends
+  // token_hash + type; /auth/confirm then verifies the OTP server-side and
+  // forwards to /invite/{token}. The prefix is this environment's appUrl, so
+  // one template works for both dev and prod.
+  const emailRedirectTo = `${appUrl}/auth/confirm?next=${encodeURIComponent(`/invite/${token}`)}`;
 
   const { data: invitation, error: insertError } = await supabaseAdmin
     .from('invitations')
@@ -230,18 +241,30 @@ export async function inviteMember(email: string, role: TeamRole) {
     throw new Error(insertError.message);
   }
 
+  // inviteUserByEmail only emails BRAND-NEW addresses — it errors for an email
+  // that's already registered (Supabase can't "create" that user), so existing
+  // users never get the Supabase invite mail. Surface whether it actually sent
+  // so the UI can be honest ("share this link" vs. "email sent") instead of
+  // always claiming an email went out.
+  let emailSent = false;
   try {
     await supabaseAdmin.auth.admin.inviteUserByEmail(normalizedEmail, {
-      redirectTo: inviteLink,
+      redirectTo: emailRedirectTo,
       data: { invitation_token: token },
     });
-  } catch {
-    // Supabase may fail if user already has an account; we still keep the
-    // invitation row so that the direct link works.
+    emailSent = true;
+  } catch (err) {
+    // Existing-user or SMTP failure — the invitation row is saved and the admin
+    // shares `shareLink` directly. Log the invitation/org id (not the invitee's
+    // email — that's PII in persistent logs) plus the error for diagnostics.
+    console.warn(
+      `[invite] Supabase invite email not sent (invitation=${invitation.id}, org=${profile.organization_id}) — existing user or SMTP`,
+      err,
+    );
   }
 
   revalidatePath('/dashboard/settings');
-  return { invitation, inviteLink };
+  return { invitation, inviteLink: shareLink, emailSent };
 }
 
 export async function revokeInvitation(invitationId: string) {
