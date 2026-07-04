@@ -1,16 +1,16 @@
 export const siteConfig = {
-  name: 'Ansvisor',
+  name: 'Optumus Analytics',
   description:
-    "Monitor, analyze, and optimize your brand's visibility in AI-powered search engines like ChatGPT, Perplexity, Gemini, and more.",
-  url: 'https://ansvisor.com',
-  ogImage: 'https://app.ansvisor.com/opengraph-image',
+    'Track your visibility across ChatGPT, Claude, Gemini, Google AI Overviews, Google AI Mode, Perplexity, Grok, and Copilot with AI Search & LLM Visibility intelligence.',
+  url: 'https://optumusanalytics.com',
+  ogImage: 'https://optumusanalytics.com/og-image',
   links: {
     github: 'https://github.com/ansvisor/ansvisor',
-    docs: 'https://docs.ansvisor.com',
+    docs: 'https://docs.optumusanalytics.com',
   },
   legal: {
-    privacy: 'https://www.ansvisor.com/privacy-policy',
-    terms: 'https://www.ansvisor.com/terms-of-service',
+    privacy: 'https://optumusanalytics.com/privacy',
+    terms: 'https://optumusanalytics.com/terms',
   },
 } as const;
 

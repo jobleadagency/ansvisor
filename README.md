@@ -1,9 +1,9 @@
 <div align="center">
 
-[![Ansvisor Banner](https://cdn.prod.website-files.com/69e606308fb6f96fb911b251/6a2a92ca0bf3f52b9dbf73d5_811d97a16c5c5f3b7bf3b4875078037e_1.png)](https://www.ansvisor.com)
+[![Optumus Analytics Banner](https://cdn.prod.website-files.com/69e606308fb6f96fb911b251/6a2a92ca0bf3f52b9dbf73d5_811d97a16c5c5f3b7bf3b4875078037e_1.png)](https://www.optumusanalytics.com)
 
-[![🚀 Try the Cloud — ansvisor.com](https://img.shields.io/badge/🚀_Try_the_Cloud-ansvisor.com-6366f1?style=for-the-badge&logoColor=white&logo=vercel)](https://www.ansvisor.com)
-[![📚 Docs](https://img.shields.io/badge/📚_Docs-docs.ansvisor.com-10b981?style=for-the-badge&logoColor=white&logo=readthedocs)](https://docs.ansvisor.com)
+[![🚀 Try the Cloud — optumusanalytics.com](https://img.shields.io/badge/🚀_Try_the_Cloud-optumusanalytics.com-6366f1?style=for-the-badge&logoColor=white&logo=vercel)](https://www.optumusanalytics.com)
+[![📚 Docs](https://img.shields.io/badge/📚_Docs-docs.optumusanalytics.com-10b981?style=for-the-badge&logoColor=white&logo=readthedocs)](https://docs.optumusanalytics.com)
 [![🎬 Product Tour](https://img.shields.io/badge/🎬_Product_Tour-Watch_the_demo-f59e0b?style=for-the-badge&logoColor=white)](https://app.supademo.com/demo/cmq2b1p5k0rk9qm6ugicrn655)
 
 [![Star on GitHub](https://img.shields.io/github/stars/ansvisor/ansvisor?style=for-the-badge&logo=github&color=gold)](https://github.com/ansvisor/ansvisor)
@@ -12,30 +12,30 @@
 
 </div>
 
-# Ansvisor - Open-source AI Visibility Platform for AI Search
+# Optumus Analytics - AI Search & LLM Visibility Platform
 
-The search landscape is transforming fast. Buyers are moving from traditional search engines to AI platforms like ChatGPT, Claude, Gemini, Google AI Mode, etc.
+The search landscape is transforming fast. Buyers are moving from traditional search engines to AI platforms like ChatGPT, Claude, Gemini, Google AI Mode, and other LLM-native experiences.
 
-At Ansvisor, we are building the open future of AI Visibility and AI Search Optimization (AEO/GEO) to help brands claim their spot in AI-generated answers.
+At Optumus Analytics, we are building the commercial platform for AI visibility and AI Search Optimization (AEO/GEO) to help brands earn consistent presence in AI-generated answers and model recommendations.
 
-What excites us most about Ansvisor is our commitment to a build-in-public and transparent approach.
+What excites us most about Optumus Analytics is the combination of deep visibility analytics, executive-ready reporting, and practical optimization workflows.
 
-We believe the future of AI visibility shouldn't be a black box. This field really needs an open platform.
+We believe the future of AI visibility should be measurable, actionable, and accessible to modern marketing and SEO teams.
 
 We're incredibly excited to shape what's next alongside our amazing community.
 
-> ⭐ **If you believe AI Visibility should be open and community-driven, [star the repo](https://github.com/ansvisor/ansvisor/stargazers) — it's how the next team discovers Ansvisor.**
+> ⭐ **If you believe AI visibility should be measurable and community-driven, [star the repo](https://github.com/ansvisor/ansvisor/stargazers) — it's how the next team discovers Optumus Analytics.**
 
-### Why Ansvisor?
+### Why Optumus Analytics?
 
-> AI search is replacing the traditional click. When ChatGPT recommends a product, no Google ranking saves you. Ansvisor measures what classical SEO can't see — how often AI engines name your brand, which competitors get cited instead, and which prompts move the needle. Self-host it for free, or use the managed cloud at [ansvisor.com](https://www.ansvisor.com).
+> AI search is replacing the traditional click. When ChatGPT recommends a product, no Google ranking saves you. Optumus Analytics measures what classical SEO can't see — how often AI engines name your brand, which competitors get cited instead, and which prompts move the needle. Self-host it for free, or use the managed cloud at [optumusanalytics.com](https://www.optumusanalytics.com).
 
 ## Resources
 
-- 📚 [Explore Documentation](https://docs.ansvisor.com/)
+- 📚 [Explore Documentation](https://docs.optumusanalytics.com/)
 - 🎯 [Take an Interactive Product Tour](https://app.supademo.com/demo/cmq2b1p5k0rk9qm6ugicrn655?utm_source=link)
-- 📖 [AI Visibility Glossary](https://www.ansvisor.com/ai-visibility-glossary)
-- 🔍 [Compare Ansvisor vs Alternatives](https://www.ansvisor.com/compare)
+- 📖 [AI Visibility Glossary](https://www.optumusanalytics.com/ai-visibility-glossary)
+- 🔍 [Compare Optumus Analytics vs Alternatives](https://www.optumusanalytics.com/compare)
 
 ## Features
 

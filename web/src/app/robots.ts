@@ -1,11 +1,8 @@
 import type { MetadataRoute } from 'next';
 
 /**
- * Block search engines from indexing the application subdomain.
- *
- * The marketing site at `ansvisor.com` is hosted separately (Webflow) and
- * is the surface that should be indexed. The Next.js app at `app.ansvisor.com`
- * is purely the authenticated product UI and provides no value in search.
+ * The marketing experience and product site are managed under the Optumus Analytics domain.
+ * The application UI remains non-indexed while the public brand site is the surface for search discovery.
  */
 export default function robots(): MetadataRoute.Robots {
   return {

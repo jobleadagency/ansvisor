@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono, Inter, Plus_Jakarta_Sans } from 'next/font/google';
+import { Geist, Geist_Mono, Inter, Inter_Tight } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
 import { PostHogProvider } from '@/components/providers/posthog-provider';
 import './globals.css';
@@ -19,35 +19,33 @@ const inter = Inter({
   subsets: ['latin'],
 });
 
-const jakarta = Plus_Jakarta_Sans({
-  variable: '--font-jakarta',
+const interTight = Inter_Tight({
+  variable: '--font-inter-tight',
   subsets: ['latin'],
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://app.ansvisor.com'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://optumusanalytics.com'),
   title: {
-    default: 'Ansvisor',
-    template: '%s | Ansvisor',
+    default: 'Optumus Analytics',
+    template: '%s | Optumus Analytics',
   },
   description:
-    "Monitor, analyze, and optimize your brand's visibility in AI-powered search engines.",
+    'Track your visibility across ChatGPT, Claude, Gemini, Google AI Overviews, Google AI Mode, Perplexity, Grok, and Copilot with AI Search & LLM Visibility intelligence.',
   openGraph: {
-    title: 'Ansvisor',
+    title: 'Optumus Analytics',
     description:
-      'Track how AI search engines mention your brand — ChatGPT, Gemini, Perplexity, Claude, Copilot.',
+      'Monitor AI Search & LLM Visibility with enterprise-grade visibility scoring, competitor intelligence, and content opportunities.',
     url: '/',
-    siteName: 'Ansvisor',
+    siteName: 'Optumus Analytics',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Ansvisor',
+    title: 'Optumus Analytics',
     description:
-      'Track how AI search engines mention your brand — ChatGPT, Gemini, Perplexity, Claude, Copilot.',
+      'Monitor AI Search & LLM Visibility with enterprise-grade visibility scoring, competitor intelligence, and content opportunities.',
   },
-  // The product app at app.ansvisor.com should not appear in search results;
-  // ansvisor.com (the Webflow marketing site) is the indexable surface.
   robots: {
     index: false,
     follow: false,
@@ -62,7 +60,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${jakarta.variable}`}
+      className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${interTight.variable}`}
     >
       <body suppressHydrationWarning className="font-sans antialiased">
         <PostHogProvider />

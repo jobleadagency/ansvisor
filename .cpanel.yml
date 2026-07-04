@@ -1,0 +1,14 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/$(whoami)/public_html
+    - /bin/bash -lc 'cd /home/$(whoami)/repo && npm --prefix web install && npm --prefix web run build'
+    - /bin/bash -lc 'rsync -a --delete /home/$(whoami)/repo/web/.next /home/$(whoami)/public_html/.next'
+    - /bin/bash -lc 'rsync -a --delete /home/$(whoami)/repo/web/public /home/$(whoami)/public_html/public'
+    - /bin/bash -lc 'rsync -a --delete /home/$(whoami)/repo/web/package.json /home/$(whoami)/public_html/package.json'
+    - /bin/bash -lc 'rsync -a --delete /home/$(whoami)/repo/web/next.config.ts /home/$(whoami)/public_html/next.config.ts'
+    - /bin/bash -lc 'rsync -a --delete /home/$(whoami)/repo/web/src /home/$(whoami)/public_html/src'
+    - /bin/bash -lc 'rsync -a --delete /home/$(whoami)/repo/web/tsconfig.json /home/$(whoami)/public_html/tsconfig.json'
+    - /bin/bash -lc 'rsync -a --delete /home/$(whoami)/repo/web/postcss.config.mjs /home/$(whoami)/public_html/postcss.config.mjs'
+    - /bin/bash -lc 'rsync -a --delete /home/$(whoami)/repo/web/tailwind.config.ts /home/$(whoami)/public_html/tailwind.config.ts'
+    - /bin/bash -lc 'rsync -a --delete /home/$(whoami)/repo/web/.env.local /home/$(whoami)/public_html/.env.local'

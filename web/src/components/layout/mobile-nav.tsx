@@ -67,7 +67,7 @@ export function MobileNav() {
             className="h-6 w-6 shrink-0"
             priority
           />
-          <span className="font-semibold">{siteConfig.name}</span>
+          <span className="text-sm font-semibold tracking-tight">{siteConfig.name}</span>
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto">
           <nav className="space-y-0.5 p-3">

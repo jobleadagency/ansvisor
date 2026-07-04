@@ -1,7 +1,7 @@
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { SignInForm } from '@/components/auth/sign-in-form';
-import { MailCheck } from 'lucide-react';
+import { MailCheck, Sparkles } from 'lucide-react';
 
 export default async function SignInPage({
   searchParams,
@@ -12,10 +12,21 @@ export default async function SignInPage({
   const showVerificationBanner = params.verified === 'pending';
 
   return (
-    <div className="flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
+    <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-[radial-gradient(circle_at_top_left,_rgba(109,94,245,0.12),_transparent_35%)] p-6 md:p-10">
       <div className="flex w-full max-w-sm flex-col gap-6">
         {showVerificationBanner && <VerificationBanner />}
-        <SignInCard />
+        <div className="rounded-2xl border border-border/80 bg-card/90 p-5 shadow-sm backdrop-blur">
+          <div className="mb-5 flex items-center gap-3 text-sm text-muted-foreground">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <Sparkles className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="font-semibold text-foreground">Optumus Analytics</p>
+              <p>Enterprise-grade AI visibility monitoring.</p>
+            </div>
+          </div>
+          <SignInCard />
+        </div>
       </div>
     </div>
   );

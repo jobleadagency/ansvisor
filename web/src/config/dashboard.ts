@@ -6,6 +6,7 @@ import {
   Globe,
   LineChart,
   Quote,
+  Radar,
   ShoppingBag,
   Sparkles,
   Tag,
@@ -102,6 +103,11 @@ export const dashboardNav: NavGroup[] = [
   {
     title: 'Optimization',
     items: [
+      {
+        title: 'Master SEO',
+        href: '/dashboard/master-seo',
+        icon: Radar,
+      },
       {
         title: 'Content Optimization',
         href: '/dashboard/content',

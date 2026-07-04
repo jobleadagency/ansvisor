@@ -85,7 +85,9 @@ export function Sidebar() {
             className="h-6 w-6 shrink-0"
             priority
           />
-          {!isCollapsed && <span className="truncate font-semibold">{siteConfig.name}</span>}
+          {!isCollapsed && (
+            <span className="truncate text-sm font-semibold tracking-tight">{siteConfig.name}</span>
+          )}
         </Link>
       </div>
 
